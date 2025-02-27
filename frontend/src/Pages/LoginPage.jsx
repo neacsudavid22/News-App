@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { authenticateUser, signUpUser } from "../Services/userService.js";
+import { authenticateUser, signUpUser } from "../Services/userService";
 import { useNavigate } from "react-router-dom"; 
 
 const LoginPage = () => {
