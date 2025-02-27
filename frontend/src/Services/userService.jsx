@@ -7,16 +7,14 @@ const authenticateUser = async (username , password) => {
             throw new Error("Failed to authenticate user, either the username or the password is wrong");
         }
 
-        const data = await response.json()
- 
-        return data; 
-
+        return await response.json()
+        
     } catch (err) {
         console.error("authenticateUser error:", err);
     }
 }
 
-const signUpUser = async (email, name ,username , password) => {
+const signUpUser = async (email, name , username, password) => {
     try {
         const response = await fetch(`http://localhost:3600/user-api/user`, {
             method: 'POST',
@@ -35,12 +33,10 @@ const signUpUser = async (email, name ,username , password) => {
             throw new Error("Failed to sign up user");
         }
 
-        const data = await response.json()
- 
-        return data; 
+        return await response.json()
 
     } catch (err) {
-        console.error("getAuthUser error:", err);
+        console.error("signUpUser error:", err);
     }
 }
 

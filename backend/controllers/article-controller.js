@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import Article from '../models/Article.js';
 
 async function getArticles(){
@@ -14,8 +13,7 @@ async function getArticles(){
 
 async function getArticleById(id){
     try{
-        const data = await Article.findById(id)
-        return data
+        return await Article.findById(id)
     }
     catch (err) {
         console.error(`getArticlesById Error: ${err.message}`);
@@ -25,8 +23,7 @@ async function getArticleById(id){
 
 async function createArticle(article){
     try{
-        const data = await Article.create(article)
-        return { message: `Article ${data._id} succesfully created`, result: data }
+        return data = await Article.create(article)
     }
     catch (err) {
         console.error(`createArticle Error: ${err.message}`);
@@ -36,8 +33,7 @@ async function createArticle(article){
 
 async function deleteArticle(id){
     try{
-        const data = await Article.deleteOne({_id: id})
-        return { message: `Article succesfully deleted`, result: data }
+        return await Article.deleteOne({_id: id})
     }
     catch (err) {
         console.error(`deleteArticle Error: ${err.message}`);
@@ -47,8 +43,7 @@ async function deleteArticle(id){
 
 async function updateArticle(id, article){
     try{
-        const data = await Article.updateOne({_id: id}, article)
-        return { message: `Article succesfully updated`, result: data }
+        return await Article.updateOne({_id: id}, article)
     }
     catch (err) {
         console.error(`updateArticle Error: ${err.message}`);

@@ -20,7 +20,6 @@ app.listen(port, ()=>{
 });
 
 //routes
-
 app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);
 app.use('/post-api', postsRouter);

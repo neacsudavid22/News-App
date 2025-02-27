@@ -14,7 +14,7 @@ const LoginPage = () => {
 
     const handleLogin = async () => {
         try{
-            const user = await authenticateUser(username, password);
+            const user = login ? await authenticateUser(username, password) : signUpUser(email, name, username, password);
             setCurrentUser(user);
             console.log("current user", currentUser)
             if (user) {
@@ -25,20 +25,6 @@ const LoginPage = () => {
         }
         catch(err){
             console.error("Error at LogIn:", err)
-        }
-    }
-
-    const handleSignUp = async () => {
-        try{
-            const user = await signUpUser(email, name, username, password);
-            setCurrentUser(user);
-            console.log("current user", currentUser)
-            if (user) {
-                navigate("/home", { replace: true }); 
-            }
-        }
-        catch(err){
-            console.error("Error at Sign up:", err)
         }
     }
 
@@ -123,7 +109,7 @@ const LoginPage = () => {
                     <input type="password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <button type="button" onClick={() => handleSignUp()}>Sign Up</button>
+                    <button type="button" onClick={() => handleLogin()}>Sign Up</button>
                 </form>
  
                 <label>I want to log in</label>

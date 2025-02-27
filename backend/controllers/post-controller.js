@@ -1,10 +1,8 @@
-import mongoose from 'mongoose';
 import Post from '../models/Post.js';
 
 async function getPosts(){
     try{
-        const data = await Post.find()
-        return data
+        return await Post.find()
     }
     catch (err) {
         console.error(`getPosts Error: ${err.message}`);
@@ -14,8 +12,7 @@ async function getPosts(){
 
 async function getPostById(id){
     try{
-        const data = await Post.findById(id)
-        return data
+        return await Post.findById(id)
     }
     catch (err) {
         console.error(`getPostsById Error: ${err.message}`);
@@ -25,8 +22,7 @@ async function getPostById(id){
 
 async function createPost(post){
     try{
-        const data = await Post.create(post)
-        return { message: `Post ${data._id} succesfully created`, result: data }
+        return await Post.create(post)
     }
     catch (err) {
         console.error(`createPost Error: ${err.message}`);
@@ -36,8 +32,7 @@ async function createPost(post){
 
 async function deletePost(id){
     try{
-        const data = await Post.deleteOne({_id: id})
-        return { message: `Post succesfully deleted`, result: data }
+        return await Post.deleteOne({_id: id})
     }
     catch (err) {
         console.error(`deletePost Error: ${err.message}`);
@@ -47,8 +42,7 @@ async function deletePost(id){
 
 async function updatePost(id, post){
     try{
-        const data = await Post.updateOne({_id: id}, post)
-        return { message: `Post succesfully updated`, result: data }
+        return await Post.updateOne({_id: id}, post)
     }
     catch (err) {
         console.error(`updatePost Error: ${err.message}`);

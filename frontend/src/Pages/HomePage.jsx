@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 
 const HomePage = () => {
     const location = useLocation();
-    const user  = location.state?.user;
+    const user = location.state?.user;
 
     return(
         <>
