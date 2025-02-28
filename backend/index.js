@@ -1,17 +1,18 @@
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 import connectDB from './config/db.js'
 import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
 import postsRouter from './routes/post-routes.js';
 
-const app = express();
-
+dotenv.config();
 // Conectează la MongoDB
 await connectDB();
 
-app.use(cors());
+const app = express();
 app.use(express.json());
+app.use(cors());
 
 //start server
 const port = process.env.PORT;

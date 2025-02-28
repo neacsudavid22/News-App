@@ -1,29 +1,40 @@
 import Article from '../models/Article.js';
 
-async function getArticles(){
+const getArticles = async () => {
     try{
-        const data = await Article.find()
-        return data
+        const articles = await Article.find()
+        if (articles.length === 0) {
+            return { error: true, message: "No articles found" };
+        }
+        return articles;
     }
     catch (err) {
         console.error(`getArticles Error: ${err.message}`);
-        process.exit(1);
+        return { error: true, message: "Internal Server Error" };
     }
 }
 
-async function getArticleById(id){
+const getArticleById = async (id) => {
     try{
-        return await Article.findById(id)
+        const article = await Article.findById(id)
+        if(!article){
+            return { error: true, message: "Article not found" };
+        }
+        return article
     }
     catch (err) {
-        console.error(`getArticlesById Error: ${err.message}`);
-        process.exit(1);
+        console.error(`getArticleById Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
     }
 }
 
-async function createArticle(article){
+const createArticle = async (article) => {
     try{
-        return data = await Article.create(article)
+        const newArticle = await Article.create(article)
+        if(!newArticle){
+            return { error: true, message: "Error creating article" };
+        }
+        return newArticle;
     }
     catch (err) {
         console.error(`createArticle Error: ${err.message}`);
@@ -31,23 +42,31 @@ async function createArticle(article){
     }
 }
 
-async function deleteArticle(id){
+const deleteArticle = async (id) => {
     try{
-        return await Article.deleteOne({_id: id})
+        const deletedArticle = await Article.deleteOne({_id: id})
+        if(!deletedArticle){
+            return { error: true, message: "Error deleting article" };
+        }
+        return deletedArticle;
     }
     catch (err) {
         console.error(`deleteArticle Error: ${err.message}`);
-        process.exit(1);
+        return { error: true, message: "Internal Server Error" };
     }
 }
 
-async function updateArticle(id, article){
+const updateArticle = async (id, article) => {
     try{
-        return await Article.updateOne({_id: id}, article)
+        const updatedArticle = await  Article.updateOne({_id: id}, article)
+        if(!updatedArticle){
+            return { error: true, message: "Error updating article" };
+        }
+        return updatedArticle;
     }
     catch (err) {
         console.error(`updateArticle Error: ${err.message}`);
-        process.exit(1);
+        return { error: true, message: "Internal Server Error" };
     }
 }
 

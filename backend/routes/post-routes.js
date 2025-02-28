@@ -4,23 +4,50 @@ import { getPosts, getPostById, createPost, deletePost, updatePost } from '../co
 const postsRouter = express.Router()
 
 postsRouter.route('/post').get(async (req, res) => {
-    res.status(200).json(await getPosts())
-})
+    const result = await getPosts();
 
-postsRouter.route('/post/:id').get(async (req, res) => {
-    res.status(200).json(await getPostById(req.params.id))
+    if (result.error) {
+        return res.status(400).json({ message: result.message });
+    }
+
+    return res.status(200).json(result);
 })
 
 postsRouter.route('/post').post(async (req, res) => {
-    res.status(200).json(await createPost(req.body))
+    const result = await createPost(req.body);
+
+    if (result.error) {
+        return res.status(400).json({ message: result.message });
+    }
+
+    return res.status(200).json(result);
+})
+
+postsRouter.route('/post/:id').get(async (req, res) => {
+    const result = await getPostById(req.params.id)
+    if (result.error) {
+        return res.status(400).json({ message: result.message });
+    }
+
+    return res.status(200).json(result);
 })
 
 postsRouter.route('/post/:id').delete(async (req, res) => {
-    res.status(200).json(await deletePost(req.params.id))
+    const result = await deletePost(req.params.id)
+    if (result.error) {
+        return res.status(400).json({ message: result.message });
+    }
+
+    return res.status(200).json(result);
 })
 
 postsRouter.route('/post/:id').put(async (req, res) => {
-    res.status(200).json(await updatePost(req.params.id, req.body))
+    const result = await updatePost(req.params.id, req.body);
+    if (result.error) {
+        return res.status(400).json({ message: result.message });
+    }
+
+    return res.status(200).json(result);
 })
 
 export default postsRouter;
