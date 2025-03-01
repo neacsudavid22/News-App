@@ -9,14 +9,17 @@ function HomePage() {
   const handleLogout = () => {
     removeToken(); 
     setUser(null); // Clear user in context
-    navigate("/"); // Redirect to login
+  }
+
+  const handleLogin = () => {
+    navigate("/login"); // Redirect to login
   };
 
   return (
     <div>
       <h2>Home Page</h2>
       {user ? <p>Welcome, {user.username}!</p> : <p>Loading...</p>}
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={user ? handleLogout : handleLogin}>{user ? "Logout" : "Login"}</button>
     </div>
   );
 }
