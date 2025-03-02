@@ -15,7 +15,11 @@ const Article = model('Article', new Schema({
     minlength: 3
   },
   category: { type: String, required: true },
-  tags: { type: [String], default: [] },
+  tags: { 
+    type: [String],
+    enum: ['politics', 'extern', 'finance', 'sports', 'tech', 'lifestyle'],
+    default: [] 
+    },
   articleContent: [{
     _id: false,
     content: String,

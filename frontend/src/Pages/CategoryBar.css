@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap');
+
+.custom-tabs .nav-link{
+    color: black !important; /* Default text color */
+    font-family: lexend, sans-serif !important; 
+    font-size: large !important; 
+    font-weight: bold !important;
+}
+
+.customFont{
+    font-family: lexend, sans-serif !important; 
+    font-size: large !important; 
+    font-weight: bold !important;
+}
+
+.custom-tabs .nav-link.active {
+    background-color: #f8f9fa !important; /* Active tab matches page */
+    color: black !important; /* Keep text black */
+    font-size: large !important; 
+    font-weight: bolder !important;
+}
