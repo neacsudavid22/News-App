@@ -1,7 +1,5 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../Components/AuthProvider";
-import Tabs from 'react-bootstrap/Tabs';
-import Tab from 'react-bootstrap/Tab';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { Link, NavLink } from 'react-router-dom';
@@ -23,7 +21,6 @@ const CategoryBar = () => {
 
   const handleCategoryChange = (category) => {
     setCategory(category);
-    console.log("Category changed to:", CATEGORIES[category]?.[0]);
   }
 
   const handleTitle = (title) => {
@@ -37,11 +34,11 @@ const CategoryBar = () => {
   }
 
   return (
-    <Container fluid className="vh-100 bg-light p-0">
-     <Navbar bg="dark" variant="dark" expand="lg" className="w-100 p-2">
-      <Container fluid className="d-flex justify-content-between ">
-  
-          <Navbar.Brand as={Link} to="/" >NewsApp</Navbar.Brand>
+    <Container fluid className="p-0">
+      {/* First Navbar */}
+      <Navbar bg="dark" variant="dark" expand="lg" className="w-100 p-2">
+        <Container fluid className="d-flex justify-content-between">
+          <Navbar.Brand as={Link} to="/">NewsApp</Navbar.Brand>
           <div className="d-flex align-items-center">
             {user ? (
               <>
@@ -52,24 +49,38 @@ const CategoryBar = () => {
               <Nav.Link className="text-light pr-2" as={NavLink} to="/login">Login</Nav.Link>
             )}
           </div>
-      </Container>
-    </Navbar>
+        </Container>
+      </Navbar>
 
-        <Tabs
-          defaultActiveKey="allNews"
-          id="category-tabs"
-          className="custom-tabs mb-3"
-          style={{background: CATEGORIES[category]?.[0] || "gray"}}
-          fill
-          transition
-          variant="tabs"
-          onSelect={(selectedKey) => handleCategoryChange(selectedKey)} 
-        > 
-          {Object.keys(CATEGORIES).map((key) => (
-            <Tab key={key} eventKey={key} title={handleTitle(key)} tabClassName="tab-custom" />
-        ))}
-        </Tabs> 
-      </Container>
+      {/* Second Navbar (Tabs) */}
+      <Navbar style={{ background: CATEGORIES[category]?.[0] || "gray" }} expand="lg" 
+              className="w-100 px-3 py-2 p-lg-0"
+      >
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse className="py-1 p-lg-0">
+          <Nav 
+            variant="tabs" 
+            activeKey={category} 
+            className="custom-tabs py-1 py-lg-0 w-100 d-flex  justify-content-around"
+            onSelect={(selectedKey) => handleCategoryChange(selectedKey)}
+            style={{ background: CATEGORIES[category]?.[0] || "gray" }} 
+          >
+            {Object.keys(CATEGORIES).map((key) => (
+              <Nav.Item key={key}>
+                <Nav.Link 
+                  eventKey={key} 
+                  className="tab-custom"
+                  style={{ color: key === category ? "black" : "whitesmoke" }} 
+                >
+                  {handleTitle(key)}
+                </Nav.Link>
+              </Nav.Item>
+            ))}
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+    </Container>
+
   );
 }
 
