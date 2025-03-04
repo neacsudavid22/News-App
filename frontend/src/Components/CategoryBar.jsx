@@ -9,6 +9,7 @@ import "./CategoryBar.css"
 const CategoryBar = () => {
   const { user, setUser, removeToken } = useContext(AuthContext); // Access context
   const [category, setCategory] = useState('allNews');  
+  
   const CATEGORIES = {
     allNews: ["gray"] ,
     politics: ["red"],
