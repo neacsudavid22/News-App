@@ -61,13 +61,15 @@ usersRouter.route('/login').post(async (req, res) => {
     return res.status(200).json(result);
 })
 
-usersRouter.route('/token').get( async (req, res) => {
-    const result = await getUserWithToken(req.headers.authorization.split(" ")[1]);
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+usersRouter.route('/token').get(authMiddleware,  async (req, res) => {
+    const user = req.user;
+    return res.status(200).json(user);
+    // const result = await getUserWithToken(req.headers.authorization.split(" ")[1]);
+    // if (result.error) {
+    //     return res.status(400).json({ message: result.message });
+    // }
 
-    return res.status(200).json(result);
+    // return res.status(200).json(result);
 })
 
 export default usersRouter;

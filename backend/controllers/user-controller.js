@@ -90,13 +90,14 @@ const loginUser = async (username, password) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return { error: true, message: "Invalid password" };
 
+        const tokenUser = await User.findOne({ username }).select("-password").exec();
         // Generate JWT token
         const token = jwt.sign(
-            { id: user._id }, process.env.JWT_SECRET, { expiresIn: "3h" }
+            { user: tokenUser }, process.env.JWT_SECRET, { expiresIn: "1h" }
         );
 
         if(!token) return { error: true, message: "Error generating token" };
-
+        //req.cookies.token = token;
         return { token };
 
     } catch (err) {

@@ -10,6 +10,11 @@ dotenv.config();
 // Conectează la MongoDB
 await connectDB();
 
+const corsOptions = {
+    // TO-DO cookies
+}
+
+
 const app = express();
 app.use(express.json());
 app.use(cors());
