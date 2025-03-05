@@ -110,6 +110,16 @@ const ArticleUploaderPage = () => {
             handleEdit(index)
         }
     };
+
+    const removeSelectedComponent = (index) => {
+            const newArticle = [...article];
+            newArticle.splice(index, 1)
+            setArticle(newArticle);
+
+            const newEdit = [...edit]
+            newEdit.splice(index, 1)
+            setEdit(newEdit)
+    };
     
     const handleEdit = (index) => {
         const newEdit = [...edit]; // Creează un nou array (evită mutația directă)
@@ -161,12 +171,18 @@ const ArticleUploaderPage = () => {
                                 { edit[index] ? renderSelectedComponent(index, item.content) 
                                     : <Image src={item.content} alt="Article Image" thumbnail className="p-2 my-2" /> }
 
-                                { edit[index] ? null : <Button variant="outline-success" type="button" 
+                                { edit[index] ? null : <Stack direction="horizontal" gap={2}>
+                                                        <Button variant="outline-success" type="button" 
                                                             onClick={() => { 
                                                                 setSelectedComponent(dict[item.contentType]); 
                                                                 handleEdit(index); 
                                                             }}>Modify
-                                                        </Button> }
+                                                        </Button>
+                                                        <Button variant="danger" type="button" 
+                                                            onClick={() => { 
+                                                                removeSelectedComponent(index); 
+                                                            }}>Remove</Button>
+                                                        </Stack> }
                             </div>
                         );
                     } else {
@@ -175,13 +191,17 @@ const ArticleUploaderPage = () => {
                                 { edit[index] ? renderSelectedComponent(index, item.content) 
                                     : React.createElement(item.contentType, { className: "p-2 my-2" }, item.content) }
 
-                                { edit[index] ? null : <Button variant="outline-success" type="button" 
+                                { edit[index] ? null : <Stack direction="horizontal" gap={2}>
+                                                        <Button variant="outline-success" type="button" 
                                                             onClick={() => { 
                                                                 setSelectedComponent(dict[item.contentType]); 
                                                                 handleEdit(index); 
-                                                            }}>Modify
-                                                        </Button> }
-                                
+                                                            }}>Modify</Button> 
+                                                        <Button variant="danger" type="button" 
+                                                            onClick={() => { 
+                                                                removeSelectedComponent(index); 
+                                                            }}>Remove</Button>
+                                                        </Stack> }
                             </div>
                         );
                     }
