@@ -19,7 +19,8 @@ const ArticleUploaderPage = () => {
     const AddImage = ({ index, content = null }) => {
         const [imageUrl, setImageUrl] = useState(content);
         return (
-            <Stack direction="horizontal" className="justify-content-start" gap={3}>
+            <Stack direction="vertical" className="justify-content-start" gap={3}>
+                <Stack direction="horizontal" gap={3}>
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Image</b></Form.Label>
                     <Form.Control
@@ -29,11 +30,13 @@ const ArticleUploaderPage = () => {
                     />
                 </Form.Group>
 
-                {imageUrl && <Image src={imageUrl} thumbnail className="mb-3" />}
-
                 <Button variant={content ? "outline-success" : "primary"} type="button" onClick={() => addSelectedComponent("Image", imageUrl, index)}>
                     {content ? "Save" : "Add Image"}
                 </Button>
+
+                </Stack>
+                {imageUrl && <Image src={imageUrl} thumbnail className="mb-3" />}
+
             </Stack>
         );
     };
