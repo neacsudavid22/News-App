@@ -4,13 +4,19 @@ import { getArticles, getArticleById, createArticle, deleteArticle, updateArticl
 const articlesRouter = express.Router()
 
 articlesRouter.route('/article').get(async (req, res) => {
-    const result = await getArticles();
+    try {
+        const category = req.query.category; 
+        const result = await getArticles(category); 
 
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(`Error fetching users: ${err.message}`);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
-
-    return res.status(200).json(result);
 })
 
 articlesRouter.route('/article/:id').get(async (req, res) => {

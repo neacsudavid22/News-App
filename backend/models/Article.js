@@ -14,12 +14,15 @@ const Article = model('Article', new Schema({
     required: [true, "Author is required"],
     minlength: 3
   },
-  category: { type: String, required: true },
+  category: { 
+    type: String,
+    enum: ['politics', 'extern', 'finance', 'sports', 'tech', 'lifestyle'],
+    required: true },
   tags: { 
     type: [String],
-    enum: ['politics', 'extern', 'finance', 'sports', 'tech', 'lifestyle'],
     default: [] 
     },
+  backgroundUrl: String,
   articleContent: [{
     _id: false,
     content: String,

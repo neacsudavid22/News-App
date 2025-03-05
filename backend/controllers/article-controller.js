@@ -1,8 +1,9 @@
 import Article from '../models/Article.js';
 
-const getArticles = async () => {
+const getArticles = async (filterCategory) => {
     try{
-        const articles = await Article.find()
+        const articles = filterCategory ? await Article.where("category").equals(filterCategory).exec()
+                                        : await Article.find().exec() 
         if (articles.length === 0) {
             return { error: true, message: "No articles found" };
         }
