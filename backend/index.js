@@ -10,17 +10,19 @@ dotenv.config();
 // Conectează la MongoDB
 await connectDB();
 
-const corsOptions = {
-    // TO-DO cookies
-}
-
+const port = process.env.PORT;
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const corsOptions = {
+    origin:[`http://localhost:${port}`],
+    methods:['GET','POST'],
+    credentials: true 
+  }
+app.use(cors(corsOptions));
 
 //start server
-const port = process.env.PORT;
 app.listen(port, ()=>{
     console.log(`server running on port: ${port}`);
 });

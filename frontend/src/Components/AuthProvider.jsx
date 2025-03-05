@@ -4,7 +4,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(() => sessionStorage.getItem("token"));
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -17,8 +17,8 @@ const AuthProvider = ({ children }) => {
 
         if (!response.ok) throw new Error("Failed to fetch user");
 
-        const userData = await response.json();
-        setUser(userData);
+        const {user} = await response.json();
+        setUser(user);
       } catch (error) {
         console.error("Error fetching user:", error);
         removeToken();
@@ -29,12 +29,12 @@ const AuthProvider = ({ children }) => {
   }, [token]); 
 
   const saveToken = (newToken) => {
-    localStorage.setItem("token", newToken);
+    sessionStorage.setItem("token", newToken);
     setToken(newToken); // Triggers fetchUser via useEffect
   };
 
   const removeToken = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setUser(null);
     setToken(null);
   };

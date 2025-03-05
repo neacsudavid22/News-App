@@ -82,7 +82,6 @@ const updateUser = async (id, user) => {
 
 const loginUser = async (username, password) => {
     try {
-        // Find user in DB
         const user = await User.findOne({ username }).exec();
         if (!user) return { error: true, message: "User doesn't exist" };
 
@@ -90,31 +89,19 @@ const loginUser = async (username, password) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return { error: true, message: "Invalid password" };
 
-        const tokenUser = await User.findOne({ username }).select("-password").exec();
+        const userObj = user.toObject();
+        delete userObj.password;
+
         // Generate JWT token
         const token = jwt.sign(
-            { user: tokenUser }, process.env.JWT_SECRET, { expiresIn: "1h" }
+            { user: userObj }, process.env.JWT_SECRET, { expiresIn: "1h" }
         );
 
         if(!token) return { error: true, message: "Error generating token" };
-        //req.cookies.token = token;
         return { token };
 
     } catch (err) {
         console.error("Error with login:", err);
-        return { error: true, message: "Internal Server Error" };
-    }
-};
-
-const getUserWithToken = async (token) => {
-    try {
-        const decode = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findOne({ _id: decode.id }).select("-password").exec();
-        if (!user) return { error: true, message: "User doesn't exist" };
-        return user;
-
-    } catch (err) {
-        console.error("Error with getting user via token:", err);
         return { error: true, message: "Internal Server Error" };
     }
 };
@@ -125,6 +112,5 @@ export {
     createUser,
     deleteUser,
     updateUser,
-    loginUser,
-    getUserWithToken
+    loginUser
 }
