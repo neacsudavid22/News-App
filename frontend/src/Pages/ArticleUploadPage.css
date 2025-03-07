@@ -1,0 +1,10 @@
+.nav-pills .nav-link {
+    background-color:  rgb(113, 113, 113); /* Bootstrap primary color */
+    color: white !important;
+    
+}
+
+.nav-pills .nav-item {
+    margin-right: 10px;  
+    margin-top: 10px;
+}

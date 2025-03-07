@@ -3,7 +3,8 @@ import LoginPage from "./Pages/LoginPage";
 import HomePage from "./Pages/HomePage";
 import { AuthProvider } from "./Components/AuthProvider"; 
 import "bootstrap/dist/css/bootstrap.min.css";
-import ArticleUploaderPage from "./Pages/ArticleUploaderPage";
+import ArticleEditorPage from "./Pages/ArticleEditorPage";
+import ArticleUploadPage from "./Pages/ArticleUploadPage";
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<HomePage />} />
-          <Route path="/author" element={<ArticleUploaderPage />} />
+          <Route path="/author" element={<ArticleEditorPage />} />
+          <Route path="/upload" element={<ArticleUploadPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

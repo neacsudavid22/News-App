@@ -27,6 +27,8 @@ app.listen(port, ()=>{
     console.log(`server running on port: ${port}`);
 });
 
+app.use('/uploads', express.static('uploads'));
+
 //routes
 app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);

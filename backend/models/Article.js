@@ -28,7 +28,7 @@ const Article = model('Article', new Schema({
     content: String,
     contentType: {
       type: String,
-      enum: ['p', 'h2', 'imgUrl', 'galleryUrl'], // others to come
+      enum: ['p', 'h2', 'Image'], // others to come
       default: 'p'
     }
   }]

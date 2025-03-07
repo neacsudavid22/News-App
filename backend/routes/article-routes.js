@@ -1,5 +1,6 @@
 import express from 'express';
 import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle } from '../controllers/article-controller.js'
+import upload from '../fileUpload.js';
 
 const articlesRouter = express.Router()
 
@@ -38,6 +39,7 @@ articlesRouter.route('/article/:id').delete(async (req, res) => {
 })
 
 articlesRouter.route('/article').post(async (req, res) => {
+ 
     const result = await createArticle(req.body);
 
     if (result.error) {

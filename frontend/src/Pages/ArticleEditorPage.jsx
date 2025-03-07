@@ -8,43 +8,59 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
-import React from "react"
+import { useNavigate } from "react-router";
 
-const ArticleUploaderPage = () => {
+const ArticleEditorPage = () => {
     const [selectedComponent, setSelectedComponent] = useState("addParagraph");
     const [title, setTitle] = useState("");
-    const [article, setArticle] = useState([]);
+    const [articleContent, setArticleContent] = useState([]);
     const [edit, setEdit] = useState([]); // Starea pentru editare
+    const navigate = useNavigate();
+    const [articleImages, setArticleImages] = useState([]);
 
     const AddImage = ({ index, content = null }) => {
-        const [imageUrl, setImageUrl] = useState(content);
+        const [imagePreviewUrl, setImagePreviewUrl] = useState(content);
+        const [file, setFile] = useState(null)
+
         return (
-            <Stack direction="vertical" className="justify-content-start" gap={3}>
-                <Stack direction="horizontal" gap={3}>
+            <Stack direction="vertical"  gap={3}>
+                
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Image</b></Form.Label>
                     <Form.Control
                         type="file"
                         accept="image/*"
-                        onChange={(e) => setImageUrl(URL.createObjectURL(e.target.files[0]))}
+                        onChange={ (e) => {
+                            setImagePreviewUrl(URL.createObjectURL(e.target.files[0]));
+                            setFile(e.target.files[0])
+                        } }
                     />
                 </Form.Group>
 
-                <Button variant={content ? "outline-success" : "primary"} type="button" onClick={() => addSelectedComponent("Image", imageUrl, index)}>
-                    {content ? "Save" : "Add Image"}
-                </Button>
+                <Stack direction="horizontal" gap={3} className="justify-content-between me-5">
 
-                </Stack>
-                {imageUrl && <Image src={imageUrl} thumbnail className="mb-3" />}
+                    {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />}
+
+                    <Button variant={content ? "outline-success" : "primary"} type="button" 
+                        onClick={async () => {
+                                setArticleImages([...articleImages, file])
+                                console.log(file)
+                                console.log(articleImages)
+                                addSelectedComponent("Image", imagePreviewUrl, index)
+                            }}>
+                        {content ? "Save" : "Add Image"}
+                    </Button>
+                    
+                </Stack>    
 
             </Stack>
         );
     };
 
     const AddHeader = ({ index, content = null }) => {
-        const [header, setHeader] = useState(content);
+        const [header, setHeader] = useState(content || "");
         return (
-            <Stack direction="horizontal" className="justify-content-start" gap={3}>
+            <Stack direction="horizontal" className="justify-content-between" gap={3}>
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Header</b></Form.Label>
                     <Form.Control
@@ -63,9 +79,9 @@ const ArticleUploaderPage = () => {
     };
 
     const AddParagraph = ({ index, content = null }) => {
-        const [paragraph, setParagraph] = useState(content);
+        const [paragraph, setParagraph] = useState(content || "");
         return (
-            <Stack direction="horizontal" className=" justify-content-start" gap={3}>
+            <Stack direction="horizontal" className=" justify-content-between" gap={3}>
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Paragraph</b></Form.Label>
                     <Form.Control
@@ -100,25 +116,37 @@ const ArticleUploaderPage = () => {
     };
 
     const addSelectedComponent = (contentType, content, index) => {
-        if (content.trim() && index === undefined) {
-            setArticle([...article, { contentType, content }]);
+        if(contentType !=="Image") content = content.trim();
+
+        if (content !== "" && index === undefined) {
+            setArticleContent([...articleContent, { contentType, content }]);
             setEdit([...edit, false]); // Inițializează `edit` pentru noul element
-        } else {
-            const newArticle = [...article];
+        } else if(content !== "" && index !== undefined){ 
+            const newArticle = [...articleContent];
             newArticle[index] = { contentType, content };
-            setArticle(newArticle);
+            setArticleContent(newArticle);
             handleEdit(index)
         }
+        return 0;   
     };
 
     const removeSelectedComponent = (index) => {
-            const newArticle = [...article];
+
+            if(articleContent[index].contentType === "Image"){
+                const images = [...articleImages];
+                images.splice(index, 1);
+                setArticleImages(images);
+            }
+
+            const newArticle = [...articleContent];
             newArticle.splice(index, 1)
-            setArticle(newArticle);
+            setArticleContent(newArticle);
 
             const newEdit = [...edit]
             newEdit.splice(index, 1)
             setEdit(newEdit)
+
+            console.log(articleImages)
     };
     
     const handleEdit = (index) => {
@@ -129,8 +157,7 @@ const ArticleUploaderPage = () => {
     };
 
     const handleSubmit = () => {
-        return 0;
-        //to-do
+        navigate("/upload", { state: {articleContent, title}});
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
@@ -164,51 +191,38 @@ const ArticleUploaderPage = () => {
             <h2>Article Preview:</h2>
             <Stack direction="vertical" gap={2} className="justify-content-center border p-3">
                 <h1>{title}</h1>
-                {article.map((item, index) => {
-                    if (item.contentType === "Image") {
-                        return (
-                            <div key={index}>
+                { articleContent.map( (item, index) => {
+                    const Tag = item.contentType;
+                    return (
+                            <div key={index} className="d-flex justify-content-between">
                                 { edit[index] ? renderSelectedComponent(index, item.content) 
-                                    : <Image src={item.content} alt="Article Image" thumbnail className="p-2 my-2" /> }
+                                    : <>
+                                       {
+                                        Tag === "Image" ? 
+                                            <Image src={item.content} alt="Article Image" thumbnail className="w-50 p-2 my-2" /> 
+                                            : <Tag className="p-2 my-2">{item.content}</Tag>
+                                       }
 
-                                { edit[index] ? null : <Stack direction="horizontal" gap={2}>
-                                                        <Button variant="outline-success" type="button" 
-                                                            onClick={() => { 
-                                                                setSelectedComponent(dict[item.contentType]); 
-                                                                handleEdit(index); 
-                                                            }}>Modify
-                                                        </Button>
-                                                        <Button variant="danger" type="button" 
-                                                            onClick={() => { 
-                                                                removeSelectedComponent(index); 
-                                                            }}>Remove</Button>
-                                                        </Stack> }
+                                       <Stack direction="horizontal" gap={2} className="mx-5">
+                                        <Button variant="outline-success" type="button" 
+                                            onClick={() => { 
+                                                setSelectedComponent(dict[item.contentType]); 
+                                                handleEdit(index); 
+                                            }}>Modify
+                                        </Button>
+                                        <Button variant="danger" type="button" 
+                                            onClick={() => { 
+                                                removeSelectedComponent(index); 
+                                            }}>Remove</Button>
+                                        </Stack>
+                                    </> }
                             </div>
                         );
-                    } else {
-                        return (
-                            <div key={index}>
-                                { edit[index] ? renderSelectedComponent(index, item.content) 
-                                    : React.createElement(item.contentType, { className: "p-2 my-2" }, item.content) }
-
-                                { edit[index] ? null : <Stack direction="horizontal" gap={2}>
-                                                        <Button variant="outline-success" type="button" 
-                                                            onClick={() => { 
-                                                                setSelectedComponent(dict[item.contentType]); 
-                                                                handleEdit(index); 
-                                                            }}>Modify</Button> 
-                                                        <Button variant="danger" type="button" 
-                                                            onClick={() => { 
-                                                                removeSelectedComponent(index); 
-                                                            }}>Remove</Button>
-                                                        </Stack> }
-                            </div>
-                        );
-                    }
-                })}
+                    })
+                }
             </Stack>
 
-            <Button variant="primary" type="button" className="my-4" onSubmit={handleSubmit}>
+            <Button variant="primary" type="button" className="my-4" onClick={handleSubmit}>
                 Post Article
             </Button>
         </Col>
@@ -217,4 +231,4 @@ const ArticleUploaderPage = () => {
     );
 };
 
-export default ArticleUploaderPage;
+export default ArticleEditorPage;

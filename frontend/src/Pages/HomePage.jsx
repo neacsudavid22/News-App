@@ -6,6 +6,7 @@ import { Link, NavLink } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Stack from 'react-bootstrap/Stack';
 import "./HomePage.css";
+import Button from "react-bootstrap/Button"
 import ArticleViewCard from "../Components/ArticleViewCard";
 import { getArticles } from "../Services/articleService";
 
@@ -60,7 +61,9 @@ const CategoryBar = () => {
       {/* First Navbar */}
       <Navbar bg="dark" variant="dark" expand="lg" className="w-100 p-2">
         <Container fluid className="d-flex justify-content-between">
-          <Navbar.Brand as={Link} to="/">NewsApp</Navbar.Brand>
+          <Badge bg="secondary" as={Button}>
+            NewsWebApp
+          </Badge>
           <div className="d-flex align-items-center">
             {user ? (
               <>
