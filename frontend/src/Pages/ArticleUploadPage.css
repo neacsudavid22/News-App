@@ -8,3 +8,7 @@
     margin-right: 10px;  
     margin-top: 10px;
 }
+
+.sticky-top-offset {
+    top: 56px;
+}
