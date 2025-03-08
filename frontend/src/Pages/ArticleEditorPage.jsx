@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
@@ -9,6 +9,9 @@ import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
 import { useNavigate } from "react-router";
+import MainNavbar from "../Components/MainNavBar";
+import Modal from "react-bootstrap/Modal";
+import "./ArticleEditorPage.css"
 
 const ArticleEditorPage = () => {
     const [selectedComponent, setSelectedComponent] = useState("addParagraph");
@@ -18,13 +21,14 @@ const ArticleEditorPage = () => {
     const navigate = useNavigate();
     const [articleImages, setArticleImages] = useState([]);
 
+    // this is not the main component, scroll down
     const AddImage = ({ index, content = null }) => {
         const [imagePreviewUrl, setImagePreviewUrl] = useState(content);
         const [file, setFile] = useState(null)
 
         return (
-            <Stack direction="vertical"  gap={3}>
-                
+            <>
+            <Stack direction="horizontal" className="justify-content-between" gap={3} >
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Image</b></Form.Label>
                     <Form.Control
@@ -54,6 +58,7 @@ const ArticleEditorPage = () => {
                 </Stack>    
 
             </Stack>
+            </>
         );
     };
 
@@ -157,16 +162,32 @@ const ArticleEditorPage = () => {
     };
 
     const handleSubmit = () => {
-        navigate("/upload", { state: {articleContent, title}});
+        if(title.length < 10) handleShow()
+        else navigate("/upload", { state: {articleContent, title, articleImages}});
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
     const dict = {p:"addParagraph", h2: "addHeader", Image: "addImage"};
 
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [innerWidth, setInnerWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setInnerWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
-        <Container fluid className="d-flex justify-content-center vh-100 pt-5">
+        <>
+        <MainNavbar/>
+
+        <Container fluid className="d-flex justify-content-center h-100 pt-4">
         <Row className="w-100 justify-content-center">
-        <Col sm={12} md={10} lg={8} xl={6}> {/* Responsive form width */}
+        <Col sm={11} md={10} lg={8} xl={6}> {/* Responsive form width */}
             <h1 className="mb-4">Article Redactation Form</h1>
             <Form className="justify-content-center">
                 <Form.Group className="mb-3">
@@ -175,16 +196,16 @@ const ArticleEditorPage = () => {
                 </Form.Group>
             </Form>
 
-            <Container className="justify-content-center w-100 sticky-top bg-white pt-2">
+            <Container className="justify-content-center w-100 sticky-top sticky-offset py-2 bg-white border-bottom">
 
-                <Tabs fill activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 my-2">
+                <Tabs fill activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 mb-2 ">
                     <Tab eventKey="addParagraph" title="Paragraph" />
                     <Tab eventKey="addImage" title="Image" />
                     <Tab eventKey="addHeader" title="Header" />
                     <Tab eventKey="hideContent" title="Hide" />
                 </Tabs>
 
-                { EDIT_MODE ? null : renderSelectedComponent() } <hr/>
+                { EDIT_MODE ? null : renderSelectedComponent() } 
             </Container>
 
             <br />
@@ -194,16 +215,16 @@ const ArticleEditorPage = () => {
                 { articleContent.map( (item, index) => {
                     const Tag = item.contentType;
                     return (
-                            <div key={index} className="d-flex justify-content-between">
+                            <div key={index} className="d-flex justify-content-between py-2 border-top">
                                 { edit[index] ? renderSelectedComponent(index, item.content) 
                                     : <>
                                        {
                                         Tag === "Image" ? 
                                             <Image src={item.content} alt="Article Image" thumbnail className="w-50 p-2 my-2" /> 
-                                            : <Tag className="p-2 my-2">{item.content}</Tag>
+                                            : <Tag className="w-100 p-2 ">{item.content}</Tag>
                                        }
 
-                                       <Stack direction="horizontal" gap={2} className="mx-5">
+                                       <Stack direction={Tag === "Image" || innerWidth < 768 ? "vertical" : "horizontal"} gap={2} className="ms-3 justify-content-center">
                                         <Button variant="outline-success" type="button" 
                                             onClick={() => { 
                                                 setSelectedComponent(dict[item.contentType]); 
@@ -228,6 +249,19 @@ const ArticleEditorPage = () => {
         </Col>
         </Row>
         </Container>
+
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+            <Modal.Title>Title error</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>The title should be at least 10 characters long</Modal.Body>
+            <Modal.Footer>
+            <Button variant="danger" onClick={handleClose}>
+                Close
+            </Button>
+            </Modal.Footer>
+        </Modal>
+        </>  
     );
 };
 
