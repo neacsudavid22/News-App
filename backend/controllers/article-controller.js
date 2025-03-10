@@ -1,19 +1,17 @@
 import Article from '../models/Article.js';
+const getArticles = async (filterCategory, page = 1) => {
+    try {
+        const articles = await Article.find(filterCategory ? { category: filterCategory } : {})
+                                      .skip((page - 1) * 20)  // Skip previous pages
+                                      .limit(20)  // Limit results per page
+                                      .exec();
 
-const getArticles = async (filterCategory) => {
-    try{
-        const articles = filterCategory ? await Article.where("category").equals(filterCategory).exec()
-                                        : await Article.find().exec() 
-        if (articles.length === 0) {
-            return { error: true, message: "No articles found" };
-        }
         return articles;
-    }
-    catch (err) {
+    } catch (err) {
         console.error(`getArticles Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
-}
+};
 
 const getArticleById = async (id) => {
     try{
@@ -39,7 +37,7 @@ const createArticle = async (article) => {
     }
     catch (err) {
         console.error(`createArticle Error: ${err.message}`);
-        process.exit(1);
+        return { error: true, message: err.message };
     }
 }
 

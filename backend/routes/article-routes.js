@@ -6,6 +6,8 @@ const articlesRouter = express.Router()
 articlesRouter.route('/article').get(async (req, res) => {
     try {
         const category = req.query.category; 
+        const page = req.query.page;
+
         const result = await getArticles(category); 
 
         if (result.error) {
