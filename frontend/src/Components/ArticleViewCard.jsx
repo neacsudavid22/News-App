@@ -1,24 +1,46 @@
 import Card from 'react-bootstrap/Card';
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
+
+import { useEffect, useState } from 'react';
 
 
-const ArticleViewCard = ({ article }) => {
-    //const size = order % 5 === 0 ? 100 : 50;
+const ArticleViewCard = ({ article, isBig }) => {
+    
+    const [backgroundPreview, setBackgroundPreview] = useState()
+
+    useEffect( () => {
+        const fetchBackgroundImage = async () => {
+            try {
+                const response = await fetch("http://localhost:3600/upload-api/upload-images/" + article.background);
+                const imageBlob = await response.blob(); // Convert response to blob
+                setBackgroundPreview(URL.createObjectURL(imageBlob)); // Set the image URL
+            } catch(err) {
+                console.error("cardImage error: " + err);
+            }
+        };
+    
+        fetchBackgroundImage();
+
+    }, [article])
+
     return (
-        <Row className={`w-100 justify-content-center`}>
-            <Col xs={11} sm={10} md={8} lg={6} xl={6}> {/* Responsive column width */}
-            <Card className="w-100"> {/* Ensure card takes full width of column */}
-                <Card.Img variant="top" src="holder.js/100px180" />
-                <Card.Body>
-                    <Card.Title>{article.title}</Card.Title>
-                    <Card.Text>
-                        {article.articleContent[0].content.toString().slice(0,200) + "..."}
-                    </Card.Text>
+        <div style={{width: "100%"}}>
+            <Card className="h-100 w-100 d-flex flex-column"> {/* Make card responsive */}
+                <Card.Img
+                    src={backgroundPreview}
+                    alt="Background"
+                    style={{ objectFit: "cover", aspectRatio: "16 / 9"}} // Image takes 70% of the card
+                    variant='top'
+                />
+                <Card.Body className='border-top d-flex flex-column justify-content-between h-100'
+                style={{ }} >
+                    <Card.Title as={isBig ? "h2" : "h3"} className='mb-3'>{article.title}</Card.Title>
+                    
+                    { isBig && <Card.Text>
+                                {article.articleContent[0].content.toString().slice(0, 200) + "..."}
+                            </Card.Text> }
                 </Card.Body>
             </Card>
-            </Col>
-        </Row>
+        </div>
     );
 };
 
