@@ -31,7 +31,8 @@ const Article = model('Article', new Schema({
       enum: ['p', 'h2', 'Image'], // others to come
       default: 'p'
     }
-  }]
+  }],
+  background: { type: String, required: true }
 }));
 
 export default Article;

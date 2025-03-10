@@ -12,6 +12,7 @@ import { useContext, useState } from "react";
 import "./ArticleUploadPage.css";
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavBar";
+import { postArticle } from "../Services/articleService";
 
 const ArticleUploadPage = () => {
     const location = useLocation();
@@ -24,9 +25,13 @@ const ArticleUploadPage = () => {
     const [tagInput, setTagInput] = useState(""); 
     const [tagSelect, setTagSelect] = useState(""); 
     const author = useContext(AuthContext).user;
+    const [background, setBackground] = useState();
+    const [backgroundPreview, setBackgroundPreview] = useState();
 
     const uploadImages = async () => {
         const formData = new FormData();
+
+        formData.append("images", background);
         articleImages.forEach((file) => {
             formData.append("images", file);
         });
@@ -50,13 +55,14 @@ const ArticleUploadPage = () => {
     const handlePublish = async () => {
         const uploadedImageUrls = await uploadImages();
     
-        if (uploadedImageUrls.length !== articleImages.length) {
+        if (uploadedImageUrls.length !== (articleImages.length + 1)) {
             console.error("Some images failed to upload");
             return;
         }
     
         // Replace temp URLs with real URLs
         let imgIndex = 0;
+        const backgroundUrl = uploadedImageUrls[imgIndex++]
         const updatedContent = articleContent.map((item) => {
             if (item.contentType === "Image") {
                 return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++]}
@@ -64,32 +70,34 @@ const ArticleUploadPage = () => {
             return item;
         });
     
-        const article = { title, author: author._id, articleContent: updatedContent, category, tags };
+        const article = { title, author: author._id, articleContent: updatedContent, category, tags, background: backgroundUrl };
 
-        try {
-            console.log(article)
-            const response = await fetch("http://localhost:3600/article-api/article", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(article),
-            });
-    
-            if (!response.ok) throw new Error("Article creation failed");
-    
-            const result = await response.json();
-            console.log("Article created:", result);
-        } catch (error) {
-            console.error("Error publishing article:", error);
-        }
+        const result = await postArticle(article);
+        console.log("Article created:", result);
     };
-    
+
+    const removeTag = () => {
+        if (tags.includes(tagSelect)) { 
+            const currentTags = [...tags]
+            currentTags.splice(currentTags.indexOf(tagSelect), 1)
+            setTags(currentTags);
+            setTagSelect(""); 
+        }
+    }
+
+    const addTag = () => {
+        if (tagInput.trim() !== "" && !tags.includes(tagInput)) { 
+            setTags([...tags, tagInput]);
+            setTagInput(""); 
+        }
+    }
 
     return (
         <>
         <MainNavbar/>
-        <Container fluid className="vh-100 mt-4">
+        <Container fluid className="h-100 mt-4">
         <Row className="w-100 justify-content-center">
-        <Col sm={12} md={10} lg={8} xl={6} className=" vh-100"> {/* Responsive form width */}
+        <Col sm={12} md={10} lg={8} xl={6} className=" h-100"> {/* Responsive form width */}
 
             <h1 className="mb-4">Article Preview</h1>
             <Stack sm={12} md={10} lg={8} xl={6} direction="vertical" gap={2} className="border p-3 overflow-y-auto h-75 mb-4">
@@ -101,7 +109,7 @@ const ArticleUploadPage = () => {
                                 {
                                 item.contentType === "Image" ? 
                                     <div key={index} className="d-flex justify-content-center">
-                                        <Image src={item.content} alt="Article Image" thumbnail className="w-50 p-2 my-2" /> 
+                                        <Image src={item.content} alt="Article Image" thumbnail className="w-75 p-2 my-3" /> 
                                     </div>
                                     :
                                     <div key={index} className="d-flex justify-content-start">
@@ -112,6 +120,23 @@ const ArticleUploadPage = () => {
                         );
                     })
                 }
+            </Stack>
+
+            <Stack direction="verical" className="d-flex justify-content-center border-top py-3 mb-1" gap={3} >
+                <Form.Group className="w-75 mb-3 pe-5">
+                    <Form.Label><b>Background</b></Form.Label>
+                    <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={ (e) => {
+                            setBackgroundPreview(URL.createObjectURL(e.target.files[0]));
+                            setBackground(e.target.files[0])
+                        } }
+                    />
+                </Form.Group>
+
+                { backgroundPreview && <Image src={backgroundPreview} thumbnail fluid className="w-75 p-2" /> }
+   
             </Stack>
 
             <Form.Select aria-label="Category" onChange={(e) => setCategory(e.target.value)} className="w-50">
@@ -131,22 +156,8 @@ const ArticleUploadPage = () => {
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                 /> 
-                <Button type="button" variant="primary" onClick={() => {
-                        if (tagInput.trim() !== "" && !tags.includes(tagInput)) { 
-                            setTags([...tags, tagInput]);
-                            setTagInput(""); 
-                        }
-                    }
-                }>Add</Button>
-                <Button type="button" variant="danger" onClick={() => {
-                        if (tags.includes(tagSelect)) { 
-                            const currentTags = [...tags]
-                            currentTags.splice(currentTags.indexOf(tagSelect), 1)
-                            setTags(currentTags);
-                            setTagSelect(""); 
-                        }
-                    }
-                }>Remove</Button>
+                <Button type="button" variant="primary" onClick={ () => addTag() }>Add</Button>
+                <Button type="button" variant="danger" onClick={ () => removeTag() }>Remove</Button>
             </Stack>
 
             <Tabs
@@ -154,14 +165,14 @@ const ArticleUploadPage = () => {
                 id="justify-tab-example"
                 className="mb-3 nav-pills"
                 onSelect={(e) => setTagSelect(e)}
+                onDoubleClick={ () => removeTag() }
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
             </Tabs>
-
-            <Button variant="success" type="button" className="mb-4" onClick={handlePublish}>
+            
+            <Button variant="success" type="button" className="mb-5" onClick={handlePublish}>
                 Publish Article
             </Button>
      
-
         </Col>
         </Row>
         </Container>

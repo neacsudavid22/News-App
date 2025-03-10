@@ -1,6 +1,8 @@
 import multer from "multer";
 import express from "express"
-
+import path from "path";
+import url from "url";
+ 
 // Configure storage
 const storage = multer.diskStorage({
     destination: "images",
@@ -23,8 +25,23 @@ uploadRouter.post("/upload-images", upload, (req, res) => {
         return res.status(400).json({ message: "No images uploaded" });
     }
 
-    const imageUrls = req.files.map((file) => `http://localhost:${port}/uploads/${file.filename}`);
-    res.json({ imageUrls });
+    const imageUrls = req.files.map((file) => `${file.filename}`); // the url of each uploaded image
+    res.status(200).json({ imageUrls });
+});
+
+uploadRouter.get("/upload-images/:url", (req, res) => {
+
+    const __filename = url.fileURLToPath(import.meta.url);  // convertește URL-ul fișierului în path absolut.
+
+    const __dirname = path.dirname(__filename); // extrage directorul fișierului curent (upload-routes.js).
+
+    const filePath = path.resolve(__dirname, "../images", req.params.url); // creează un path absolut către imagine.
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            res.status(404).json({ message: "No corresponding image for given URL" });
+        }
+    });
 });
 
 export default uploadRouter;
