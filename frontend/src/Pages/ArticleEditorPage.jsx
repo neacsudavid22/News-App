@@ -244,7 +244,7 @@ const ArticleEditorPage = () => {
             </Stack>
 
             <Button variant="primary" type="button" className="my-4" onClick={handleSubmit}>
-                Post Article
+                Next
             </Button>
         </Col>
         </Row>

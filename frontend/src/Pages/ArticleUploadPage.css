@@ -1,7 +1,21 @@
 .nav-pills .nav-link {
-    background-color:  rgb(113, 113, 113); /* Bootstrap primary color */
+    background-color:  #007bff; /* Bootstrap primary color */
     color: white !important;
-    
+}
+
+.nav-pills .nav-link:hover {
+    background-color:  hsl(211, 100%, 40%); /* Bootstrap primary color */
+    color: white !important;
+}
+
+.nav-pills .nav-link.active {
+    background-color:  rgb(148, 21, 21); /* Bootstrap primary color */
+    color: white !important;
+}
+
+.nav-pills .nav-link.active:hover {
+    background-color:  hsl(0, 75%, 43%) !important; /* Bootstrap primary color */
+    color: white !important;
 }
 
 .nav-pills .nav-item {

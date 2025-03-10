@@ -19,10 +19,10 @@ const MainNavbar = () => {
                 <Navbar.Brand as={Link} to="/"> NewsWebApp </Navbar.Brand>
             
                 {user ? (
-                    <>
-                    <Navbar.Text className="text-light px-3">@{user?.username}</Navbar.Text>
-                    <Nav.Link className="text-light" as={Link} to="/" onClick={handleLogout}>Logout</Nav.Link>
-                    </>
+                    <Stack direction="horizontal">
+                        <Navbar.Text className="text-light px-3">@{user?.username}</Navbar.Text>
+                        <Nav.Link className="text-light" as={Link} to="/" onClick={handleLogout}>Logout</Nav.Link>
+                    </Stack>
                 ) : (
                     <Nav.Link className="text-light" as={NavLink} to="/login">Login</Nav.Link>
                 )}
