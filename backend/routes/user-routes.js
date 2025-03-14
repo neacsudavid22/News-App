@@ -16,56 +16,69 @@ const usersRouter = express.Router()
         return res.status(200).json(result);
     })
 
-usersRouter.route('/user').post(async (req, res) => {
-    const result = await createUser(req.body);
+    usersRouter.route('/user').post(async (req, res) => {
+        const result = await createUser(req.body);
 
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
 
-    return res.status(200).json(result);
-})
+        return res.status(200).json(result);
+    })
 
-usersRouter.route('/user/:id').get(authMiddleware, async (req, res) => {
-    const result = await getUserById(req.params.id)
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+    usersRouter.route('/user/:id').get(authMiddleware, async (req, res) => {
+        const result = await getUserById(req.params.id)
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
 
-    return res.status(200).json(result);
-})
+        return res.status(200).json(result);
+    })
 
-usersRouter.route('/user/:id').delete(authMiddleware, async (req, res) => {
-    const result = await deleteUser(req.params.id)
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+    usersRouter.route('/author/:id').get(async (req, res) => {
+        const result = await getUserById(req.params.id)
+        if(result.account !== "author"){
+            return res.status(400).json({ message: "User is not an author" });
+        }
 
-    return res.status(200).json(result);
-})
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
 
-usersRouter.route('/user/:id').put(authMiddleware, async (req, res) => {
-    const result = await updateUser(req.params.id, req.body);
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+        return res.status(200).json(result.name);
+    })
 
-    return res.status(200).json(result);
-})
+    usersRouter.route('/user/:id').delete(authMiddleware, async (req, res) => {
+        const result = await deleteUser(req.params.id)
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
 
-usersRouter.route('/login').post(async (req, res) => {
-    const result = await loginUser(req.body.username, req.body.password);
+        return res.status(200).json(result);
+    })
 
-    if (result.error) {
-        return res.status(400).json({ message: result.message });
-    }
+    usersRouter.route('/user/:id').put(authMiddleware, async (req, res) => {
+        const result = await updateUser(req.params.id, req.body);
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
 
-    return res.status(200).json(result);
-})
+        return res.status(200).json(result);
+    })
 
-usersRouter.route('/token').get(authMiddleware,  async (req, res) => {
-    const {user} = req.user;
-    return res.status(200).json({user});
-})
+    usersRouter.route('/login').post(async (req, res) => {
+        const result = await loginUser(req.body.username, req.body.password);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json(result);
+    })
+
+    usersRouter.route('/token').get(authMiddleware,  async (req, res) => {
+        const {user} = req.user;
+        return res.status(200).json({user});
+    })
 
 export default usersRouter;
