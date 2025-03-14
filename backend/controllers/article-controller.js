@@ -69,10 +69,51 @@ const updateArticle = async (id, article) => {
     }
 }
 
+const likePost = async (articleId, userId) => {
+    try{
+        const { likes } = await Article.findById(articleId).select('likes');
+        
+        likes.includes(userId) ? likes.remove(userId)
+                                    : likes.push(userId)
+
+        const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { likes: likes } })
+        if(!updatedArticlePost){
+            return { error: true, message: "Error updating likes on article post" };
+        }
+        return updatedArticlePost;
+    }
+    catch (err) {
+        console.error(`likePost Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
+const savePost = async (articleId, userId) => {
+    try{
+        const { saves } = await Article.findById(articleId).select('saves');
+        
+        saves.includes(userId) ? saves.remove(userId)
+                                    : saves.push(userId)
+
+        const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { saves: saves } }
+        )
+        if(!updatedArticlePost){
+            return { error: true, message: "Error updating saves on article post" };
+        }
+        return updatedArticlePost;
+    }
+    catch (err) {
+        console.error(`savePost Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
 export {
     getArticles,
     getArticleById,
     createArticle,
     deleteArticle,
-    updateArticle
+    updateArticle,
+    likePost,
+    savePost
 }
