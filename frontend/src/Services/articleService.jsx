@@ -14,6 +14,21 @@ const getArticles = async (category, page) => {
     }
 }
 
+const getArticleById = async (articleId) => {
+    try {
+        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch article");
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("getArticleById error:", err);
+        return null;
+    }
+}
+
 const postArticle = async (article) => {
     try {
         const response = await fetch("http://localhost:3600/article-api/article", {
@@ -30,7 +45,25 @@ const postArticle = async (article) => {
     }
 }
 
+const interactOnPost = async (articleId, userId, interaction = "like") => {
+    try{
+        const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
+            method: 'PUT'
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to get author");
+        }
+        return await response.json();
+
+    }catch(err){
+        console.error("getAuthor error:", err);
+        return null;
+    }
+}
+
 export {
     getArticles,
-    postArticle
+    postArticle,
+    getArticleById,
+    interactOnPost
 }

@@ -47,4 +47,18 @@ const signUpUser = async (email, name, username, password) => {
     }
 };
 
-export { authenticateUser, signUpUser };
+const getAuthorName = async (authorId) => {
+    try{
+        const response = await fetch(`http://localhost:3600/user-api/author/${authorId}`);
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to get author");
+        }
+        return await response.json();
+
+    }catch(err){
+        console.error("getAuthor error:", err);
+        return null;
+    }
+}
+
+export { authenticateUser, signUpUser, getAuthorName };
