@@ -8,18 +8,19 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
-import { useNavigate } from "react-router";
 import MainNavbar from "../Components/MainNavBar";
 import Modal from "react-bootstrap/Modal";
 import "./ArticleEditorPage.css"
+import { useLocation, useNavigate } from "react-router";
 
 const ArticleEditorPage = () => {
-    const [selectedComponent, setSelectedComponent] = useState("addParagraph");
-    const [title, setTitle] = useState("");
-    const [articleContent, setArticleContent] = useState([]);
-    const [edit, setEdit] = useState([]); // Starea pentru editare
+    const [selectedComponent, setSelectedComponent] = useState("hideContent");
+    const [title, setTitle] = useState(JSON.parse(localStorage.getItem("article"))?.title || "");
+    const [articleContent, setArticleContent] = useState(JSON.parse(localStorage.getItem("article"))?.articleContent || []);
+    const [edit, setEdit] = useState([]);
+    const [articleImages, setArticleImages] = useState(JSON.parse(localStorage.getItem("article"))?.articleImages || []);
     const navigate = useNavigate();
-    const [articleImages, setArticleImages] = useState([]);
+    const location = useLocation();
 
     // this is not the main component, scroll down
     const AddImage = ({ index, content = null }) => {
@@ -27,45 +28,44 @@ const ArticleEditorPage = () => {
         const [file, setFile] = useState(null)
 
         return (
-            <>
-            <Stack direction="horizontal" className="justify-content-between" gap={3} >
-                <Form.Group className="w-75 mb-3 pe-5">
-                    <Form.Label><b>Image</b></Form.Label>
-                    <Form.Control
-                        type="file"
-                        accept="image/*"
-                        onChange={ (e) => {
-                            setImagePreviewUrl(URL.createObjectURL(e.target.files[0]));
-                            setFile(e.target.files[0])
-                        } }
-                    />
-                </Form.Group>
+            <Stack direction="vertical" gap={3} className="justify-content-center  me-5">
 
-                <Stack direction="horizontal" gap={3} className="justify-content-between me-5">
-
-                    {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />}
+                <Stack direction="horizontal" className="justify-content-between" gap={3} >
+                    <Form.Group className="w-75 mb-3 pe-5">
+                        <Form.Label><b>Image</b></Form.Label>
+                        <Form.Control
+                            type="file"
+                            accept="image/*"
+                            onChange={ (e) => {
+                                setImagePreviewUrl(URL.createObjectURL(e.target.files[0]));
+                                setFile(e.target.files[0])
+                            } }
+                        />
+                    </Form.Group>
 
                     <Button variant={content ? "outline-success" : "primary"} type="button" 
-                        onClick={async () => {
+                            onClick={async () => {
                                 setArticleImages([...articleImages, file])
                                 console.log(file)
                                 console.log(articleImages)
                                 addSelectedComponent("Image", imagePreviewUrl, index)
-                            }}>
+                            }}
+                            className="mt-3"    
+                    >
                         {content ? "Save" : "Add Image"}
                     </Button>
-                    
-                </Stack>    
+                </Stack>
 
-            </Stack>
-            </>
+                {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />} 
+                
+            </Stack>    
         );
     };
 
     const AddHeader = ({ index, content = null }) => {
         const [header, setHeader] = useState(content || "");
         return (
-            <Stack direction="horizontal" className="justify-content-between" gap={3}>
+            <Stack direction="horizontal" className="w-100 justify-content-between" gap={3}>
                 <Form.Group className="w-75 mb-3 pe-5">
                     <Form.Label><b>Header</b></Form.Label>
                     <Form.Control
@@ -76,7 +76,10 @@ const ArticleEditorPage = () => {
                     />
                 </Form.Group>
 
-                <Button variant={content ? "outline-success" : "primary"} type="button" onClick={() => addSelectedComponent("h2", header, index)}>
+                <Button variant={content ? "outline-success" : "primary"} type="button" 
+                        onClick={() => addSelectedComponent("h2", header, index)}
+                        className="mt-3"    
+                >
                     {content ? "Save" : "Add Header"}
                 </Button>
             </Stack>
@@ -86,19 +89,22 @@ const ArticleEditorPage = () => {
     const AddParagraph = ({ index, content = null }) => {
         const [paragraph, setParagraph] = useState(content || "");
         return (
-            <Stack direction="horizontal" className=" justify-content-between" gap={3}>
-                <Form.Group className="w-75 mb-3 pe-5">
+            <Stack direction="horizontal" className="w-100 justify-content-between" gap={3}>
+                <Form.Group className="w-100 mb-3 pe-2">
                     <Form.Label><b>Paragraph</b></Form.Label>
                     <Form.Control
                         as="textarea"
-                        rows={3}
+                        rows={7}
                         placeholder="Enter paragraph text"
                         value={paragraph}
                         onChange={(e) => setParagraph(e.target.value)}
                     />
                 </Form.Group>
 
-                <Button variant={content ? "outline-success" : "primary"} type="button" onClick={() => addSelectedComponent("p", paragraph, index)}>
+                <Button variant={content ? "outline-success" : "primary"} type="button" 
+                        onClick={() => addSelectedComponent("p", paragraph, index)}
+                        className="mt-3"    
+                >
                     {content ? "Save" : "Add Paragraph"}
                 </Button>
             </Stack>
@@ -162,8 +168,11 @@ const ArticleEditorPage = () => {
     };
 
     const handleSubmit = () => {
-        if(title.length < 10) handleShow()
-        else navigate("/upload", { state: {articleContent, title, articleImages}});
+        if(title.length < 10) handleShow();
+        else {
+            localStorage.setItem("article", JSON.stringify({articleContent, title, articleImages}));
+            navigate("/author/upload", { state: { fromEditor: true } });
+        }
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
@@ -181,6 +190,12 @@ const ArticleEditorPage = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    useEffect(() => {
+        if (!location.state?.fromUploader) {
+            localStorage.removeItem("article");
+        }
+    }, [location]);
+
     return (
         <>
         <MainNavbar/>
@@ -192,13 +207,13 @@ const ArticleEditorPage = () => {
             <Form className="justify-content-center">
                 <Form.Group className="mb-3">
                     <Form.Label><b>Title</b></Form.Label>
-                    <Form.Control type="text" placeholder="Enter title" onChange={(e) => setTitle(e.target.value)} />
+                    <Form.Control type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </Form.Group>
             </Form>
 
             <Container className="justify-content-center w-100 sticky-top sticky-offset py-2 bg-white border-bottom">
 
-                <Tabs fill activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 mb-2 ">
+                <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 mb-2 ">
                     <Tab eventKey="addParagraph" title="Paragraph" />
                     <Tab eventKey="addImage" title="Image" />
                     <Tab eventKey="addHeader" title="Header" />

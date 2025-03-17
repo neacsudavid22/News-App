@@ -56,7 +56,7 @@ const Article = model('Article', new Schema({
               type: SchemaTypes.ObjectId,
               ref: 'User', 
           },
-          response: { type: Number, default: null }   
+          responseTo: { type: Number, default: null }   
           // I will search in this array for the position of the comment it responses to
       }],
       default: [] 

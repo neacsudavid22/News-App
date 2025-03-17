@@ -1,14 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap');
-
 .custom-tabs .nav-link{
     color: black !important; /* Default text color */
-    font-family: lexend, sans-serif !important; 
-    font-size: large !important; 
-    font-weight: bold !important;
-}
-
-.customFont{
-    font-family: lexend, sans-serif !important; 
     font-size: large !important; 
     font-weight: bold !important;
 }
@@ -19,6 +10,7 @@
     font-size: large !important; 
     font-weight: bolder !important;
 }
+
 .sticky-offset {
     top: 3.45rem !important;
 }

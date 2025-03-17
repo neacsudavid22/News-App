@@ -8,6 +8,13 @@ import { getAuthorName } from "../Services/userService";
 const ArticleComponent = ( {article} ) => { 
     const [imageUrls, setImageUrls] = useState({}); // Store image URLs
     const [author, setAuthor] = useState(null);
+    const [innerWidth, setInnerWidth] = useState();
+
+    useEffect(() => {
+        const handleResize = () => setInnerWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         const fetchAuthor = async () => {
@@ -50,27 +57,28 @@ const ArticleComponent = ( {article} ) => {
     return (
         <Container className="w-100 my-4">
             <Row className="w-100 justify-content-center ms-1 mb-3">
-                <Col xs={12} sm={10} md={8} lg={6} xl={6} > 
+                <Col xs={12} sm={12} md={8} lg={8} xl={7} > 
                     <h1>{article?.title || "Loading..."}</h1>
                 </Col>
             </Row>
             <Row className="w-100 justify-content-center ms-1 my-2">
-                <Col xs={12} sm={10} md={8} lg={6} xl={6} > 
-                    <h6>{"Author: " + author || "Loading..."}</h6>
+                <Col xs={12} sm={12} md={8} lg={8} xl={7} > 
+                    <h5>{"Author: " + author || "Loading..."}</h5>
                 </Col>
             </Row>
                 {article?.articleContent?.map((a, index) => {
                     const Tag = a.contentType;
                     return (
                         <Row className="w-100 justify-content-center">
-                        <Col xs={12} sm={10} md={8} lg={6} xl={6} className="mb-1" key={index}>
+                        <Col xs={12} sm={12} md={8} lg={8} xl={7} className="mb-1" key={index}>
                             {Tag === "Image" ? (
                                 <div key={index} className="d-flex justify-content-center">
-                                    <Image src={imageUrls[a.content] || ""} alt="Image" className="w-75 p-2 my-3" />
+                                    <Image fluid  thumbnail src={imageUrls[a.content] || ""} alt="Image" 
+                                    className={innerWidth > 768 ? "w-75 p-2 my-3" : "w-100 p-2 my-3" } />
                                 </div>
                             ) : (
-                                <div key={index} className="d-flex justify-content-start">
-                                    <Tag className="p-2 my-2" style={{textAlign: "justify", texJustify: "inter-word"}}>{a.content}</Tag>
+                                <div key={index} className=" justify-content-start">
+                                    <Tag className="p-2 my-2" style={{textAlign: "justify", texJustify: "auto   ", fontSize: "1.2rem"}}>{a.content}</Tag>
                                 </div>
                             )}
                         </Col>

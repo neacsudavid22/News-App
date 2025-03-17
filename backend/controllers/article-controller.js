@@ -108,6 +108,24 @@ const savePost = async (articleId, userId) => {
     }
 }
 
+const postComment = async (articleId, userId, comment) => {
+    try{
+        const { comments } = await Article.findById(articleId).select('comments');
+        
+        comments.push({ user: userId, content: comment });
+
+        const updatedArticlePost = await Article.findByIdAndUpdate({_id: articleId}, { $set: { comments: comments } })
+        if(!updatedArticlePost){
+            return { error: true, message: "Error updating comments on article post" };
+        }
+        return updatedArticlePost;
+    }
+    catch (err) {
+        console.error(`postComment Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
 export {
     getArticles,
     getArticleById,
@@ -115,5 +133,6 @@ export {
     deleteArticle,
     updateArticle,
     likePost,
-    savePost
+    savePost,
+    postComment
 }

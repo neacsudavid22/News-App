@@ -1,5 +1,5 @@
 import express from 'express';
-import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle, savePost, likePost } from '../controllers/article-controller.js'
+import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle, savePost, likePost, postComment } from '../controllers/article-controller.js'
 
 const articlesRouter = express.Router()
 
@@ -92,6 +92,21 @@ articlesRouter.route('/article/like/:articleId/:userId').put(async (req, res) =>
 
     } catch(err){
         console.error("likePost error:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/article/comment/:articleId/:userId').put(async (req, res) => {
+    try{
+        const result = await postComment(req.params.articleId, req.params.userId, req.body.comment);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.status(200).json(result);
+
+    } catch(err){
+        console.error("postComment error:", err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 })

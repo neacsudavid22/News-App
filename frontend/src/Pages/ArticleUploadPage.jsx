@@ -1,4 +1,4 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
@@ -8,25 +8,30 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./ArticleUploadPage.css";
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavBar";
 import { postArticle } from "../Services/articleService";
+import Modal from "react-bootstrap/esm/Modal";
 
 const ArticleUploadPage = () => {
     const location = useLocation();
-    const state = location.state || {}; 
-    const articleContent = state.articleContent || [];
-    const articleImages = state.articleImages || [];
-    const title = state.title || "";
+    const navigate = useNavigate();
+
+    const author = useContext(AuthContext).user;
+
+    const articleContent = JSON.parse(localStorage.getItem("article"))?.articleContent || [];
+    const articleImages = JSON.parse(localStorage.getItem("article"))?.articleImages || [];
+    const title = JSON.parse(localStorage.getItem("article"))?.title || "";
+
     const [category, setCategory] = useState("politics")
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState(""); 
     const [tagSelect, setTagSelect] = useState(""); 
-    const author = useContext(AuthContext).user;
     const [background, setBackground] = useState();
     const [backgroundPreview, setBackgroundPreview] = useState();
+    const [UPLOAD_SUCCESFULL, SET_UPLOAD_SUCCESFULL] = useState(false);
 
     const uploadImages = async () => {
         const formData = new FormData();
@@ -53,27 +58,40 @@ const ArticleUploadPage = () => {
     };
     
     const handlePublish = async () => {
-        const uploadedImageUrls = await uploadImages();
+        try{
+            const uploadedImageUrls = await uploadImages();
     
-        if (uploadedImageUrls.length !== (articleImages.length + 1)) {
-            console.error("Some images failed to upload");
-            return;
-        }
-    
-        // Replace temp URLs with real URLs
-        let imgIndex = 0;
-        const backgroundUrl = uploadedImageUrls[imgIndex++]
-        const updatedContent = articleContent.map((item) => {
-            if (item.contentType === "Image") {
-                return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++]}
+            if (uploadedImageUrls.length !== (articleImages.length + background ? 1 : 0)) {
+                console.error("Some images failed to upload");
+                return;
             }
-            return item;
-        });
-    
-        const article = { title, author: author._id, articleContent: updatedContent, category, tags, background: backgroundUrl };
+        
+            // Replace temp URLs with real URLs
+            let imgIndex = 0;
+            const backgroundUrl = uploadedImageUrls[imgIndex++]
+            const updatedContent = articleContent.map((item) => {
+                if (item.contentType === "Image") {
+                    return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++]}
+                }
+                return item;
+            });
+        
+            const article = { title, author: author._id, articleContent: updatedContent, category, tags, background: backgroundUrl };
 
-        const result = await postArticle(article);
-        console.log("Article created:", result);
+            const result = await postArticle(article) || "";
+            result ? SET_UPLOAD_SUCCESFULL(true) : SET_UPLOAD_SUCCESFULL(false);
+
+            if(UPLOAD_SUCCESFULL) {
+                localStorage.removeItem("article");
+            }
+
+            console.log("Article created:", result);
+
+        } catch (error) {
+            console.error("Error during article creation:", error);
+        }
+        
+        handleShow();
     };
 
     const removeTag = () => {
@@ -92,14 +110,47 @@ const ArticleUploadPage = () => {
         }
     }
 
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow((prev) => !prev);
+
+    const handleBack = () => {
+        navigate(-1);
+    }
+
+    useEffect(() => {
+        if (!location.state?.fromEditor) {
+            navigate("/author", { state: { fromUploader: true }}); // Dacă nu vine din Author, îl redirecționezi
+            return null;
+        }
+    }, [location.state, navigate]);
+
     return (
         <>
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>{UPLOAD_SUCCESFULL ? "Success" : "Problem occured" }</Modal.Title> 
+            </Modal.Header>
+
+            <Modal.Body>
+                <p>{UPLOAD_SUCCESFULL ? "Article Published Succesfully" : "Problem at Publishing" }</p>
+            </Modal.Body>
+        </Modal>
+
         <MainNavbar/>
+        
         <Container fluid className="h-100 mt-4">
         <Row className="w-100 justify-content-center">
         <Col sm={12} md={10} lg={8} xl={6} className=" h-100"> {/* Responsive form width */}
 
-            <h1 className="mb-4">Article Preview</h1>
+            <Stack direction="horizontal" className="d-flex justify-content-between align-items-center mb-4">
+                <h1>Article Preview</h1> 
+                <Button variant="danger" type="button" onClick={handleBack}>
+                    Back
+                </Button>
+            </Stack>
+
             <Stack sm={12} md={10} lg={8} xl={6} direction="vertical" gap={2} className="border p-3 overflow-y-auto h-75 mb-4">
                 <h1>{title}</h1>
                 { articleContent.map( (item, index) => {
@@ -169,12 +220,16 @@ const ArticleUploadPage = () => {
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
             </Tabs>
             
-            <Button variant="success" type="button" className="mb-5" onClick={handlePublish}>
+            <Button variant="success" type="button" className="mb-5" 
+                    onClick={ handlePublish }>
                 Publish Article
             </Button>
      
+            
         </Col>
         </Row>
+
+        
         </Container>
         </>
     );

@@ -2,16 +2,12 @@ import { useState, useEffect } from "react";
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
 import "./HomePage.css";
-import ArticleViewCard from "../Components/ArticleViewCard";
 import { getArticles } from "../Services/articleService";
 import MainNavbar from "../Components/MainNavBar";
 
 const CategoryBar = () => {
   const [category, setCategory] = useState('allNews');  
-  const [page, setPage] = useState(1);
 
   const [innerWidth, setInnerWidth] = useState(window.innerWidth);
 
@@ -33,8 +29,6 @@ const CategoryBar = () => {
 
   const handleCategoryChange = (category) => {
     setCategory(category);
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    setPage(1)
   }
 
   const handleTitle = (title) => {
@@ -47,7 +41,7 @@ const CategoryBar = () => {
   useEffect( () => {
     const handleArticles = async () => { 
       try {
-          const data = await getArticles(category, page);
+          const data = await getArticles(category);
 
           if (data) {
               setArticles(data)
@@ -57,46 +51,7 @@ const CategoryBar = () => {
       }
     }
     handleArticles()
-  }, [category, page])   
-
-  const articleGridAuto = () => {
-    const articleGrid = [];
-    let articleRow = []; 
-
-    articles.forEach((articleItem, index) => {
-        articleRow.push(articleItem);
-
-        if (articleRow.length === 3 || index === articles.length - 1) {
-            articleGrid.push(
-              <>
-              <Row>
-                  <Col className="mb-3 mt-2" xs={12} sm={10} md={8} lg={12} xl={12}>
-                      <ArticleViewCard key={articleRow[0].id} article={articleRow[0]} isBig={true} />
-                  </Col>
-              </Row>
-
-              <Row>
-                  {articleRow[1] && (
-                      <Col className="mb-3 mt-2" xs={12} sm={10} md={8} lg={6} xl={6}>
-                          <ArticleViewCard key={articleRow[1].id} article={articleRow[1]} 
-                          isBig={innerWidth < 768 } />
-                      </Col>
-                  )}
-                  {articleRow[2] && (
-                      <Col className="mb-3 mt-2" xs={12} sm={10} md={8} lg={6} xl={6}>
-                          <ArticleViewCard key={articleRow[2].id} article={articleRow[2]} isBig={innerWidth < 768} />
-                      </Col>
-                  )}
-              </Row>
-              </>
-            );
-            articleRow = []; // Reset for the next row
-        }
-    });
-
-    return articleGrid;
-};
-
+  }, [category])   
 
   return (
     <Container fluid className="p-0">
@@ -130,10 +85,9 @@ const CategoryBar = () => {
         </Navbar.Collapse>
       </Navbar>
 
-      {/*from here*/}
       <div className="d-flex justify-content-center">
       <Container fluid className={ innerWidth < 768 ? "w-75" : "w-50"}> 
-        {articleGridAuto()}
+        {articles.map((a) => <p>{a.title}</p>)}
       </Container>
 
       </div>

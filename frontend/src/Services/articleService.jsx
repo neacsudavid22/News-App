@@ -45,10 +45,14 @@ const postArticle = async (article) => {
     }
 }
 
-const interactOnPost = async (articleId, userId, interaction = "like") => {
+const interactOnPost = async (articleId, userId, interaction = "like", comment = null, responseTo = null) => {
     try{
         const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
-            method: 'PUT'
+            method: 'PUT',
+            body: JSON.stringify({comment, responseTo}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
         if(!response.ok){
             throw new Error(response?.message || "Failed to get author");
