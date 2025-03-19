@@ -136,7 +136,7 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
         if (isLastNode === true) {
             // Remove the entire comment from the comments array
             updatedArticlePost = await Article.findByIdAndUpdate(
-                articleId,
+                { _id: articleId},
                 { $pull: { comments: { _id: commentId } } },
                 { new: true }
             );
@@ -166,6 +166,27 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
     }
 };
 
+const deleteGarbageComments = async (articleId, comments) => {
+    try {
+
+        const updatedArticlePost = await Article.findOneAndUpdate(
+            { _id: articleId},
+            { $set: { comments: comments } },
+            { new: true }
+        );
+        
+
+        if (!updatedArticlePost) {
+            return { error: true, message: "Error deleting garbage comments on article post" };
+        }
+
+        return updatedArticlePost.comments; 
+    } 
+    catch (err) {
+        console.error(`deleteGarbageComments Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
 
 export {
     getArticles,
@@ -176,5 +197,6 @@ export {
     likePost,
     savePost,
     postComment,
-    deleteComment
+    deleteComment,
+    deleteGarbageComments
 }

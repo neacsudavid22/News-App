@@ -87,11 +87,33 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
     }
 }
 
+const deleteGarbageComment = async (articleId, commentList) => {
+    try{
+        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}/delete-garbage-comments`, {
+            method: 'PUT',
+            body: JSON.stringify({comments: commentList}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to delete garbage comments");
+        }
+
+        return await response.json()
+
+    } catch(err){
+        console.error("deleteGarbageComment error:", err);
+        return null;
+    }
+}
+
 
 export {
     getArticles,
     postArticle,
     getArticleById,
     interactOnPost,
-    deleteComment
+    deleteComment,
+    deleteGarbageComment
 }

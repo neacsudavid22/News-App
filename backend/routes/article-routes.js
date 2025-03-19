@@ -1,5 +1,5 @@
 import express from 'express';
-import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle, savePost, likePost, postComment, deleteComment } from '../controllers/article-controller.js'
+import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle, savePost, likePost, postComment, deleteComment, deleteGarbageComments } from '../controllers/article-controller.js'
 
 const articlesRouter = express.Router()
 
@@ -138,7 +138,21 @@ articlesRouter.route('/article/save/:articleId/:userId').put(async (req, res) =>
         console.error("savePost error:", err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
-    
+})
+
+articlesRouter.route('/article/:articleId/delete-garbage-comments').put(async (req, res) => {
+    try{
+        const result = await deleteGarbageComments(req.params.articleId, req.body.comments);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.status(200).json(result);
+
+    } catch(err){
+        console.error("deleteGarbageComments error:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
 })
 
 export default articlesRouter;

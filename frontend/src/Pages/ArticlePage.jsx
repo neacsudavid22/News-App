@@ -8,7 +8,7 @@ import Row from "react-bootstrap/esm/Row";
 import Modal from "react-bootstrap/Modal";
 import { AuthContext } from "../Components/AuthProvider";
 import { useParams } from "react-router";
-import { deleteComment, getArticleById, interactOnPost } from "../Services/articleService";
+import { deleteComment, deleteGarbageComment, getArticleById, interactOnPost } from "../Services/articleService";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
 import React from "react";
@@ -19,6 +19,8 @@ const ArticlePage = () => {
 
     const { id } = useParams(); 
     const [article, setArticle] = useState(null);
+    const [IS_ARTICLE_FETCH_NEDEED, SET_IS_ARTICLE_FETCH_NEDEED] = useState(false);
+
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -43,6 +45,8 @@ const ArticlePage = () => {
                 const data = await getArticleById(id);
                 if (data) {
                     setArticle(data);
+                    setCommentList([...data.comments]);
+
                 }
             } catch (err) {
                 console.error("Error fetching article:", err);
@@ -50,14 +54,8 @@ const ArticlePage = () => {
         };
         
         if (id) fetchArticle();
-    }, [id]);
+    }, [id, IS_ARTICLE_FETCH_NEDEED]);
 
-    useEffect(() => {
-        if (article?.comments) {
-            setCommentList([...article.comments]);
-        }
-    }, [article]);
-    
     useEffect(() => {
         
         if (!commentList) {
@@ -82,18 +80,35 @@ const ArticlePage = () => {
         setCommentTree(treeList);
         setCommentMap(tempCommentMap);
 
-        let IS_CHANGED = false;
-    
-        commentList.forEach((comment) => { 
-            if (tempCommentMap[comment._id]?.replies.length === 0 && comment.removed) {
-                commentList.splice(commentList.findIndex(c => c._id === comment._id), 1);
-                IS_CHANGED = true;
+        const tempCommentList = [...commentList];
+
+        let KEEP_VERIFYING = false;
+        let IS_MODIFIED = false
+        do {
+            KEEP_VERIFYING = false;
+            tempCommentList.forEach((comment) => { 
+                if (tempCommentMap[comment._id]?.replies.length === 0 && comment.removed) {
+                    tempCommentList.splice(tempCommentList.findIndex(c => c._id === comment._id), 1);
+                    KEEP_VERIFYING = true;
+                    IS_MODIFIED = true
+                }
+            });
+        } while(KEEP_VERIFYING);
+
+        if(IS_MODIFIED) {
+            const garbageFetch = async () => {
+                try{
+                    await deleteGarbageComment(id, tempCommentList);
+                    // the value doesnt matter, I just need to know I entered here for the fetch
+                    SET_IS_ARTICLE_FETCH_NEDEED(prev => !prev);
+                } catch(err){
+                    console.error(err);
+                }
             }
-        });
+            garbageFetch();
+        }
 
-        if(IS_CHANGED) setCommentList(commentList);
-
-    }, [commentList]);
+    }, [id, commentList]);
     
 
     useEffect(() => {
@@ -123,12 +138,7 @@ const ArticlePage = () => {
         try {
             const addedComment = await interactOnPost(id, user._id, "comment", commentContent, responseTo);
             if (addedComment) {
-                if(responseTo){
-                    setCommentList((prev) => [...prev, addedComment]);
-                }
-                else{
-                    setCommentList((prev) => [addedComment, ...prev,]);
-                }
+                setCommentList((prev) => [...prev, addedComment]);
             }
         } catch (error) {
             console.error("Error adding comment:", error);
@@ -192,7 +202,7 @@ const ArticlePage = () => {
                             }      
 
                             {
-                            (comment.userId === user?._id && !comment.removed) &&
+                            (comment?.userId === user?._id && !comment.removed) &&
                             <Button 
                                 id="Delete-Button"
                                 size="sm" 
