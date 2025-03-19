@@ -129,6 +129,44 @@ const postComment = async (articleId, userId, content, responseTo) => {
     }
 }
 
+const deleteComment = async (articleId, commentId, isLastNode) => {
+    try {
+        let updatedArticlePost;
+
+        if (isLastNode === true) {
+            // Remove the entire comment from the comments array
+            updatedArticlePost = await Article.findByIdAndUpdate(
+                articleId,
+                { $pull: { comments: { _id: commentId } } },
+                { new: true }
+            );
+        } else {
+            // If it got replies, mark it as deleted instead of removing
+            updatedArticlePost = await Article.findOneAndUpdate(
+                { _id: articleId, "comments._id": commentId },
+                { 
+                    $set: { 
+                        "comments.$.content": "deleted", 
+                        "comments.$.removed": true 
+                    }
+                },
+                { new: true }
+            );
+        }
+
+        if (!updatedArticlePost) {
+            return { error: true, message: "Error deleting comment on article post" };
+        }
+
+        return updatedArticlePost.comments; 
+    } 
+    catch (err) {
+        console.error(`deleteComment Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
+
 export {
     getArticles,
     getArticleById,
@@ -137,5 +175,6 @@ export {
     updateArticle,
     likePost,
     savePost,
-    postComment
+    postComment,
+    deleteComment
 }

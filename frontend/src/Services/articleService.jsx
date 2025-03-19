@@ -47,7 +47,6 @@ const postArticle = async (article) => {
 
 const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo = null) => {
     try{
-        console.log("userId:", userId, "content:", content);
         const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
             method: 'PUT',
             body: JSON.stringify({content, responseTo}),
@@ -56,13 +55,34 @@ const interactOnPost = async (articleId, userId, interaction = "like", content =
             }
         });
         if(!response.ok){
-            throw new Error(response?.message || "Failed to get author");
+            throw new Error(response?.message || `Failed to interact on post on ${interaction} action`);
         }
 
         return await response.json()
 
     } catch(err){
-        console.error("getAuthor error:", err);
+        console.error(`nteractOnPost error on ${interaction} action: `, err);
+        return null;
+    }
+}
+
+const deleteComment = async (articleId, commentId, isLastNode) => {
+    try{
+        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}/delete-comment/${commentId}`, {
+            method: 'PUT',
+            body: JSON.stringify({isLastNode}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to delete comment");
+        }
+
+        return await response.json()
+
+    } catch(err){
+        console.error("deleteComment error:", err);
         return null;
     }
 }
@@ -71,5 +91,6 @@ export {
     getArticles,
     postArticle,
     getArticleById,
-    interactOnPost
+    interactOnPost,
+    deleteComment
 }

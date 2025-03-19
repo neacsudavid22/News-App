@@ -51,6 +51,7 @@ const Article = model('Article', new Schema({
   comments: {
       type: [{
           content: String,
+          removed: {type: Boolean, default: false }, 
           userId: {
               type: SchemaTypes.ObjectId,
               ref: 'User', 

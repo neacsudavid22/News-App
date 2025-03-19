@@ -8,12 +8,11 @@ import Row from "react-bootstrap/esm/Row";
 import Modal from "react-bootstrap/Modal";
 import { AuthContext } from "../Components/AuthProvider";
 import { useParams } from "react-router";
-import { getArticleById, interactOnPost } from "../Services/articleService";
+import { deleteComment, getArticleById, interactOnPost } from "../Services/articleService";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
 import React from "react";
 import Stack from "react-bootstrap/esm/Stack";
-import Card from "react-bootstrap/Card";
 import Collapse from 'react-bootstrap/Collapse';
 
 const ArticlePage = () => { 
@@ -27,11 +26,12 @@ const ArticlePage = () => {
 
     const [commentList, setCommentList] = useState([]);
     const [commentTree, setCommentTree] = useState(null);
+    const [commentMap, setCommentMap] = useState({});
     const [commentContent, setCommentContent] = useState("");
 
     const [openMap, setOpenMap] = useState({});
     const [replyMap, setReplyMap] = useState({});
-    
+
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -50,7 +50,7 @@ const ArticlePage = () => {
         };
         
         if (id) fetchArticle();
-    }, [id, commentList]);
+    }, [id]);
 
     useEffect(() => {
         if (article?.comments) {
@@ -59,24 +59,28 @@ const ArticlePage = () => {
     }, [article]);
     
     useEffect(() => {
-        if (!commentList) return;
-    
-        const commentMap = {};
+        if (!commentList) {
+           return;
+        }
+
+        const tempCommentMap = {};
         const treeList = [];
     
         commentList.forEach((comment) => {
-            commentMap[comment._id] = { ...comment, replies: [] };
+            tempCommentMap[comment._id] = { ...comment, replies: [] };
         });
     
         commentList.forEach((comment) => {
-            if (comment.responseTo !== null && commentMap[comment.responseTo]) {
-                commentMap[comment.responseTo].replies.push(commentMap[comment._id]);
+            if (comment.responseTo !== null && tempCommentMap[comment.responseTo]) {
+                tempCommentMap[comment.responseTo].replies.push(tempCommentMap[comment._id]);
             } else {
-                treeList.push(commentMap[comment._id]);
+                treeList.push(tempCommentMap[comment._id]);
             }
         });
     
         setCommentTree(treeList);
+        setCommentMap(tempCommentMap);
+
     }, [commentList]);
     
 
@@ -95,6 +99,7 @@ const ArticlePage = () => {
     };
 
     const handleReplyForm = (index) => {
+        setCommentContent("");
         setReplyMap((prevReplyMap) => ({
             ...prevReplyMap,
             [index]: !prevReplyMap[index],
@@ -107,12 +112,25 @@ const ArticlePage = () => {
             const addedComment = await interactOnPost(id, user._id, "comment", commentContent, responseTo);
             if (addedComment) {
                 setCommentList((prev) => [...prev, addedComment]);
-                
             }
         } catch (error) {
             console.error("Error adding comment:", error);
         }
     };
+
+    const handleDeleteComment = async (comment) => {
+        if (user?._id !== comment.userId) return handleShow();
+        try {
+            const isLastNode = !commentMap[comment._id]?.replies.length;
+            console.log(isLastNode);
+            const updatedCommentList = await deleteComment(id, comment._id, isLastNode);
+            if (updatedCommentList) {
+                setCommentList(() => [...updatedCommentList]);
+            }
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    }
     
     const createCommentSection = (commentTreeNode, depth = 0) => {
         if (!commentTreeNode) return null;
@@ -123,15 +141,17 @@ const ArticlePage = () => {
             return (
                 <div key={nodeId} >
                     <Row>
-                        <Col xs={{ span: (12 - depth), offset: depth }}
+                        <Col xs={{ span: Math.max((12 - depth), 6), offset: Math.min(depth, 6) }}
                              className="d-flex flex-column flex-wrap pt-2 border-top">
 
-                            <Stack direction="vertical" gap={2} className="small">
-                                <p className="mt-2 text-break"><strong>{"@" + (comment.userId || "username")}</strong></p>
-                                <p className="mt-2 text-break">{comment.content}</p>
+                            <Stack direction="vertical" className="small mb-1">
+                                <p className="mt-2 text-break">
+                                    <strong>{comment.removed ? "deleted" : "@" + (comment.userId || "username")}</strong>
+                                </p>
+                                <p className="mb-1 text-break">{comment.content}</p>
                             </Stack>
 
-                            <Stack gap={2} direction="horizontal" className="mb-2">
+                            <Stack gap={2} direction="horizontal" className="my-2">
                             <Button
                                 id="Reply-Button"
                                 size="sm" 
@@ -139,8 +159,9 @@ const ArticlePage = () => {
                                 aria-expanded={replyMap[nodeId] || false}
                                 aria-controls={nodeId}
                                 onClick={() => handleReplyForm(nodeId)}
-                            >{replyMap[nodeId] ? <i className="bi bi-reply-fill"></i> : <i class="bi bi-reply"></i>}
+                            >{replyMap[nodeId] ? <i className="bi bi-reply-fill"></i> : <i className="bi bi-reply"></i>}
                             </Button> 
+                            
                             {comment.replies.length > 0 &&
                             <Button 
                                 id="Collapse-Button"
@@ -149,9 +170,21 @@ const ArticlePage = () => {
                                 onClick={() => handleOpen(nodeId)}
                                 aria-expanded={openMap[nodeId] || false}
                                 aria-controls={nodeId}
-                            > {openMap[nodeId] ? <i class="bi bi-caret-up-fill"></i> : <i class="bi bi-caret-down-fill"></i>}
+                            > {openMap[nodeId] ? <i className="bi bi-caret-up-fill"></i> : <i className="bi bi-caret-down-fill"></i>}
                             </Button>
                             }      
+
+                            {
+                            (comment.userId === user?._id && !comment.removed) &&
+                            <Button 
+                                id="Delete-Button"
+                                size="sm" 
+                                variant="outline-danger"
+                                onClick={() => handleDeleteComment(comment)}
+                                className="ms-3"
+                            > <i className="bi bi-trash"></i>
+                            </Button>
+                            }           
                             </Stack>
                             
                         </Col>  
@@ -283,7 +316,7 @@ const ArticlePage = () => {
                     </Button>   
                     
                     <Container fluid className="fs-6" body>
-                        {commentTree ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
+                        {commentList ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
                     </Container>
                     
                 </Col>
