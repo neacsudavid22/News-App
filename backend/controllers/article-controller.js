@@ -108,17 +108,20 @@ const savePost = async (articleId, userId) => {
     }
 }
 
-const postComment = async (articleId, userId, comment) => {
+const postComment = async (articleId, userId, content, responseTo) => {
     try{
         const { comments } = await Article.findById(articleId).select('comments');
         
-        comments.push({ user: userId, content: comment });
+        comments.push({ userId, content, responseTo });
 
-        const updatedArticlePost = await Article.findByIdAndUpdate({_id: articleId}, { $set: { comments: comments } })
+        const updatedArticlePost = await Article.findByIdAndUpdate({_id: articleId}, { $set: { comments: comments } }, { new: true })
         if(!updatedArticlePost){
             return { error: true, message: "Error updating comments on article post" };
         }
-        return updatedArticlePost;
+
+        const newComment = updatedArticlePost.comments[updatedArticlePost.comments.length - 1];
+
+        return newComment;
     }
     catch (err) {
         console.error(`postComment Error: ${err.message}`);

@@ -1,6 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
-import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser } from '../controllers/user-controller.js'
+import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, getUsername } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
 
@@ -34,7 +34,7 @@ const usersRouter = express.Router()
 
         return res.status(200).json(result);
     })
-
+    
     usersRouter.route('/author/:id').get(async (req, res) => {
         const result = await getUserById(req.params.id)
         if(result.account !== "author"){

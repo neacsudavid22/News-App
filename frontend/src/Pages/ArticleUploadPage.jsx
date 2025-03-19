@@ -21,9 +21,9 @@ const ArticleUploadPage = () => {
 
     const author = useContext(AuthContext).user;
 
-    const articleContent = JSON.parse(localStorage.getItem("article"))?.articleContent || [];
-    const articleImages = JSON.parse(localStorage.getItem("article"))?.articleImages || [];
-    const title = JSON.parse(localStorage.getItem("article"))?.title || "";
+    const articleContent = location.state.articleContent || [];
+    const articleImages = location.state.articleImages || [];
+    const title = location.state.title || "";
 
     const [category, setCategory] = useState("politics")
     const [tags, setTags] = useState([]);
@@ -61,7 +61,7 @@ const ArticleUploadPage = () => {
         try{
             const uploadedImageUrls = await uploadImages();
     
-            if (uploadedImageUrls.length !== (articleImages.length + background ? 1 : 0)) {
+            if (uploadedImageUrls.length !== (articleImages.length + 1)) {
                 console.error("Some images failed to upload");
                 return;
             }
@@ -116,12 +116,12 @@ const ArticleUploadPage = () => {
     const handleShow = () => setShow((prev) => !prev);
 
     const handleBack = () => {
-        navigate(-1);
+        navigate("/author", { state: {...location.state} });
     }
 
     useEffect(() => {
         if (!location.state?.fromEditor) {
-            navigate("/author", { state: { fromUploader: true }}); // Dacă nu vine din Author, îl redirecționezi
+            navigate("/author", { state: {...location.state} }); // Dacă nu vine din Author, îl redirecționezi
             return null;
         }
     }, [location.state, navigate]);

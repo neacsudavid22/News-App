@@ -29,6 +29,20 @@ const getUserById = async (id) => {
     }
 }
 
+const getUsername = async (id) => {
+    try{
+        const {username} = await User.findById(id).select("username")
+        if(!username){
+            return { error: true, message: "User not found" };
+        }
+        return username
+    }
+    catch (err) {
+        console.error(`getUsersById Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
 const createUser = async (user) => {
     try{
         const saltRounds = 10;
@@ -112,5 +126,6 @@ export {
     createUser,
     deleteUser,
     updateUser,
-    loginUser
+    loginUser,
+    getUsername
 }

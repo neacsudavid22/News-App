@@ -45,11 +45,12 @@ const postArticle = async (article) => {
     }
 }
 
-const interactOnPost = async (articleId, userId, interaction = "like", comment = null, responseTo = null) => {
+const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo = null) => {
     try{
+        console.log("userId:", userId, "content:", content);
         const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
             method: 'PUT',
-            body: JSON.stringify({comment, responseTo}),
+            body: JSON.stringify({content, responseTo}),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -57,9 +58,10 @@ const interactOnPost = async (articleId, userId, interaction = "like", comment =
         if(!response.ok){
             throw new Error(response?.message || "Failed to get author");
         }
-        return await response.json();
 
-    }catch(err){
+        return await response.json()
+
+    } catch(err){
         console.error("getAuthor error:", err);
         return null;
     }

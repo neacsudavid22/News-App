@@ -17,7 +17,6 @@ const upload = multer({
 }).array("images");
 
 const uploadRouter = express.Router()
-const port = process.env.PORT || 3600;
 
 // Middleware function
 uploadRouter.post("/upload-images", upload, (req, res) => {

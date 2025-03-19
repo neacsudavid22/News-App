@@ -6,7 +6,6 @@ const articlesRouter = express.Router()
 articlesRouter.route('/article').get(async (req, res) => {
     try {
         const category = req.query.category; 
-        const page = req.query.page;
 
         const result = await getArticles(category); 
 
@@ -98,7 +97,7 @@ articlesRouter.route('/article/like/:articleId/:userId').put(async (req, res) =>
 
 articlesRouter.route('/article/comment/:articleId/:userId').put(async (req, res) => {
     try{
-        const result = await postComment(req.params.articleId, req.params.userId, req.body.comment);
+        const result = await postComment(req.params.articleId, req.params.userId, req.body.content, req.body.responseTo);
 
         if (result.error) {
             return res.status(400).json({ message: result.message });

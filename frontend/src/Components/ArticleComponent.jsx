@@ -19,6 +19,8 @@ const ArticleComponent = ( {article} ) => {
     useEffect(() => {
         const fetchAuthor = async () => {
             try {
+                    if(!article) return;
+
                     const authorName = await getAuthorName(article.author);
                     if(authorName){
                         setAuthor(authorName);

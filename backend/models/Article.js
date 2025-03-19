@@ -50,14 +50,20 @@ const Article = model('Article', new Schema({
   },
   comments: {
       type: [{
-          _id: false,
           content: String,
-          user: {
+          userId: {
               type: SchemaTypes.ObjectId,
               ref: 'User', 
           },
-          responseTo: { type: Number, default: null }   
-          // I will search in this array for the position of the comment it responses to
+          responseTo: { 
+            type: Schema.Types.Mixed,
+            default: null,
+            validate: {
+                validator: function(value) {
+                return value === null || mongoose.isValidObjectId(value);
+              }
+            } 
+          }   
       }],
       default: [] 
   }

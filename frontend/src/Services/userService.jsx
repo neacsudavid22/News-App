@@ -61,4 +61,19 @@ const getAuthorName = async (authorId) => {
     }
 }
 
-export { authenticateUser, signUpUser, getAuthorName };
+const getUsername = async (userId) => {
+    try{
+        const response = await fetch(`http://localhost:3600/user-api/username/${userId}`);
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to get username");
+        }
+        
+        return await response.json();
+
+    }catch(err){
+        console.error("getUsername error:", err);
+        return null;
+    }
+}
+
+export { authenticateUser, signUpUser, getAuthorName, getUsername };

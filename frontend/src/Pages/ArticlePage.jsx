@@ -11,7 +11,10 @@ import { useParams } from "react-router";
 import { getArticleById, interactOnPost } from "../Services/articleService";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
-import Stack from "react-bootstrap/Stack";
+import React from "react";
+import Stack from "react-bootstrap/esm/Stack";
+import Card from "react-bootstrap/Card";
+import Collapse from 'react-bootstrap/Collapse';
 
 const ArticlePage = () => { 
 
@@ -20,11 +23,19 @@ const ArticlePage = () => {
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
 
+    const { user } = useContext(AuthContext);
+
+    const [commentList, setCommentList] = useState([]);
+    const [commentTree, setCommentTree] = useState(null);
+    const [commentContent, setCommentContent] = useState("");
+
+    const [openMap, setOpenMap] = useState({});
+    const [replyMap, setReplyMap] = useState({});
+    
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchArticle = async () => {
@@ -39,7 +50,35 @@ const ArticlePage = () => {
         };
         
         if (id) fetchArticle();
-    }, [id]);
+    }, [id, commentList]);
+
+    useEffect(() => {
+        if (article?.comments) {
+            setCommentList(article.comments);
+        }
+    }, [article]);
+    
+    useEffect(() => {
+        if (!commentList) return;
+    
+        const commentMap = {};
+        const treeList = [];
+    
+        commentList.forEach((comment) => {
+            commentMap[comment._id] = { ...comment, replies: [] };
+        });
+    
+        commentList.forEach((comment) => {
+            if (comment.responseTo !== null && commentMap[comment.responseTo]) {
+                commentMap[comment.responseTo].replies.push(commentMap[comment._id]);
+            } else {
+                treeList.push(commentMap[comment._id]);
+            }
+        });
+    
+        setCommentTree(treeList);
+    }, [commentList]);
+    
 
     useEffect(() => {
         if(user && article){
@@ -47,28 +86,115 @@ const ArticlePage = () => {
             setSaved(article.saves.includes(user._id));
         }
     }, [user, article]);
+    
+    const handleOpen = (index) => {
+        setOpenMap((prevOpenMap) => ({
+            ...prevOpenMap,
+            [index]: !prevOpenMap[index],
+        }));
+    };
 
-    // const createCommentTree = (commentList) => {
-    //     let map = {};
-    //     let treeList = [];
-        
-    //     // Create a map of all nodes
-    //     commentList.forEach((item, index) => {
-    //         map[index] = { ...item, responses: [] };
-    //     });
-        
-    //     // Link children to parents or add to root list
-    //     commentList.forEach((item, index) => {
-    //         if (item.responseTo === null) {
-    //         treeList.push(map[index]); // Multiple root nodes
-    //         } else {
-    //         map[index]?.responses.push(map[index]);
-    //         }
-    //     });
-    //     console.log(treeList);
-        
-    //     return treeList;
-    // }
+    const handleReplyForm = (index) => {
+        setReplyMap((prevReplyMap) => ({
+            ...prevReplyMap,
+            [index]: !prevReplyMap[index],
+        }));
+    };
+    
+    const handleCommentPost = async (responseTo = null) => {
+        if (!user) return handleShow();
+        try {
+            const addedComment = await interactOnPost(id, user._id, "comment", commentContent, responseTo);
+            if (addedComment) {
+                setCommentList((prev) => [...prev, addedComment]);
+                
+            }
+        } catch (error) {
+            console.error("Error adding comment:", error);
+        }
+    };
+    
+    const createCommentSection = (commentTreeNode, depth = 0) => {
+        if (!commentTreeNode) return null;
+    
+        const Wrapper = depth === 0 ? Container : "div"; 
+    
+        return commentTreeNode.map((comment, index) => {
+            const nodeId = `${index}-${depth}`;
+    
+            return (
+                <Wrapper gap={3} direction="vertical" className="min-w-vw" key={nodeId} >
+                    <Row className="w-100">
+                        <Col lg={12} className="w-100 d-flex flex-column pt-2 border-top " style={{ marginLeft: depth * 20 }}>
+                            <div className="small">
+                                <strong>{"@" + (comment.userId || "username")}</strong>
+                                <p className="mt-2">{comment.content}</p>
+                            </div>
+                        </Col>
+                        <Col xs={12} className="w-100 vw-100">
+                            <Stack gap={2} direction="horizontal" className="mb-2"
+                                    style={{ marginLeft: depth * 20 }}>
+                            <Button
+                                id="Reply-Button"
+                                size="sm" 
+                                variant={replyMap[nodeId] ? "warning" : "outline-warning" }
+                                aria-expanded={replyMap[nodeId] || false}
+                                aria-controls={nodeId}
+                                onClick={() => handleReplyForm(nodeId)}
+                            >{replyMap[nodeId] ? <i className="bi bi-reply-fill"></i> : <i class="bi bi-reply"></i>}
+                            </Button> 
+                            {comment.replies.length > 0 &&
+                            <Button 
+                                id="Collapse-Button"
+                                size="sm" 
+                                variant={openMap[nodeId] ? "outline-danger" : "outline-primary"}
+                                onClick={() => handleOpen(nodeId)}
+                                aria-expanded={openMap[nodeId] || false}
+                                aria-controls={nodeId}
+                            > {openMap[nodeId] ? <i class="bi bi-caret-up-fill"></i> : <i class="bi bi-caret-down-fill"></i>}
+                            </Button>
+                            }      
+                            </Stack>
+                            
+                        </Col>  
+                    </Row>
+                    <Collapse in={replyMap[nodeId] || false}>
+                            <div id={nodeId}>
+                                <div className="border-top mb-3 ">
+                                <FloatingLabel controlId="floatingTextarea" label="Leave a comment" className="mt-4" >
+                                    <Form.Control as="textarea" disabled={!user} 
+                                                style={{ height: '100px' }} placeholder="Leave a comment here"
+                                                onChange={(e) => setCommentContent(e.target.value)}
+                                                />
+                                </FloatingLabel>
+                                </div>
+                                
+                                <Button style={{borderRadius: "25%"}} 
+                                        variant="outline-secondary"
+                                        onClick={() => {
+                                            handleCommentPost(comment._id);
+                                            handleReplyForm(nodeId);
+                                            setTimeout(() => handleOpen(nodeId), 600);
+                                        }}
+                                        className="me-2 mb-3 "
+                                >
+                                    <i className="bi bi-chat-square-text"></i>
+                                </Button>   
+                            </div>
+                            </Collapse>
+                    <Row className="w-100">
+                        <Collapse in={openMap[nodeId] || false}>
+                            <div id={nodeId} className="mt-2">
+                                {comment.replies.length > 0 && createCommentSection(comment.replies, depth + 1)}
+                            </div>
+                        </Collapse>
+                    </Row>        
+                </Wrapper>
+            );
+        });
+    };
+    
+    
     return(
         <>
         <MainNavbar />
@@ -138,24 +264,24 @@ const ArticlePage = () => {
                     <h3 className="mt-4">Comment Section</h3>
                     <FloatingLabel controlId="floatingTextarea" label="Leave a comment" className="mt-4" >
                         <Form.Control as="textarea" disabled={!user} 
-                                    style={{ height: '100px' }} placeholder="Leave a comment here" />
+                                    style={{ height: '100px' }} placeholder="Leave a comment here"
+                                    onChange={(e) => setCommentContent(e.target.value)}
+                                    />
                     </FloatingLabel>
                     </div>
                     
 
                     <Button style={{borderRadius: "25%"}} 
                             variant="outline-secondary"
-                            onClick={(e) => {
-                                if (!user) return handleShow();
-                                const comment = e.target.value;
-                                interactOnPost(id, user._id, "comment", comment);
-
-                            }}
-                            className="me-2"
+                            onClick={handleCommentPost}
+                            className="me-2 mb-3 "
                     >
                         <i className="bi bi-chat-square-text"></i>
                     </Button>   
-
+                    
+                    <Card className="w-100 fs-6 p-0" body>
+                        {commentTree ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
+                    </Card>
                 </Col>
             </Row>
         </Container>

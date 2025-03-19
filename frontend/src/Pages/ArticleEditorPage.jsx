@@ -14,13 +14,13 @@ import "./ArticleEditorPage.css"
 import { useLocation, useNavigate } from "react-router";
 
 const ArticleEditorPage = () => {
+    const location = useLocation()
     const [selectedComponent, setSelectedComponent] = useState("hideContent");
-    const [title, setTitle] = useState(JSON.parse(localStorage.getItem("article"))?.title || "");
-    const [articleContent, setArticleContent] = useState(JSON.parse(localStorage.getItem("article"))?.articleContent || []);
-    const [edit, setEdit] = useState([]);
-    const [articleImages, setArticleImages] = useState(JSON.parse(localStorage.getItem("article"))?.articleImages || []);
+    const [title, setTitle] = useState(location.state?.title || "");
+    const [articleContent, setArticleContent] = useState(location.state?.articleContent || []);
+    const [edit, setEdit] = useState([]); // Starea pentru editare
     const navigate = useNavigate();
-    const location = useLocation();
+    const [articleImages, setArticleImages] = useState(location.state?.articleImages || []);
 
     // this is not the main component, scroll down
     const AddImage = ({ index, content = null }) => {
@@ -168,11 +168,8 @@ const ArticleEditorPage = () => {
     };
 
     const handleSubmit = () => {
-        if(title.length < 10) handleShow();
-        else {
-            localStorage.setItem("article", JSON.stringify({articleContent, title, articleImages}));
-            navigate("/author/upload", { state: { fromEditor: true } });
-        }
+        if(title.length < 10) handleShow()
+        else navigate("/author/upload", { state: {articleContent, title, articleImages, fromEditor: true}});
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
@@ -189,12 +186,6 @@ const ArticleEditorPage = () => {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
-
-    useEffect(() => {
-        if (!location.state?.fromUploader) {
-            localStorage.removeItem("article");
-        }
-    }, [location]);
 
     return (
         <>
