@@ -45,7 +45,7 @@ const postArticle = async (article) => {
     }
 }
 
-const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo = null) => {
+const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo) => {
     try{
         const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
             method: 'PUT',
@@ -86,6 +86,7 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
         return null;
     }
 }
+
 
 export {
     getArticles,

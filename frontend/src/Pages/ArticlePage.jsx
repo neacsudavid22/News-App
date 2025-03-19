@@ -54,11 +54,12 @@ const ArticlePage = () => {
 
     useEffect(() => {
         if (article?.comments) {
-            setCommentList(article.comments);
+            setCommentList([...article.comments]);
         }
     }, [article]);
     
     useEffect(() => {
+        
         if (!commentList) {
            return;
         }
@@ -80,6 +81,17 @@ const ArticlePage = () => {
     
         setCommentTree(treeList);
         setCommentMap(tempCommentMap);
+
+        let IS_CHANGED = false;
+    
+        commentList.forEach((comment) => { 
+            if (tempCommentMap[comment._id]?.replies.length === 0 && comment.removed) {
+                commentList.splice(commentList.findIndex(c => c._id === comment._id), 1);
+                IS_CHANGED = true;
+            }
+        });
+
+        if(IS_CHANGED) setCommentList(commentList);
 
     }, [commentList]);
     
@@ -111,7 +123,12 @@ const ArticlePage = () => {
         try {
             const addedComment = await interactOnPost(id, user._id, "comment", commentContent, responseTo);
             if (addedComment) {
-                setCommentList((prev) => [...prev, addedComment]);
+                if(responseTo){
+                    setCommentList((prev) => [...prev, addedComment]);
+                }
+                else{
+                    setCommentList((prev) => [addedComment, ...prev,]);
+                }
             }
         } catch (error) {
             console.error("Error adding comment:", error);
@@ -214,7 +231,7 @@ const ArticlePage = () => {
                             >
                                 <i className="bi bi-chat-square-text"></i>
                             </Button>   
-                        </div>
+                            </div>
                         </Collapse>
                     </Col>
                     </Row>
@@ -297,23 +314,24 @@ const ArticlePage = () => {
 
 
                     <div className="border-top my-3">
-                    <h3 className="mt-4">Comment Section</h3>
-                    <FloatingLabel controlId="floatingTextarea" label="Leave a comment" className="mt-4" >
-                        <Form.Control as="textarea" disabled={!user} 
-                                    style={{ height: '100px' }} placeholder="Leave a comment here"
-                                    onChange={(e) => setCommentContent(e.target.value)}
-                                    />
-                    </FloatingLabel>
+                        <h3 className="mt-4">Comment Section</h3>
+                        <FloatingLabel label="Leave a comment" className="mt-4 border-top mb-3 " >
+                            <Form.Control as="textarea" disabled={!user} 
+                                        style={{ height: '100px' }} placeholder="Leave a comment here"
+                                        onChange={(e) => setCommentContent(e.target.value)}
+                                        />
+                        </FloatingLabel>
+                        
+                        <Button style={{borderRadius: "25%"}} 
+                                variant="outline-secondary"
+                                onClick={() => {
+                                    handleCommentPost();
+                                }}
+                                className="me-2 mb-3 "
+                        >
+                            <i className="bi bi-chat-square-text"></i>
+                        </Button>   
                     </div>
-                    
-
-                    <Button style={{borderRadius: "25%"}} 
-                            variant="outline-secondary"
-                            onClick={handleCommentPost}
-                            className="me-2 mb-3 "
-                    >
-                        <i className="bi bi-chat-square-text"></i>
-                    </Button>   
                     
                     <Container fluid className="fs-6" body>
                         {commentList ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
