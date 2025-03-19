@@ -117,23 +117,21 @@ const ArticlePage = () => {
     const createCommentSection = (commentTreeNode, depth = 0) => {
         if (!commentTreeNode) return null;
     
-        const Wrapper = depth === 0 ? Container : "div"; 
-    
         return commentTreeNode.map((comment, index) => {
             const nodeId = `${index}-${depth}`;
     
             return (
-                <Wrapper gap={3} direction="vertical" className="min-w-vw" key={nodeId} >
-                    <Row className="w-100">
-                        <Col lg={12} className="w-100 d-flex flex-column pt-2 border-top " style={{ marginLeft: depth * 20 }}>
-                            <div className="small">
-                                <strong>{"@" + (comment.userId || "username")}</strong>
-                                <p className="mt-2">{comment.content}</p>
-                            </div>
-                        </Col>
-                        <Col xs={12} className="w-100 vw-100">
-                            <Stack gap={2} direction="horizontal" className="mb-2"
-                                    style={{ marginLeft: depth * 20 }}>
+                <div key={nodeId} >
+                    <Row>
+                        <Col xs={{ span: (12 - depth), offset: depth }}
+                             className="d-flex flex-column flex-wrap pt-2 border-top">
+
+                            <Stack direction="vertical" gap={2} className="small">
+                                <p className="mt-2 text-break"><strong>{"@" + (comment.userId || "username")}</strong></p>
+                                <p className="mt-2 text-break">{comment.content}</p>
+                            </Stack>
+
+                            <Stack gap={2} direction="horizontal" className="mb-2">
                             <Button
                                 id="Reply-Button"
                                 size="sm" 
@@ -158,38 +156,43 @@ const ArticlePage = () => {
                             
                         </Col>  
                     </Row>
-                    <Collapse in={replyMap[nodeId] || false}>
-                            <div id={nodeId}>
-                                <div className="border-top mb-3 ">
-                                <FloatingLabel controlId="floatingTextarea" label="Leave a comment" className="mt-4" >
-                                    <Form.Control as="textarea" disabled={!user} 
-                                                style={{ height: '100px' }} placeholder="Leave a comment here"
-                                                onChange={(e) => setCommentContent(e.target.value)}
-                                                />
-                                </FloatingLabel>
-                                </div>
-                                
-                                <Button style={{borderRadius: "25%"}} 
-                                        variant="outline-secondary"
-                                        onClick={() => {
-                                            handleCommentPost(comment._id);
-                                            handleReplyForm(nodeId);
-                                            setTimeout(() => handleOpen(nodeId), 600);
-                                        }}
-                                        className="me-2 mb-3 "
-                                >
-                                    <i className="bi bi-chat-square-text"></i>
-                                </Button>   
+                    
+                    <Row>
+                    <Col>
+                        <Collapse in={replyMap[nodeId] || false}>
+                        <div id={nodeId}>
+                            <div className="border-top mb-3 ">
+                            <FloatingLabel label="Leave a comment" className="mt-4" >
+                                <Form.Control as="textarea" disabled={!user} 
+                                            style={{ height: '100px' }} placeholder="Leave a comment here"
+                                            onChange={(e) => setCommentContent(e.target.value)}
+                                            />
+                            </FloatingLabel>
                             </div>
-                            </Collapse>
-                    <Row className="w-100">
-                        <Collapse in={openMap[nodeId] || false}>
-                            <div id={nodeId} className="mt-2">
-                                {comment.replies.length > 0 && createCommentSection(comment.replies, depth + 1)}
-                            </div>
+                            
+                            <Button style={{borderRadius: "25%"}} 
+                                    variant="outline-secondary"
+                                    onClick={() => {
+                                        handleCommentPost(comment._id);
+                                        handleReplyForm(nodeId);
+                                        setTimeout(() => handleOpen(nodeId), 600);
+                                    }}
+                                    className="me-2 mb-3 "
+                            >
+                                <i className="bi bi-chat-square-text"></i>
+                            </Button>   
+                        </div>
                         </Collapse>
-                    </Row>        
-                </Wrapper>
+                    </Col>
+                    </Row>
+                   
+
+                    <Collapse in={openMap[nodeId] || false}>
+                        <div id={nodeId} className="mt-2">
+                            {comment.replies.length > 0 && createCommentSection(comment.replies, depth + 1)}
+                        </div>
+                    </Collapse>
+                </div>
             );
         });
     };
@@ -279,9 +282,10 @@ const ArticlePage = () => {
                         <i className="bi bi-chat-square-text"></i>
                     </Button>   
                     
-                    <Card className="w-100 fs-6 p-0" body>
+                    <Container fluid className="fs-6" body>
                         {commentTree ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
-                    </Card>
+                    </Container>
+                    
                 </Col>
             </Row>
         </Container>
