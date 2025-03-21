@@ -28,7 +28,7 @@ uploadRouter.post("/upload-images", upload, (req, res) => {
     res.status(200).json({ imageUrls });
 });
 
-uploadRouter.get("/upload-images/:url", (req, res) => {
+uploadRouter.get("/get-image/:url", (req, res) => {
 
     const __filename = url.fileURLToPath(import.meta.url);  // convertește URL-ul fișierului în path absolut.
 

@@ -108,7 +108,6 @@ const deleteGarbageComment = async (articleId, commentList) => {
     }
 }
 
-
 export {
     getArticles,
     postArticle,

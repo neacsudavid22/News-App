@@ -10,7 +10,7 @@ const ArticleViewCard = ({ article, isBig }) => {
     useEffect( () => {
         const fetchBackgroundImage = async () => {
             try {
-                const response = await fetch("http://localhost:3600/upload-api/upload-images/" + article.background);
+                const response = await fetch("http://localhost:3600/upload-api/get-image/" + article.background);
                 const imageBlob = await response.blob(); // Convert response to blob
                 setBackgroundPreview(URL.createObjectURL(imageBlob)); // Set the image URL
             } catch(err) {

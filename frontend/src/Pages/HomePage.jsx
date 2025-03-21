@@ -5,17 +5,13 @@ import Container from 'react-bootstrap/Container';
 import "./HomePage.css";
 import { getArticles } from "../Services/articleService";
 import MainNavbar from "../Components/MainNavBar";
+import MainArticleCard from "../Components/MainArticleCard";
+import Stack from "react-bootstrap/esm/Stack";
+import SecondaryArticleCard from "../Components/SecondaryArticleCard";
 
 const CategoryBar = () => {
   const [category, setCategory] = useState('allNews');  
 
-  const [innerWidth, setInnerWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => setInnerWidth(window.innerWidth);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
   
   const CATEGORIES = {
     allNews: ["gray"] ,
@@ -54,7 +50,7 @@ const CategoryBar = () => {
   }, [category])   
 
   return (
-    <Container fluid className="p-0">
+    <Stack className="w-100">
       <MainNavbar/>
 
       {/* Second Navbar (Tabs) */}
@@ -85,14 +81,12 @@ const CategoryBar = () => {
         </Navbar.Collapse>
       </Navbar>
 
-      <div className="d-flex justify-content-center">
-      <Container fluid className={ innerWidth < 768 ? "w-75" : "w-50"}> 
-        {articles.map((a) => <p>{a.title}</p>)}
+      <Container fluid> 
+        {articles.map((a) => a.main ? <MainArticleCard key={a._id} article={a}/> 
+                                    : <SecondaryArticleCard key={a._id} article={a}/>)}
       </Container>
 
-      </div>
-
-    </Container>
+    </Stack>
   );
 }
 

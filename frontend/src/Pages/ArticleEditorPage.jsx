@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
@@ -12,6 +12,7 @@ import MainNavbar from "../Components/MainNavBar";
 import Modal from "react-bootstrap/Modal";
 import "./ArticleEditorPage.css"
 import { useLocation, useNavigate } from "react-router";
+import useWindowSize from "../hooks/useWindowSize";
 
 const ArticleEditorPage = () => {
     const location = useLocation()
@@ -179,13 +180,7 @@ const ArticleEditorPage = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const [innerWidth, setInnerWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => setInnerWidth(window.innerWidth);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const {width} = useWindowSize();
 
     return (
         <>
@@ -230,7 +225,7 @@ const ArticleEditorPage = () => {
                                             : <Tag className="w-100 p-2 ">{item.content}</Tag>
                                        }
 
-                                       <Stack direction={Tag === "Image" || innerWidth < 768 ? "vertical" : "horizontal"} gap={2} className="ms-3 justify-content-center">
+                                       <Stack direction={Tag === "Image" || width < 768 ? "vertical" : "horizontal"} gap={2} className="ms-3 justify-content-center">
                                         <Button variant="outline-success" type="button" 
                                             onClick={() => { 
                                                 setSelectedComponent(dict[item.contentType]); 

@@ -14,6 +14,7 @@ const Article = model('Article', new Schema({
     required: [true, "Author is required"],
     minlength: 3
   },
+  main: { type: Boolean, default: false },
   category: { 
     type: String,
     enum: ['politics', 'extern', 'finance', 'sports', 'tech', 'lifestyle'],

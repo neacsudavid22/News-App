@@ -4,17 +4,12 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Image from "react-bootstrap/Image";
 import { getAuthorName } from "../Services/userService";
+import useWindowSize from "../hooks/useWindowSize";
 
 const ArticleComponent = ( {article} ) => { 
     const [imageUrls, setImageUrls] = useState({}); // Store image URLs
     const [author, setAuthor] = useState(null);
-    const [innerWidth, setInnerWidth] = useState();
-
-    useEffect(() => {
-        const handleResize = () => setInnerWidth(window.innerWidth);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const {width} = useWindowSize();
 
     useEffect(() => {
         const fetchAuthor = async () => {
@@ -42,7 +37,7 @@ const ArticleComponent = ( {article} ) => {
             for (const item of article.articleContent) {
                 if (item.contentType === "Image") {
                     try {
-                        const response = await fetch(`http://localhost:3600/upload-api/upload-images/${item.content}`);
+                        const response = await fetch(`http://localhost:3600/upload-api/get-image/${item.content}`);
                         const imageBlob = await response.blob();
                         newImageUrls[item.content] = URL.createObjectURL(imageBlob);
                     } catch (err) {
@@ -76,7 +71,7 @@ const ArticleComponent = ( {article} ) => {
                             {Tag === "Image" ? (
                                 <div key={index} className="d-flex justify-content-center">
                                     <Image fluid  thumbnail src={imageUrls[a.content] || ""} alt="Image" 
-                                    className={innerWidth > 768 ? "w-75 p-2 my-3" : "w-100 p-2 my-3" } />
+                                    className={width > 768 ? "w-75 p-2 my-3" : "w-100 p-2 my-3" } />
                                 </div>
                             ) : (
                                 <div key={index} className=" justify-content-start">
