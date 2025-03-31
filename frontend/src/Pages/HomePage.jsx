@@ -4,7 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import "./HomePage.css";
 import { getArticles } from "../Services/articleService";
-import MainNavbar from "../Components/MainNavBar";
+import MainNavbar from "../Components/MainNavbar";
 import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
@@ -50,12 +50,12 @@ const CategoryBar = () => {
   }, [category])   
 
   return (
-    <Stack className="w-100">
-      <MainNavbar/>
+    <Stack direction="vertical" className="w-100 bg-light">
+      <MainNavbar />
 
       {/* Second Navbar (Tabs) */}
       <Navbar sticky="top" style={{ background: CATEGORIES[category]?.[0] || "gray", marginBottom: "2rem" }} expand="lg" 
-              className="w-100 p-2 p-lg-0 sticky-offset"
+              className="w-100 p-2 p-lg-0 sticky-offset z-index-1000"
       >
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse className="py-1 p-lg-0">
