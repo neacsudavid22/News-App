@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import LoginPage from "./Pages/LoginPage";
 import HomePage from "./Pages/HomePage";
 import { AuthContext, AuthProvider } from "./Components/AuthProvider"; 
@@ -8,12 +8,19 @@ import ArticleEditorPage from "./Pages/ArticleEditorPage";
 import ArticleUploadPage from "./Pages/ArticleUploadPage";
 import ArticlePage from "./Pages/ArticlePage";
 import { useContext } from "react";
+import ProfilePage from "./Pages/ProfilePage";
 
 function App() {
 
   function ProtectedRoute({ children }) {
     const { user } = useContext(AuthContext);
     return user?.account === "author" ? children : <LoginPage />;
+  }
+
+  function ProtectedRouteLoggedIn({ children }) {
+    const { user } = useContext(AuthContext);
+    const { id } = useParams();
+    return user?._id === id ? children : <HomePage />;
   }
 
   return (
@@ -24,6 +31,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/author" element={<ProtectedRoute> <ArticleEditorPage /> </ProtectedRoute>} />
           <Route path="/author/upload" element={<ProtectedRoute> <ArticleUploadPage /> </ProtectedRoute>} />
+          <Route path="/profile/:id" element={<ProtectedRouteLoggedIn> <ProfilePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/article/:id" element={<ArticlePage />} />
         </Routes>
       </AuthProvider>
