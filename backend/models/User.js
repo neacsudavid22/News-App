@@ -7,6 +7,10 @@ const User = model("User", new Schema({
         unique: true,
         minlength: [10, "The email must have at least 10 characters"]
     },
+    phone: {
+        type: String,
+        required: true
+    },
     password: { 
         type: String, 
         required: true,
@@ -50,6 +54,15 @@ const User = model("User", new Schema({
         type: [SchemaTypes.ObjectId],
         ref: 'Post',
         default: []
+    },
+    birthdate: {
+        type: Date,
+        required: true
+    },
+    gender: {
+        type: String,
+        enum: ["male", "female", "other"],
+        required: true
     }
 }, { timestamps: true }));
 
