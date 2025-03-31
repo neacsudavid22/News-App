@@ -14,24 +14,29 @@ import Col from 'react-bootstrap/Col';
 const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [name, setName] = useState("");
+    const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
+    const [birthdate, setBirthdate] = useState(Date.now);
     const [login, setLogin] = useState(true);
     const navigate = useNavigate();
     const { saveToken } = useContext(AuthContext); 
 
     useEffect(() => {
-        // Reset input fields when toggling between Login & Sign-up
         setUsername("");
         setEmail("");
+        setPhone("");
         setName("");
         setPassword("");
+        setGender(null);
+        setBirthdate(Date.now);
     }, [login]);
 
     const handleAuth = async () => {
         try {
             const data = login ? await authenticateUser(username, password)
-                                : await signUpUser(email, name, username, password);
+                                : await signUpUser(email, phone, name, gender, birthdate, username, password);
 
             if (data.token) {
                 saveToken(data.token);
@@ -43,10 +48,10 @@ const LoginPage = () => {
     };
 
     return (
-        <Container fluid className="d-flex justify-content-center vh-100 pt-5 bg-light ">
+        <Container fluid className="d-flex justify-content-center vh-100 pt-5">
             <Row className="w-100 justify-content-center">
                 <Col sm={12} md={8} lg={8} xl={6}> {/* Responsive form width */}
-                    <Form className="fs-6 p-2 mt-2 shadow rounded bg-white">
+                    <Form className="fs-6 p-2 mt-2 mb-5 shadow rounded bg-white">
                         <Stack direction="vertical" gap={4} className="text-center m-4">
                             <h2>{login ? "Login Form" : "Sign Up Form"}</h2>
 
@@ -64,12 +69,48 @@ const LoginPage = () => {
                                     </Form.Group>
 
                                     <Form.Group>
+                                        <FloatingLabel label="Phone number">
+                                            <Form.Control
+                                                type="tel"
+                                                placeholder="0712345678"
+                                                value={phone}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                        </FloatingLabel>
+                                    </Form.Group>
+
+                                    <Form.Group>
                                         <FloatingLabel label="Full Name">
                                             <Form.Control
                                                 type="text"
                                                 placeholder="John Doe"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
+                                            />
+                                        </FloatingLabel>
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <FloatingLabel label="gender">
+                                            <Form.Select 
+                                                aria-label="gender select"  
+                                                value={gender}
+                                                onChange={(e) => setGender(e.target.value)}
+                                            >
+                                                <option value="male">male</option>
+                                                <option value="female">female</option>
+                                                <option value="other">other</option>
+                                            </Form.Select>
+                                        </FloatingLabel>
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <FloatingLabel label="birthdate">
+                                        <Form.Control
+                                                type="date"
+                                                placeholder="birthdate"
+                                                value={birthdate}
+                                                onChange={(e) => setBirthdate(e.target.value)}
                                             />
                                         </FloatingLabel>
                                     </Form.Group>
@@ -98,25 +139,19 @@ const LoginPage = () => {
                                 </FloatingLabel>
                             </Form.Group>
 
-                            <Container className="d-flex justify-content-center">
-                                <Row>
-                                    <Col>
-                                        <Button variant="primary" onClick={handleAuth} className="fs-5">
-                                            {login ? "Log In" : "Sign Up"}
-                                        </Button>
-                                    </Col>
-                                </Row>  
-                            </Container>
-
-                            <div className="d-flex justify-content-center w-100">
+                            <Stack direction="horizontal" gap={3} className="d-flex justify-content-between">
                                 <Form.Check
                                     type="switch"
                                     id="toggleAuth"
-                                    label={login ? "I want to sign up" : "I want to log in"}
+                                    label={login ? "Sign up" : "Log in"}
                                     checked={!login}
                                     onChange={() => setLogin((prev) => !prev)}
                                 />
-                            </div>
+                                <Button size="sm" variant="primary" onClick={handleAuth} className="fs-5">
+                                    {login ? "Log In" : "Sign Up"}
+                                </Button>
+                            </Stack>
+                            
                         </Stack>
                     </Form>
                 </Col>
