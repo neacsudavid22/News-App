@@ -11,7 +11,7 @@ import Image from "react-bootstrap/Image";
 import { useContext, useEffect, useState } from "react";
 import "./ArticleUploadPage.css";
 import { AuthContext } from "../Components/AuthProvider";
-import MainNavbar from "../Components/MainNavBar";
+import MainNavbar from "../Components/MainNavbar";
 import { postArticle } from "../Services/articleService";
 import Modal from "react-bootstrap/esm/Modal";
 
@@ -224,12 +224,9 @@ const ArticleUploadPage = () => {
                     onClick={ handlePublish }>
                 Publish Article
             </Button>
-     
-            
+    
         </Col>
         </Row>
-
-        
         </Container>
         </>
     );

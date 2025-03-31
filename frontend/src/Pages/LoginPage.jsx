@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { authenticateUser, signUpUser } from "../Services/userService";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../Components/AuthProvider";
-import { useContext } from "react";
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 import Button from 'react-bootstrap/Button';
@@ -10,6 +8,7 @@ import Stack from 'react-bootstrap/Stack';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { AuthContext } from "../Components/AuthProvider";
  
 const LoginPage = () => {
     const [username, setUsername] = useState("");
@@ -19,9 +18,9 @@ const LoginPage = () => {
     const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
     const [birthdate, setBirthdate] = useState(Date.now);
-    const [login, setLogin] = useState(true);
+    const [TRY_TO_LOGIN, SET_TRY_TO_LOGIN] = useState(true);
     const navigate = useNavigate();
-    const { saveToken } = useContext(AuthContext); 
+    const { login } = useContext(AuthContext);
 
     useEffect(() => {
         setUsername("");
@@ -31,15 +30,15 @@ const LoginPage = () => {
         setPassword("");
         setGender(null);
         setBirthdate(Date.now);
-    }, [login]);
+    }, [TRY_TO_LOGIN]);
 
     const handleAuth = async () => {
         try {
-            const data = login ? await authenticateUser(username, password)
+            const { token } = TRY_TO_LOGIN ? await authenticateUser(username, password)
                                 : await signUpUser(email, phone, name, gender, birthdate, username, password);
 
-            if (data.token) {
-                saveToken(data.token);
+            if (token) {
+                login();
                 navigate("/");
             }
         } catch (err) {
@@ -53,9 +52,9 @@ const LoginPage = () => {
                 <Col sm={12} md={8} lg={8} xl={6}> {/* Responsive form width */}
                     <Form className="fs-6 p-2 mt-2 mb-5 shadow rounded bg-white">
                         <Stack direction="vertical" gap={4} className="text-center m-4">
-                            <h2>{login ? "Login Form" : "Sign Up Form"}</h2>
+                            <h2>{TRY_TO_LOGIN ? "Login Form" : "Sign Up Form"}</h2>
 
-                            {!login && (
+                            {!TRY_TO_LOGIN && (
                                 <>
                                     <Form.Group>
                                         <FloatingLabel label="Email address">
@@ -143,12 +142,12 @@ const LoginPage = () => {
                                 <Form.Check
                                     type="switch"
                                     id="toggleAuth"
-                                    label={login ? "Sign up" : "Log in"}
-                                    checked={!login}
-                                    onChange={() => setLogin((prev) => !prev)}
+                                    label={TRY_TO_LOGIN ? "Sign up" : "Log in"}
+                                    checked={!TRY_TO_LOGIN}
+                                    onChange={() => SET_TRY_TO_LOGIN((prev) => !prev)}
                                 />
                                 <Button size="sm" variant="primary" onClick={handleAuth} className="fs-5">
-                                    {login ? "Log In" : "Sign Up"}
+                                    {TRY_TO_LOGIN ? "Log In" : "Sign Up"}
                                 </Button>
                             </Stack>
                             
