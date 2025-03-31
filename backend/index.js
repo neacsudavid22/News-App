@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 
 // Connect to MongoDB
-async () => await connectDB();
+await connectDB();
 
 const port = process.env.PORT || 5000;
 

@@ -32,7 +32,7 @@ const AuthProvider = ({ children }) => {
             if (!response.ok) throw new Error(response.message || "Failed to refresh user");
 
             login();
-            
+
         } catch (error) {
             console.error("Error refreshing user:", error);
             setUser(null);
@@ -47,7 +47,7 @@ const AuthProvider = ({ children }) => {
             });
 
             setUser(null);
-            window.location.reload(); // Ensure the state resets properly
+            window.location.reload(); 
         } catch (error) {
             console.error("Error logging out:", error);
         }
