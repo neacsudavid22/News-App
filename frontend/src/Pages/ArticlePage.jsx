@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import ArticleComponent from "../Components/ArticleComponent";
-import MainNavbar from "../Components/MainNavBar";
+import MainNavbar from "../Components/MainNavbar";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/esm/Col";
