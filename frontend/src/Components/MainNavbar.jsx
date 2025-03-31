@@ -41,7 +41,6 @@ const MainNavbar = () => {
     const sendFriendRequest = async () => {
         const response = IS_BY_ID ? await sendFriendRequestById(user._id, friendId)
                                 : await sendFriendRequestByUsername(user._id, friendUsername);
-        console.log(IS_BY_ID ? "sendFriendRequestById" : "sendFriendRequestByUsername");
         if(response.message){
             setFriendRequest({ message: response.message, error: response.error });
         }
@@ -103,7 +102,7 @@ const MainNavbar = () => {
                             <Form.Check
                                     type="switch"
                                     id="toggleAuth"
-                                    label={IS_BY_ID ? "id on" : "username on"}
+                                    label={IS_BY_ID ? "id" : "username"}
                                     checked={IS_BY_ID}
                                     onChange={() => SET_IS_BY_ID((prev) => !prev)}
                                 />
