@@ -1,3 +1,4 @@
+
 const authenticateUser = async (username, password) => {
     try {
         const response = await fetch(`http://localhost:3600/user-api/login`, {
@@ -19,7 +20,7 @@ const authenticateUser = async (username, password) => {
     }
 };
 
-const signUpUser = async (email, name, username, password) => {
+const signUpUser = async (email, phone, name, gender, birthdate, username, password) => {
     try {
         const response = await fetch(`http://localhost:3600/user-api/user`, {
             method: 'POST',
@@ -28,9 +29,12 @@ const signUpUser = async (email, name, username, password) => {
             },
             body: JSON.stringify({
                 email,
+                phone,
                 name,
                 username,
                 password,
+                gender,
+                birthdate,
                 account: "standard",
             }),
         });
@@ -76,4 +80,53 @@ const getUsername = async (userId) => {
     }
 }
 
-export { authenticateUser, signUpUser, getAuthorName, getUsername };
+const sendFriendRequestById = async (userId, friendId) => {
+    try {
+        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/friend-request-by-id`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ friendId })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok && !data.show) {
+            throw new Error(data.message || "Unknown error occurred");
+        }
+
+        return data; 
+
+    } catch (err) {
+        console.error("sendFriendRequestService error:", err);
+        return { error: true, message: err.message };
+    }
+};
+
+const sendFriendRequestByUsername = async (userId, friendUsername) => {
+    try {
+        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/friend-request-by-username`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ friendUsername })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok && !data.show) {
+            throw new Error(data.message || "Unknown error occurred");
+        }
+
+        return data; 
+
+    } catch (err) {
+        console.error("sendFriendRequestService error:", err);
+        return { error: true, message: err.message };
+    }
+};
+
+
+export { authenticateUser, signUpUser, getAuthorName, getUsername, sendFriendRequestById, sendFriendRequestByUsername };

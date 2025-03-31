@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import mongoose from 'mongoose';
 
 const getUsers = async () => {
     try {
@@ -22,20 +23,6 @@ const getUserById = async (id) => {
             return { error: true, message: "User not found" };
         }
         return user
-    }
-    catch (err) {
-        console.error(`getUsersById Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-}
-
-const getUsername = async (id) => {
-    try{
-        const {username} = await User.findById(id).select("username")
-        if(!username){
-            return { error: true, message: "User not found" };
-        }
-        return username
     }
     catch (err) {
         console.error(`getUsersById Error: ${err.message}`);
@@ -94,6 +81,69 @@ const updateUser = async (id, user) => {
     }
 }
 
+const sendFriendRequestById = async (id, friendId) => {
+    try {
+        if(!mongoose.Types.ObjectId.isValid(friendId)){
+            return { error: true, message: "Must provide an valid id!" };
+        }
+
+        const user = await User.findById(id).select('_id');
+        if (!user) {
+            return { error: true, message: "Error: current user id not found" };
+        }
+
+        const userFriend = await User.findById(friendId).select('friendRequests');
+        if (!userFriend) {
+            return { error: true, show: true, message: "Friend not found, wrong id!" };
+        }
+
+        if(user.friendList && user.friendList.includes(userFriend._id)){
+            return { error: true, show: true, message: "You are already friend with this user!" };
+        }
+
+
+        if (userFriend.friendRequests && userFriend.friendRequests.includes(user._id)) {
+            return { error: true, show: true, message: "Friend request already sent!" };
+        }
+
+        await User.updateOne({ _id: friendId }, { $addToSet: { friendRequests: user._id } });
+
+        return { error: false, message: "Friend request sent succesfully!" };
+    } catch (err) {
+        console.error(`sendFriendRequestById Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
+const sendFriendRequestByUsername = async (id, friendUsername) => {
+    try {
+        const user = await User.findById(id).select('_id');
+        if (!user) {
+            return { error: true, message: "Error: current user id not found" };
+        }
+
+        const userFriend = await User.findOne({username: friendUsername}).select('friendRequests');
+        if (!userFriend) {
+            return { error: true, show: true, message: "Friend not found, wrong username!" };
+        }
+ 
+        if(user.friendList && user.friendList.includes(userFriend._id)){
+            return { error: true, show: true, message: "You are already friend with this user!" };
+        }
+
+        if (userFriend.friendRequests && userFriend.friendRequests.includes(user._id)) {
+            return { error: true, show: true, message: "Friend request already sent!" };
+        }
+
+        await User.updateOne({ _id: userFriend._id }, { $addToSet: { friendRequests: user._id } });
+
+        return { error: false, message: "Friend request sent succesfully!" };
+    } catch (err) {
+        console.error(`sendFriendRequestByUsername Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
 const loginUser = async (username, password) => {
     try {
         const user = await User.findOne({ username }).exec();
@@ -127,5 +177,6 @@ export {
     deleteUser,
     updateUser,
     loginUser,
-    getUsername
+    sendFriendRequestById,
+    sendFriendRequestByUsername
 }
