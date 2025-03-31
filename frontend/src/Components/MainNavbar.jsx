@@ -38,6 +38,10 @@ const MainNavbar = () => {
         return;
     }
 
+    const [showShareId, setShowShareId] = useState(false);
+    const handleCloseShareId = () => setShowShareId(false);
+    const handleShowShareId = () => setShowShareId(true);
+
     const sendFriendRequest = async () => {
         const response = IS_BY_ID ? await sendFriendRequestById(user._id, friendId)
                                 : await sendFriendRequestByUsername(user._id, friendUsername);
@@ -63,10 +67,36 @@ const MainNavbar = () => {
                         
                         >
                             <Dropdown.Item type="button" variant="danger" onClick={handleShow}>Add a friend</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={handleShowShareId}>Share your id</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item type="button" as={Link} to="/" onClick={handleLogout}>Logout</Dropdown.Item>
                         </SplitButton>
+
+                        <Modal show={showShareId} onHide={handleCloseShareId} centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Share your ID</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Id couldn't be get"
+                                    value={user._id}
+                                    aria-label="Disabled input example"
+                                    readOnly
+                                />
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleCloseShareId}>
+                                    Close
+                                </Button>
+                                <Button variant="success" onClick={() => {
+                                        navigator.clipboard.writeText(user._id);
+                                        setTimeout( () => handleCloseShareId(), 1000);
+                                    }}
+                                >Copy Id</Button>
+                            </Modal.Footer>
+                        </Modal>
 
                         <Modal show={show} onHide={handleClose} centered>
                             <Modal.Header closeButton>
