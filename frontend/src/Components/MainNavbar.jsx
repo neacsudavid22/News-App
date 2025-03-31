@@ -26,7 +26,10 @@ const MainNavbar = () => {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleShow = () => {
+        setShow(true);
+        setFriendRequest({});
+    }
 
     const navigate = useNavigate();
 
