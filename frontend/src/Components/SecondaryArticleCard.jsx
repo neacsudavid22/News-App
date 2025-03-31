@@ -63,11 +63,14 @@ const SecondaryArticleCard = ({ article }) => {
 
                     {/* Right Side - Image */}
                     <Col xs={3} sm={3} md={4} lg={4} xl={2} className="d-flex justify-content-center align-items-center">
+                    {
+                    backgroundUrl &&
                         <Image 
                             thumbnail
                             src={backgroundUrl} 
                             style={{ aspectRatio: "4 / 3", objectFit: "cover" }} 
                         />
+                    }
                     </Col>
 
                 </Card>

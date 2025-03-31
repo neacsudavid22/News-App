@@ -47,13 +47,16 @@ const MainArticleCard = ({article}) => {
         <Row className="mb-4 justify-content-center">
         <Col xs={12} sm={12} md={10} lg={8} xl={6} style={{height: "28rem"}} >
         <Card className="d-flex flex-column h-100" style={{cursor:"pointer"}} onClick={handleNavigation}>
-            <div style={{ flex: "8", overflow: "hidden" }}> 
-                <Card.Img 
-                variant="top" 
-                src={backgroundUrl} 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-                />
-            </div>
+            {
+                backgroundUrl &&
+                <div style={{ flex: "8", overflow: "hidden" }}> 
+                    <Card.Img 
+                    variant="top" 
+                    src={backgroundUrl} 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    />
+                </div>
+            }
             <Card.Body className="border-top" style={{ flex: "2" }} > 
                 <Card.Title className="fs-4">{article?.title || "Loading..."}</Card.Title>
                 <Card.Text className="fs-6" style={{textAlign: "justify", textJustify: "inter-word"}}>
