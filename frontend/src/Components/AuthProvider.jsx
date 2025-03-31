@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -14,13 +14,25 @@ const AuthProvider = ({ children }) => {
 
             if (!response.ok) throw new Error("Failed to fetch user");
 
-            const { user } = await response.json();
-            setUser(user);
+            const result = await response.json();
+            setUser(result.user);
         } catch (error) {
             console.error("Error fetching user:", error);
             setUser(null);
         }
-    };
+    };  
+
+    useEffect(()=>{
+        const verifyAuthentificationStatus = async () => {
+            const response = await fetch("http://localhost:3600/user-api/check-auth", { 
+                method: "GET",
+                credentials: "include"
+            })
+            const { authenticated } = await response.json();
+            return authenticated;
+        }
+        if(verifyAuthentificationStatus() === true) { login(); }
+    }, []);
 
     const refresh = async () => {
         try {

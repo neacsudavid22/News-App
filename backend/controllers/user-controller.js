@@ -51,7 +51,7 @@ const createUser = async (user) => {
 const deleteUser = async (id) => {
     try{
         const deletedUser = await User.deleteOne({_id: id})
-        if(!deleteUser){
+        if(!deletedUser){
             return { error: true, message: "Error deleting user" };
         }
         return deletedUser;
@@ -69,7 +69,7 @@ const updateUser = async (id, user) => {
             const salt = await bcrypt.genSalt(saltRounds);
             user.password = await bcrypt.hash(user.password, salt);
         }
-        const updatedUser = await User.updateOne({_id: id}, user);
+        const updatedUser = await User.findByIdAndUpdate({_id: id}, user);
         if(!updatedUser){
             return { error: true, message: "Error updating user" };
         }
