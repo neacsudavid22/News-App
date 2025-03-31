@@ -62,7 +62,7 @@ const usersRouter = express.Router()
         if (result.error) {
             return res.status(400).json({ message: result.message });
         }
-
+        
         return res.status(200).json(result);
     })
 
@@ -93,12 +93,52 @@ const usersRouter = express.Router()
             return res.status(400).json({ message: result.message });
         }
 
+        res.cookie("token", result.token, {
+            httpOnly: true, // Prevent JavaScript access
+            sameSite: "Strict", // Prevent CSRF
+            maxAge: 60 * 60 * 1000 // 1 hour
+        });
+
         return res.status(200).json(result);
     })
 
-    usersRouter.route('/token').get(authMiddleware,  async (req, res) => {
-        const {user} = req.user;
-        return res.status(200).json({user});
-    })
+    usersRouter.post("/logout", authMiddleware, (req, res) => {
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: "Strict"
+        });
+        return res.status(200).json({ message: "Logged out successfully" });
+    });
 
+    usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {
+        return res.status(200).json({ user: req.user });
+    });
+
+    usersRouter.get("/refresh-token", authMiddleware, async (req, res) => {
+        try {
+            const user = await getUserById(req.user._id);
+            if (!user) {
+                return res.status(400).json({ message: "User not found" });
+            }
+            const forRefresh = true;
+            const result = await loginUser(user.username, user.password, forRefresh);
+    
+            res.clearCookie("token", {
+                httpOnly: true,
+                sameSite: "Strict"
+            });
+    
+            res.cookie("token", result.token, {
+                httpOnly: true,
+                sameSite: "Strict",
+                maxAge: 60 * 60 * 1000
+            });
+    
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error("Error refreshing token:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    });
+    
 export default usersRouter;

@@ -11,7 +11,7 @@ import SplitButton from 'react-bootstrap/SplitButton';
 import { sendFriendRequestById, sendFriendRequestByUsername } from "../Services/userService";
 
 const MainNavbar = () => {
-    const { user, setUser, removeToken } = useContext(AuthContext); 
+    const { user, logout } = useContext(AuthContext); 
     const [friendRequest, setFriendRequest] = useState({});
     const [friendId, setFriendId] = useState(null);
     const [friendUsername, setFriendUsername] = useState(null);
@@ -19,8 +19,7 @@ const MainNavbar = () => {
     const [IS_BY_ID, SET_IS_BY_ID] = useState(true);
 
     const handleLogout = () => {
-        removeToken(); 
-        setUser(null); 
+        if(user){ logout() }
     }
 
     const [show, setShow] = useState(false);

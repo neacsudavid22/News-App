@@ -69,10 +69,11 @@ const updateUser = async (id, user) => {
             const salt = await bcrypt.genSalt(saltRounds);
             user.password = await bcrypt.hash(user.password, salt);
         }
-        const updatedUser = await User.updateOne({_id: id}, user)
+        const updatedUser = await User.updateOne({_id: id}, user);
         if(!updatedUser){
             return { error: true, message: "Error updating user" };
         }
+        
         return updatedUser;
     }
     catch (err) {
@@ -144,14 +145,17 @@ const sendFriendRequestByUsername = async (id, friendUsername) => {
     }
 };
 
-const loginUser = async (username, password) => {
+const loginUser = async (username, password, forRefresh = false) => {
     try {
         const user = await User.findOne({ username }).exec();
         if (!user) return { error: true, message: "User doesn't exist" };
 
         // Compare password with hashed version
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return { error: true, message: "Invalid password" };
+        if(!forRefresh){
+            const validPassword = await bcrypt.compare(password, user.password);
+            if (!validPassword) return { error: true, message: "Invalid password" };
+        }
+        else if (password !== user.password) return { error: true, message: "Invalid password" };
 
         const userObj = user.toObject();
         delete userObj.password;
@@ -163,7 +167,6 @@ const loginUser = async (username, password) => {
 
         if(!token) return { error: true, message: "Error generating token" };
         return { token };
-
     } catch (err) {
         console.error("Error with login:", err);
         return { error: true, message: "Internal Server Error" };

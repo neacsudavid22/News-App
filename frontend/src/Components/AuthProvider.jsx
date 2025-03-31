@@ -1,49 +1,63 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => sessionStorage.getItem("token"));
+    const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) return;
-      try {
-        const response = await fetch("http://localhost:3600/user-api/token", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    const login = async () => {
+        try {
+            const response = await fetch("http://localhost:3600/user-api/user-by-token", {
+                method: "GET",
+                credentials: "include"
+            });
 
-        if (!response.ok) throw new Error("Failed to fetch user");
+            if (!response.ok) throw new Error("Failed to fetch user");
 
-        const {user} = await response.json();
-        setUser(user);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        removeToken();
-      }
+            const { user } = await response.json();
+            setUser(user);
+        } catch (error) {
+            console.error("Error fetching user:", error);
+            setUser(null);
+        }
     };
 
-    fetchUser();
-  }, [token]); 
+    const refresh = async () => {
+        try {
+            const response = await fetch(`http://localhost:3600/user-api/refresh-token`, {
+                method: "GET",
+                credentials: "include"
+            });
 
-  const saveToken = (newToken) => {
-    sessionStorage.setItem("token", newToken);
-    setToken(newToken); // Triggers fetchUser via useEffect
-  };
+            if (!response.ok) throw new Error(response.message || "Failed to refresh user");
 
-  const removeToken = () => {
-    sessionStorage.removeItem("token");
-    setUser(null);
-    setToken(null);
-  };
+            login();
+            
+        } catch (error) {
+            console.error("Error refreshing user:", error);
+            setUser(null);
+        }
+    };
 
-  return (
-    <AuthContext.Provider value={{ user, saveToken, removeToken}}>
-      {children}
-    </AuthContext.Provider>
-  );
+    const logout = async () => {
+        try {
+            await fetch("http://localhost:3600/user-api/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+
+            setUser(null);
+            window.location.reload(); // Ensure the state resets properly
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+
+    return (
+        <AuthContext.Provider value={{ user, login, logout, refresh }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export { AuthContext, AuthProvider };
