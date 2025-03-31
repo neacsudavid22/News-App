@@ -10,9 +10,7 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 
 // Connect to MongoDB
-(async () => {
-    await connectDB();
-})();
+async () => await connectDB();
 
 const port = process.env.PORT || 5000;
 
@@ -24,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
   origin: ["http://localhost:5173"], 
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], 
-  credentials: true, // Allow cookies and authentication headers
+  credentials: true,
   allowedHeaders: ["Content-Type"]
 };
 

@@ -95,7 +95,7 @@ const usersRouter = express.Router()
 
         res.cookie("token", result.token, {
             httpOnly: true, // Prevent JavaScript access
-            sameSite: "Strict", // Prevent CSRF
+            sameSite: "Lax", // Prevent CSRF
             maxAge: 60 * 60 * 1000 // 1 hour
         });
 
@@ -105,7 +105,7 @@ const usersRouter = express.Router()
     usersRouter.post("/logout", authMiddleware, (req, res) => {
         res.clearCookie("token", {
             httpOnly: true,
-            sameSite: "Strict"
+            sameSite: "Lax"
         });
         return res.status(200).json({ message: "Logged out successfully" });
     });
@@ -125,12 +125,12 @@ const usersRouter = express.Router()
     
             res.clearCookie("token", {
                 httpOnly: true,
-                sameSite: "Strict"
+                sameSite: "Lax"
             });
     
             res.cookie("token", result.token, {
                 httpOnly: true,
-                sameSite: "Strict",
+                sameSite: "Lax",
                 maxAge: 60 * 60 * 1000
             });
     
