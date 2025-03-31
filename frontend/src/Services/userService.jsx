@@ -1,22 +1,20 @@
-
 const authenticateUser = async (username, password) => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const response = await fetch("http://localhost:3600/user-api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
+            credentials: "include"
         });
 
         if (!response.ok) {
             throw new Error("Failed to authenticate user, either the username or password is wrong");
         }
 
-        return await response.json(); 
+        return await response.json();
     } catch (err) {
         console.error("authenticateUser error:", err);
-        return null; 
+        return null;
     }
 };
 
@@ -128,5 +126,29 @@ const sendFriendRequestByUsername = async (userId, friendUsername) => {
     }
 };
 
+const updateUser = async (userId, user) => {
+    try {
+        const response = await fetch(`http://localhost:3600/user-api/user/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+            credentials: "include"
+        });
 
-export { authenticateUser, signUpUser, getAuthorName, getUsername, sendFriendRequestById, sendFriendRequestByUsername };
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || "Unknown error occurred");
+        }
+        return result; 
+
+    } catch (err) {
+        console.error("updateUser error:", err);
+        return { error: true, message: err.message };
+    }
+};
+
+
+export { authenticateUser, signUpUser, getAuthorName, getUsername, sendFriendRequestById, sendFriendRequestByUsername, updateUser };
