@@ -14,6 +14,7 @@ import Form from "react-bootstrap/Form";
 import React from "react";
 import Stack from "react-bootstrap/esm/Stack";
 import Collapse from 'react-bootstrap/Collapse';
+import { getUsername } from "../Services/userService";
 
 const ArticlePage = () => { 
 
@@ -38,6 +39,8 @@ const ArticlePage = () => {
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const [usernames, setUsernames] = useState([]);
 
     useEffect(() => {
         const fetchArticle = async () => {
@@ -79,6 +82,31 @@ const ArticlePage = () => {
     
         setCommentTree(treeList);
         setCommentMap(tempCommentMap);
+
+        const handleUsernames = async () => {
+            const getUsernameFetch = async (id) => {
+                try {
+                    const username = await getUsername(id);
+                    return username;
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+        
+            const tempUsernames = {};
+            
+            await Promise.all(
+                Object.values(tempCommentMap).map(async (c) => {
+                    const username = await getUsernameFetch(c.userId);
+                    tempUsernames[c.userId] = username;
+                })
+            );
+        
+            setUsernames(tempUsernames);
+        };
+        
+        
+        handleUsernames();
 
         const tempCommentList = [...commentList];
 
@@ -160,11 +188,12 @@ const ArticlePage = () => {
     }
     
     const createCommentSection = (commentTreeNode, depth = 0) => {
+
+        
         if (!commentTreeNode) return null;
     
         return commentTreeNode.map((comment, index) => {
             const nodeId = `${index}-${depth}`;
-    
             return (
                 <div key={nodeId} >
                     <Row>
@@ -173,7 +202,7 @@ const ArticlePage = () => {
 
                             <Stack direction="vertical" className="small mb-1">
                                 <p className="mt-2 text-break">
-                                    <strong>{comment.removed ? "deleted" : "@" + (comment.userId || "username")}</strong>
+                                    <strong>{comment.removed ? "deleted" : "@" + (usernames[comment.userId] || "loading..")}</strong>
                                 </p>
                                 <p className="mb-1 text-break">{comment.content}</p>
                             </Stack>

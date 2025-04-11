@@ -69,10 +69,9 @@ const getUsername = async (userId) => {
         if(!response.ok){
             throw new Error(response?.message || "Failed to get username");
         }
-        
-        return await response.json();
-
-    }catch(err){
+        const username = await response.json();
+        return username;
+    } catch(err){
         console.error("getUsername error:", err);
         return null;
     }
