@@ -113,39 +113,5 @@ const usersRouter = express.Router()
     usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {
         return res.status(200).json({ user: req.user });
     });
-
-    usersRouter.get("/refresh-token", authMiddleware, async (req, res) => {
-        try {
-            const user = await getUserById(req.user._id);
-            if (!user) {
-                return res.status(400).json({ message: "User not found" });
-            }
-            const forRefresh = true;
-            const result = await loginUser(user.username, user.password, forRefresh);
-    
-            res.clearCookie("token", {
-                httpOnly: true,
-                sameSite: "Lax"
-            });
-    
-            res.cookie("token", result.token, {
-                httpOnly: true,
-                sameSite: "Lax",
-                maxAge: 60 * 60 * 1000
-            });
-    
-            return res.status(200).json(result);
-        } catch (error) {
-            console.error("Error refreshing token:", error);
-            return res.status(500).json({ message: "Internal server error" });
-        }
-    });
-
-    usersRouter.get("/check-auth", (req, res) => {
-        if (req.cookies.token) {
-            return res.json({ authenticated: true });
-        }
-        return res.json({ authenticated: false });
-    });
     
 export default usersRouter;
