@@ -2,33 +2,25 @@ import { useContext, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import Navbar from 'react-bootstrap/Navbar';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import Form from 'react-bootstrap/Form';
 import Stack from "react-bootstrap/Stack";
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import SplitButton from 'react-bootstrap/SplitButton';
-import { sendFriendRequestById, sendFriendRequestByUsername } from "../Services/userService";
+
+import AddFriendModal from './AddFriendModal';
+import ShareIdModal from './ShareIdModal';
+import FriendRequestsModal from './FriendRequestsModal';
 
 const MainNavbar = () => {
     const { user, logout } = useContext(AuthContext); 
-    const [friendRequest, setFriendRequest] = useState({});
-    const [friendId, setFriendId] = useState(null);
-    const [friendUsername, setFriendUsername] = useState(null);
-
-    const [IS_BY_ID, SET_IS_BY_ID] = useState(true);
 
     const handleLogout = () => {
         if(user){ logout() }
     }
 
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => {
-        setShow(true);
-        setFriendRequest({});
-    }
+    const [showAddFriend, setShowAddFriend] = useState(false);
+    const [showShareId, setShowShareId] = useState(false);
+    const [showFriendRequests, setShowFriendRequests] = useState(false);
 
     const navigate = useNavigate();
 
@@ -38,17 +30,7 @@ const MainNavbar = () => {
         return;
     }
 
-    const [showShareId, setShowShareId] = useState(false);
-    const handleCloseShareId = () => setShowShareId(false);
-    const handleShowShareId = () => setShowShareId(true);
-
-    const sendFriendRequest = async () => {
-        const response = IS_BY_ID ? await sendFriendRequestById(user._id, friendId)
-                                : await sendFriendRequestByUsername(user._id, friendUsername);
-        if(response.message){
-            setFriendRequest({ message: response.message, error: response.error });
-        }
-    }
+    
 
     return(
         <Navbar sticky="top" bg="dark" variant="dark" expand="lg" className="w-100 m-0 p-2 px-3">
@@ -64,88 +46,22 @@ const MainNavbar = () => {
                         align="end"
                         title={('@' + user?.username) || "loading.." }
                         id="dropdown-menu-align-end"
-                        
                         >
-                            <Dropdown.Item type="button" variant="danger" onClick={handleShow}>Add a friend</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={handleShowShareId}>Share your id</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowAddFriend(true)}>Add a friend</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendRequests(true)}>View friend requests</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item type="button" as={Link} to="/" onClick={handleLogout}>Logout</Dropdown.Item>
                         </SplitButton>
 
-                        <Modal show={showShareId} onHide={handleCloseShareId} centered>
-                            <Modal.Header closeButton>
-                                <Modal.Title>Share your ID</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Id couldn't be get"
-                                    value={user._id}
-                                    aria-label="Disabled input example"
-                                    readOnly
-                                />
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleCloseShareId}>
-                                    Close
-                                </Button>
-                                <Button variant="success" onClick={() => {
-                                        navigator.clipboard.writeText(user._id);
-                                        setTimeout( () => handleCloseShareId(), 1000);
-                                    }}
-                                >Copy Id</Button>
-                            </Modal.Footer>
-                        </Modal>
+                        <AddFriendModal show={showAddFriend} handleClose={() => setShowAddFriend(false)} />
+                        <ShareIdModal show={showShareId} handleClose={() => setShowShareId(false)} userId={user._id} />
+                        <FriendRequestsModal 
+                            show={showFriendRequests} 
+                            handleClose={() => setShowFriendRequests(false)} 
+                        />
 
-                        <Modal show={show} onHide={handleClose} centered>
-                            <Modal.Header closeButton>
-                                <Modal.Title>Add a friend!</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Form>
-                                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                                        <Form.Control type="text" className=" mb-3" 
-                                                      placeholder={`Insert friend's unique ${IS_BY_ID ? "id" : "username"}`}
-                                                      onChange={
-                                                        (e) => {
-                                                            IS_BY_ID ? setFriendId(e.target.value)
-                                                                     : setFriendUsername(e.target.value)
-                                                        }
-                                                    } />
-                                        <Form.Text className="text-muted" >
-                                        { IS_BY_ID ? "The id can be found in the profile page and must be shared before" 
-                                                  : "Introduce the username of the user you want to befriend" }
-                                        </Form.Text>
-                                        <br/><br/>
-                                        {   
-                                        friendRequest.message && 
-                                        <Form.Text style={{color: friendRequest.error ? "red" : "green"}}>
-                                        {friendRequest.message}
-                                        </Form.Text>
-                                        }
-                                       
-                                    </Form.Group>
-                                </Form>
-                            </Modal.Body>
-                            <Modal.Footer className="d-flex justify-content-between">
-                            <Form.Check
-                                    type="switch"
-                                    id="toggleAuth"
-                                    label={IS_BY_ID ? "id" : "username"}
-                                    checked={IS_BY_ID}
-                                    onChange={() => SET_IS_BY_ID((prev) => !prev)}
-                                />
-                                <div>
-                                <Button variant="secondary" onClick={handleClose} className="me-2">
-                                    Close
-                                </Button>
-                                <Button variant="danger" onClick={sendFriendRequest}>
-                                    Send Request
-                                </Button>
-                                </div>
-                            </Modal.Footer>
-                        </Modal>
                     </Stack>
                 ) : (
                     <Button className="text-light" variant="danger" as={NavLink} to="/login">Login</Button>
