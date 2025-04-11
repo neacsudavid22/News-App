@@ -1,6 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
-import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername } from '../controllers/user-controller.js'
+import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
 
@@ -14,6 +14,16 @@ const usersRouter = express.Router()
         }
 
         return res.status(200).json(result);
+    })
+
+    usersRouter.route('/username/:id').get( async (req, res) => {
+        const result = await getUserById(req.params.id);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json(result.username);
     })
 
     usersRouter.route('/user').post(async (req, res) => {
@@ -78,6 +88,26 @@ const usersRouter = express.Router()
 
     usersRouter.route('/user/:id/friend-request-by-username').post(async (req, res) => {
         const result = await sendFriendRequestByUsername(req.params.id, req.body.friendUsername);
+    
+        if (result.error && !result.show) {
+            return res.status(400).json({ show: false, message: result.message });
+        }
+    
+        return res.status(200).json(result); 
+    });
+
+    usersRouter.route('/user/:id/accept-friend-request-by-id').post(async (req, res) => {
+        const result = await acceptFriendRequest(req.params.id, req.body.friendId);
+    
+        if (result.error && !result.show) {
+            return res.status(400).json({ show: false, message: result.message });
+        }
+    
+        return res.status(200).json(result); 
+    });
+
+    usersRouter.route('/user/:id/decline-friend-request-by-id').post(async (req, res) => {
+        const result = await declineFriendRequest(req.params.id, req.body.friendId);
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });

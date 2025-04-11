@@ -9,6 +9,7 @@ const AddFriendModal = ({ show, handleClose }) => {
     const [friendUsername, setFriendUsername] = useState("");
     const [IS_BY_ID, SET_IS_BY_ID] = useState(true);
     const [friendRequest, setFriendRequest] = useState({});
+    const [content, setContent] = useState("");
 
     const sendFriendRequest = async () => {
         const response = IS_BY_ID
@@ -32,11 +33,11 @@ const AddFriendModal = ({ show, handleClose }) => {
                             type="text"
                             className="mb-3"
                             placeholder={`Insert friend's unique ${IS_BY_ID ? "id" : "username"}`}
-                            onChange={(e) =>
-                                IS_BY_ID
-                                    ? setFriendId(e.target.value)
-                                    : setFriendUsername(e.target.value)
-                            }
+                            value={content}
+                            onChange={(e) => {
+                                setContent(e.target.value);  
+                                IS_BY_ID ? setFriendId(e.target.value) : setFriendUsername(e.target.value);
+                            }}
                         />
                         <Form.Text className="text-muted">
                             {IS_BY_ID
@@ -58,7 +59,10 @@ const AddFriendModal = ({ show, handleClose }) => {
                     id="toggleAuth"
                     label={IS_BY_ID ? "id" : "username"}
                     checked={IS_BY_ID}
-                    onChange={() => SET_IS_BY_ID((prev) => !prev)}
+                    onChange={() => {
+                        SET_IS_BY_ID((prev) => !prev);
+                        setContent("");  
+                    }}
                 />
                 <div>
                     <Button variant="secondary" onClick={handleClose} className="me-2">

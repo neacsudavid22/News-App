@@ -1,9 +1,12 @@
 import { Modal, Button, ListGroup, Row, Col } from 'react-bootstrap';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
+import { getUsername } from '../Services/userService';
 
 const FriendRequestsModal = ({ show, handleClose }) => {
     const { user } = useContext(AuthContext);
+    const friendRequests = user?.friendRequests;
+    const [usernames, setUsernames] = useState([]);
 
     const handleAccept = () => {
         //TO-DO
@@ -13,8 +16,34 @@ const FriendRequestsModal = ({ show, handleClose }) => {
         //TO-DO
     }
 
+    useEffect(() => {
+        const getUsernameFetch = async (id) => {
+            try {
+                const username = await getUsername(id);
+                return username;
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const fetchUsernames = async () => {
+            const tempUsernames = {}
+                
+            await Promise.all(
+                (friendRequests).map(async (fr) => {
+                    const username = await getUsernameFetch(fr);
+                    tempUsernames[fr] = username;
+                })
+            );
+        
+            setUsernames(tempUsernames);
+        }
+
+        fetchUsernames();
+    }, [friendRequests]);
+
     return (
-        <Modal show={show} onHide={handleClose} centered>
+        <Modal show={show} className='mt-4' onHide={handleClose} >
             <Modal.Header closeButton>
                 <Modal.Title>Friend Requests</Modal.Title>
             </Modal.Header>
@@ -25,7 +54,7 @@ const FriendRequestsModal = ({ show, handleClose }) => {
                             <ListGroup.Item key={index}>
                                 <Row className="align-items-center">
                                     <Col xs={6} className="text-truncate">
-                                        <code>{requestId}</code>
+                                        <strong>{usernames[requestId] || "Loading.."}</strong>
                                     </Col>
                                     <Col xs="auto">
                                         <Button

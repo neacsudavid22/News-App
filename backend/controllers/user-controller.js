@@ -22,7 +22,7 @@ const getUserById = async (id) => {
         if(!user){
             return { error: true, message: "User not found" };
         }
-        return user
+        return user;
     }
     catch (err) {
         console.error(`getUsersById Error: ${err.message}`);
@@ -93,6 +93,10 @@ const sendFriendRequestById = async (id, friendId) => {
             return { error: true, message: "Error: current user id not found" };
         }
 
+        if (id === friendId) {
+            return { error: true, message: "This is your account" };
+        }
+
         const userFriend = await User.findById(friendId).select('friendRequests');
         if (!userFriend) {
             return { error: true, show: true, message: "Friend not found, wrong id!" };
@@ -118,7 +122,7 @@ const sendFriendRequestById = async (id, friendId) => {
 
 const sendFriendRequestByUsername = async (id, friendUsername) => {
     try {
-        const user = await User.findById(id).select('_id');
+        const user = await User.findById(id);
         if (!user) {
             return { error: true, message: "Error: current user id not found" };
         }
@@ -126,6 +130,10 @@ const sendFriendRequestByUsername = async (id, friendUsername) => {
         const userFriend = await User.findOne({username: friendUsername}).select('friendRequests');
         if (!userFriend) {
             return { error: true, show: true, message: "Friend not found, wrong username!" };
+        }
+
+        if(user.username === friendUsername){
+            return { error: true, message: "This is your account" };
         }
  
         if(user.friendList && user.friendList.includes(userFriend._id)){
@@ -144,6 +152,74 @@ const sendFriendRequestByUsername = async (id, friendUsername) => {
         return { error: true, message: "Internal Server Error" };
     }
 };
+
+const acceptFriendRequest = async (id, friendId) => {
+    try {
+        const user = await User.findById(id).select('_id friendRequests friendList');
+        if (!user) {
+            return { error: true, message: "Error: current user id not found" };
+        }
+
+        const userFriend = await User.findById(friendId).select('_id friendRequests friendList');
+        if (!userFriend) {
+            return { error: true, message: "Friend not found, wrong id!" };
+        }
+
+        if (user.friendList && user.friendList.includes(friendId)) {
+            return { error: true, message: "You are already friends with this user!" };
+        }
+
+        if (!user.friendRequests || !user.friendRequests.includes(friendId)) {
+            return { error: true, message: "No friend request found from this user!" };
+        }
+
+        await User.updateOne(
+            { _id: id },
+            { $pull: { friendRequests: friendId }, $addToSet: { friendList: friendId } }
+        );
+
+        await User.updateOne(
+            { _id: friendId },
+            { $addToSet: { friendList: id } }
+        );
+
+        return { error: false, message: "Friend request accepted successfully!" };
+    } catch (err) {
+        console.error(`acceptFriendRequest Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
+
+const declineFriendRequest = async (id, friendId) => {
+    try {
+        const user = await User.findById(id).select('_id friendRequests');
+        if (!user) {
+            return { error: true, message: "Error: current user id not found" };
+        }
+
+        const userFriend = await User.findById(friendId).select('_id friendRequests');
+        if (!userFriend) {
+            return { error: true, message: "Friend not found, wrong id!" };
+        }
+
+        if (!user.friendRequests || !user.friendRequests.includes(friendId)) {
+            return { error: true, message: "No friend request found from this user!" };
+        }
+
+        await User.updateOne(
+            { _id: id },
+            { $pull: { friendRequests: friendId } }
+        );
+
+        return { error: false, message: "Friend request declined successfully!" };
+    } catch (err) {
+        console.error(`declineFriendRequest Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
+
 
 const loginUser = async (username, password, forRefresh = false) => {
     try {
@@ -181,5 +257,7 @@ export {
     updateUser,
     loginUser,
     sendFriendRequestById,
-    sendFriendRequestByUsername
+    sendFriendRequestByUsername,
+    acceptFriendRequest,
+    declineFriendRequest
 }
