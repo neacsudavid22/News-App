@@ -22,13 +22,34 @@ const AuthProvider = ({ children }) => {
         }
     };  
 
-    useEffect(() => {
-        const tryLogin = async () => {
-            await login(); 
-        };
-        tryLogin();
+    useEffect(()=>{
+        const verifyAuthentificationStatus = async () => {
+            const response = await fetch("http://localhost:3600/user-api/check-auth", { 
+                method: "GET",
+                credentials: "include"
+            })
+            const { authenticated } = await response.json();
+            return authenticated;
+        }
+        if(verifyAuthentificationStatus() === true) { login(); }
     }, []);
 
+    const refresh = async () => {
+        try {
+            const response = await fetch(`http://localhost:3600/user-api/refresh-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) throw new Error(response.message || "Failed to refresh user");
+
+            login();
+
+        } catch (error) {
+            console.error("Error refreshing user:", error);
+            setUser(null);
+        }
+    };
 
     const logout = async () => {
         try {
@@ -45,7 +66,7 @@ const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, refresh }}>
             {children}
         </AuthContext.Provider>
     );
