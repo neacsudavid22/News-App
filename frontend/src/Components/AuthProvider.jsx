@@ -22,16 +22,11 @@ const AuthProvider = ({ children }) => {
         }
     };  
 
-    useEffect(()=>{
-        const verifyAuthentificationStatus = async () => {
-            const response = await fetch("http://localhost:3600/user-api/check-auth", { 
-                method: "GET",
-                credentials: "include"
-            })
-            const { authenticated } = await response.json();
-            return authenticated;
-        }
-        if(verifyAuthentificationStatus() === true) { login(); }
+    useEffect(() => {
+        const tryLogin = async () => {
+            await login(); 
+        };
+        tryLogin();
     }, []);
 
     const refresh = async () => {
