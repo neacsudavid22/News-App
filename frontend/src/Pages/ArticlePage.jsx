@@ -15,11 +15,14 @@ import React from "react";
 import Stack from "react-bootstrap/esm/Stack";
 import Collapse from 'react-bootstrap/Collapse';
 import { getUsername } from "../Services/userService";
+import ShareArticle from "../Components/ShareArticle";
 
 const ArticlePage = () => { 
 
     const { id } = useParams(); 
     const [article, setArticle] = useState(null);
+    const [likeCount, setLikeCount] = useState(article?.likes.length || 0);
+
     const [IS_ARTICLE_FETCH_NEDEED, SET_IS_ARTICLE_FETCH_NEDEED] = useState(false);
 
     const [liked, setLiked] = useState(false);
@@ -42,6 +45,11 @@ const ArticlePage = () => {
 
     const [usernames, setUsernames] = useState([]);
 
+    const [showShare, setShowShare] = useState(false);
+
+    const handleShowShare = () => setShowShare(true);
+    const handleCloseShare = () => setShowShare(false);
+
     useEffect(() => {
         const fetchArticle = async () => {
             try {
@@ -49,7 +57,8 @@ const ArticlePage = () => {
                 if (data) {
                     setArticle(data);
                     setCommentList([...data.comments]);
-
+                    setLikeCount(() => data.likes.length);
+                    console.log(data);
                 }
             } catch (err) {
                 console.error("Error fetching article:", err);
@@ -146,18 +155,18 @@ const ArticlePage = () => {
         }
     }, [user, article]);
     
-    const handleOpen = (index) => {
+    const handleOpen = (nodeId) => {
         setOpenMap((prevOpenMap) => ({
             ...prevOpenMap,
-            [index]: !prevOpenMap[index],
+            [nodeId]: !prevOpenMap[nodeId],
         }));
     };
 
-    const handleReplyForm = (index) => {
+    const handleReplyForm = (nodeId) => {
         setCommentContent("");
         setReplyMap((prevReplyMap) => ({
             ...prevReplyMap,
-            [index]: !prevReplyMap[index],
+            [nodeId]: !prevReplyMap[nodeId],
         }));
     };
     
@@ -188,16 +197,15 @@ const ArticlePage = () => {
     }
     
     const createCommentSection = (commentTreeNode, depth = 0) => {
-
         
         if (!commentTreeNode) return null;
     
-        return commentTreeNode.map((comment, index) => {
-            const nodeId = `${index}-${depth}`;
+        return commentTreeNode.map((comment) => {
+            const nodeId = comment._id
             return (
                 <div key={nodeId} >
                     <Row>
-                        <Col xs={{ span: Math.max((12 - depth), 6), offset: Math.min(depth, 6) }}
+                        <Col xs={{ span: Math.max((12 - depth), 9), offset: Math.min(depth, 3) }}
                              className="d-flex flex-column flex-wrap pt-2 border-top">
 
                             <Stack direction="vertical" className="small mb-1">
@@ -209,36 +217,39 @@ const ArticlePage = () => {
 
                             <Stack gap={2} direction="horizontal" className="my-2">
                             <Button
+                                className="rounded-4"
                                 id="Reply-Button"
                                 size="sm" 
                                 variant={replyMap[nodeId] ? "warning" : "outline-warning" }
                                 aria-expanded={replyMap[nodeId] || false}
                                 aria-controls={nodeId}
                                 onClick={() => handleReplyForm(nodeId)}
-                            >{replyMap[nodeId] ? <i className="bi bi-reply-fill"></i> : <i className="bi bi-reply"></i>}
+                            ><strong className="pe-1">Reply</strong>{replyMap[nodeId] ? <i className="bi bi-reply-fill"></i> : <i className="bi bi-reply"></i>}
                             </Button> 
                             
                             {comment.replies.length > 0 &&
                             <Button 
+                                className="rounded-4"
                                 id="Collapse-Button"
                                 size="sm" 
                                 variant={openMap[nodeId] ? "outline-danger" : "outline-primary"}
                                 onClick={() => handleOpen(nodeId)}
                                 aria-expanded={openMap[nodeId] || false}
                                 aria-controls={nodeId}
-                            > {openMap[nodeId] ? <i className="bi bi-caret-up-fill"></i> : <i className="bi bi-caret-down-fill"></i>}
+                            > <strong>{`See ${openMap[nodeId] ? "less" : "more"}`}</strong>
+                                {openMap[nodeId] ? <i className="bi bi-caret-up-fill"></i> : <i className="bi bi-caret-down-fill"></i>}
                             </Button>
                             }      
 
                             {
                             (comment?.userId === user?._id && !comment.removed) &&
                             <Button 
+                                className="rounded-4"
                                 id="Delete-Button"
                                 size="sm" 
                                 variant="outline-danger"
                                 onClick={() => handleDeleteComment(comment)}
-                                className="ms-3"
-                            > <i className="bi bi-trash"></i>
+                            > <strong>Delete</strong><i className="bi bi-trash"></i>
                             </Button>
                             }           
                             </Stack>
@@ -259,16 +270,16 @@ const ArticlePage = () => {
                             </FloatingLabel>
                             </div>
                             
-                            <Button style={{borderRadius: "25%"}} 
-                                    variant="outline-secondary"
-                                    onClick={() => {
-                                        handleCommentPost(comment._id);
-                                        handleReplyForm(nodeId);
-                                        setTimeout(() => handleOpen(nodeId), 600);
-                                    }}
-                                    className="me-2 mb-3 "
+                            <Button 
+                                variant="outline-secondary"
+                                onClick={() => {
+                                    handleCommentPost(comment._id);
+                                    handleReplyForm(nodeId);
+                                    setTimeout(() => handleOpen(nodeId), 600);
+                                }}
+                                className="me-2 mb-3 rounded-4"
                             >
-                                <i className="bi bi-chat-square-text"></i>
+                                <strong className="pe-2">Comment</strong><i className="bi bi-chat-square-text"></i>
                             </Button>   
                             </div>
                         </Collapse>
@@ -284,8 +295,7 @@ const ArticlePage = () => {
                 </div>
             );
         });
-    };
-    
+    };    
     
     return(
         <>
@@ -308,47 +318,48 @@ const ArticlePage = () => {
             <Row className="w-100 justify-content-center mb-3">
                 <Col xs={12} sm={12} md={10} lg={8} xl={7}> 
                    
-                    <Button style={{borderRadius: "25%"}} 
-                            variant="secondary"   
+                    <Button 
+                            variant="outline-dark"  
                             disabled
-                            className="me-2"
+                            className="me-2 rounded-5"
                     >
-                         <strong>{article?.likes.length}</strong>
+                         <strong>{likeCount}</strong>
                     </Button>
-                    <Button style={{borderRadius: "25%"}} 
+                    <Button
                             variant={ liked ? "danger" : "outline-danger" }   
-                            onClick={() => {
+                            onClick={async () => {
                                 if (!user) return handleShow();
+                                liked ? setLikeCount(prev=>prev-1) : setLikeCount(prev=>prev+1) 
                                 setLiked(!liked);  
                                 const interaction = "like";
-                                interactOnPost(id, user._id, interaction)
+                                await interactOnPost(id, user._id, interaction)
                             }}
 
-                            className="me-2"
+                            className="me-2 rounded-5"
                     >
-                        <i className={ liked ? "bi bi-heart-fill" : "bi bi-heart" }></i> 
+                        <strong>Like</strong>  <i className={ liked ? "bi bi-heart-fill" : "bi bi-heart" }></i> 
                     </Button>
-                    <Button style={{borderRadius: "25%"}} 
+                    <Button
                             variant={ saved ? "primary" : "outline-primary" }   
-                            onClick={() => {
+                            onClick={async () => {
                                 if (!user) return handleShow();
                                 setSaved(!saved);  
                                 const interaction = "save";
-                                interactOnPost(id, user._id, interaction);
+                                await interactOnPost(id, user._id, interaction);
                             }}
-                            className="me-2"
+                            className="me-2 rounded-5"
                     >
-                        <i className={ saved ? "bi bi-save-fill" : "bi bi-save"}></i>
+                         <strong>Save</strong> <i className={ saved ? "bi bi-save-fill" : "bi bi-save"}></i>
                     </Button>
-                    <Button style={{borderRadius: "25%"}} 
-                            variant="outline-warning"
+                    <Button
+                            variant="outline-info"
                             onClick={() => {
-                                if (!user) return handleShow();
-                                
+                                if (!user) return handleShow(); 
+                                handleShowShare(); 
                             }}
-                            className="me-2"
+                            className="me-2 rounded-5"
                     >
-                        <i className="bi bi-send-fill"></i>
+                       <strong>Share</strong> <i className="bi bi-send-fill"></i>
                     </Button>
 
 
@@ -361,14 +372,14 @@ const ArticlePage = () => {
                                         />
                         </FloatingLabel>
                         
-                        <Button style={{borderRadius: "25%"}} 
+                        <Button 
                                 variant="outline-secondary"
                                 onClick={() => {
                                     handleCommentPost();
                                 }}
-                                className="me-2 mb-3 "
+                                className="me-2 mb-3 rounded-4"
                         >
-                            <i className="bi bi-chat-square-text"></i>
+                           <strong>Comment</strong> <i className="mx-1 bi bi-chat-square-text"></i>
                         </Button>   
                     </div>
                     
@@ -379,8 +390,12 @@ const ArticlePage = () => {
                 </Col>
             </Row>
         </Container>
+        <ShareArticle 
+            show={showShare} 
+            handleClose={handleCloseShare} 
+            articleId={id}
+        />
         </>
-            
     );
 };
 

@@ -38,10 +38,10 @@ const MainNavbar = () => {
         if (unchekedRequest) {
             const timeout = setTimeout(() => {
                 setFadeIn(true);
-            }, 1000); // Trigger fade after 1 second
-            return () => clearTimeout(timeout); // Clean up on unmount
+            }, 1000);
+            return () => clearTimeout(timeout); 
         } else {
-            setFadeIn(false); // Reset fade if no unchecked request
+            setFadeIn(false); 
         }
     }, [unchekedRequest]);
 

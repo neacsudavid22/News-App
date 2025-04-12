@@ -172,6 +172,30 @@ const updateUser = async (userId, user) => {
     }
 };
 
+const shareArticle = async (userId, articleId, friendId) => {
+    try{
+        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/share-article-to/${friendId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(articleId),
+            credentials: "include"
+        });     
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unknown error occurred");
+        }
+        return result; 
+
+    } catch (err) {
+        console.error("updateUser error:", err);
+        return { error: true, message: err.message };
+    }
+}
+
+
 export { 
     authenticateUser, 
     signUpUser, 
@@ -180,5 +204,6 @@ export {
     sendFriendRequestById, 
     sendFriendRequestByUsername, 
     updateUser, 
-    requestService 
+    requestService,
+    shareArticle
 };
