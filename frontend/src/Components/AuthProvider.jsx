@@ -22,13 +22,6 @@ const AuthProvider = ({ children }) => {
         }
     };  
 
-    useEffect(() => {
-        const tryLogin = async () => {
-            await login(); 
-        };
-        tryLogin();
-    }, []);
-
     const refresh = async () => {
         try {
             const response = await fetch(`http://localhost:3600/user-api/refresh-token`, {
@@ -38,7 +31,7 @@ const AuthProvider = ({ children }) => {
 
             if (!response.ok) throw new Error(response.message || "Failed to refresh user");
 
-            login();
+            await login();
 
         } catch (error) {
             console.error("Error refreshing user:", error);
@@ -54,11 +47,41 @@ const AuthProvider = ({ children }) => {
             });
 
             setUser(null);
+            
             window.location.reload(); 
         } catch (error) {
             console.error("Error logging out:", error);
         }
     };
+
+    
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                console.log("cheking")
+                const response = await fetch("http://localhost:3600/user-api/check-auth", {
+                    method: "GET",
+                    credentials: "include"
+                });
+                const result = await response.json();
+                if (result.authenticated === true) {
+                    const response = await fetch("http://localhost:3600/user-api/user-by-token", {
+                        method: "GET",
+                        credentials: "include"
+                    });
+        
+                    if (response.ok){
+                        const result = await response.json();
+                        setUser(result.user);
+                    }
+                }
+            } catch (err) {
+                console.error("Auth check error:", err);
+            }
+        };
+        checkAuth();
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, login, logout, refresh }}>

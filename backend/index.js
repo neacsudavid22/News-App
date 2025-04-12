@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-// Connect to MongoDB
 await connectDB();
 
 const port = process.env.PORT || 5000;
@@ -26,17 +25,13 @@ const corsOptions = {
   allowedHeaders: ["Content-Type"]
 };
 
-// Apply CORS with options
 app.use(cors(corsOptions));
 
-// JSON parser for non-upload routes
 app.use('/article-api', express.json(), articlesRouter);
 app.use('/user-api', express.json(), usersRouter);
 
-// FormData (multipart) is handled separately in upload-api
 app.use('/upload-api', uploadRouter);
 
-// Start Server
 app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
 });
