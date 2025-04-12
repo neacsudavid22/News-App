@@ -1,6 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
-import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest } from '../controllers/user-controller.js'
+import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest, shareArticle } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
 
@@ -177,5 +177,18 @@ const usersRouter = express.Router()
     usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {
         return res.status(200).json({ user: req.user });
     });
+
+    usersRouter.put("/share-article-to/:id", authMiddleware, async (req, res) => {
+        try {
+            const result = await shareArticle(req.user._id, req.body.articleId, req.params.id);
+            if (result.error) {
+                return res.status(400).json({ message: result.message });
+            }
+    
+            return res.status(200).json(result);
+        } catch(err){
+            console.error(err);
+        }
+    })
     
 export default usersRouter;

@@ -172,14 +172,14 @@ const updateUser = async (userId, user) => {
     }
 };
 
-const shareArticle = async (userId, articleId, friendId) => {
+const shareArticle = async (articleId, friendId) => {
     try{
-        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/share-article-to/${friendId}`, {
+        const response = await fetch(`http://localhost:3600/user-api/share-article-to/${friendId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(articleId),
+            body: JSON.stringify({articleId: articleId}),
             credentials: "include"
         });     
         const result = await response.json();

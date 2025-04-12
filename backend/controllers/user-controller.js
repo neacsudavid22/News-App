@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from 'mongoose';
+import Article from '../models/Article.js';
 
 const getUsers = async () => {
     try {
@@ -219,8 +220,6 @@ const declineFriendRequest = async (id, friendId) => {
     }
 };
 
-
-
 const loginUser = async (username, password, forRefresh = false) => {
     try {
         const user = await User.findOne({ username }).exec();
@@ -249,6 +248,31 @@ const loginUser = async (username, password, forRefresh = false) => {
     }
 };
 
+const shareArticle = async (userId, articleId, friendId) => {
+    try{
+        const user = await User.findById(userId).exec();
+        if (!user) return { error: true, message: "Your User doesn't exist" };
+
+        const friend = await User.findById(friendId).exec();
+        if (!friend) return { error: true, message: "friend User doesn't exist" };
+
+        const article = await Article.findById(articleId).exec();
+        if (!article) return { error: true, message: "Article doesn't exist" };
+
+        const result = await User.updateOne(
+            { _id: user._id },
+            {$addToSet: { 
+                shareList: {articleShared: article._id, userFrom: friend._id} 
+            }}
+        );
+
+        return { result };
+    }catch(err){
+        console.error("shareArticle error: " + err);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
 export {
     getUsers,
     getUserById,
@@ -259,5 +283,6 @@ export {
     sendFriendRequestById,
     sendFriendRequestByUsername,
     acceptFriendRequest,
-    declineFriendRequest
+    declineFriendRequest,
+    shareArticle
 }
