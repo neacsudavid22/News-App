@@ -1,8 +1,12 @@
 import { useState } from "react";
 import Form from 'react-bootstrap/Form';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 import Modal from 'react-bootstrap/Modal';
 import Button from "react-bootstrap/esm/Button";
+import useWindowSize from "../hooks/useWindowSize";
 
 const SettingsModifyProperty = ({ property, modifiedUser, setModifiedUser }) => {
     const [userProperty, setUserProperty] = useState(modifiedUser[property] || "");
@@ -24,35 +28,46 @@ const SettingsModifyProperty = ({ property, modifiedUser, setModifiedUser }) => 
         switch (property) {
             case "birthdate":
                 return (
-                    <div>
-                        <strong className="m-0 fs-5">
+                    <Col>
+                        <strong className="fs-5 me-1">
                             {`${property.charAt(0).toUpperCase() + property.slice(1)}: `}
                         </strong>
-                        <h2 className="mt-1 fs-5">
-                            {(new Date(modifiedUser[property]).toDateString() || "loading..")}
-                        </h2>
-                    </div>
+                        <strong className="fs-5">
+                            {(new Date(modifiedUser[property]).toLocaleDateString() || "loading..")}
+                        </strong>
+                    </Col>
                 );
             default:
                 return (
-                    <div>
-                        <strong className={`m-0 fs-${size}`}>
+                    <Col>
+                        <strong className={`fs-${size} me-1`}>
                             {`${property.charAt(0).toUpperCase() + property.slice(1)}: `}
                         </strong>
-                        <h2 className="mt-1 fs-5">{modifiedUser[property] || "loading.."}</h2>
-                    </div>
+                        <strong className={`fs-${size}`}>{modifiedUser[property] || "loading.."}</strong>
+                    </Col>
                 );
         }
     };
 
     const dict = { email: "email", name: "text", username: "text", phone: "tel", birthdate: "date" };
 
+    const { width } = useWindowSize();
+
     return (
         <>
-        <div>{handleMessage()}</div>
-        <div className="border-bottom pb-3">                            
-            <Button variant="outline-warning" size="sm" onClick={handleShow}>{`Modify ${property}`}</Button>
-        </div>
+        <Container fluid className="my-2">
+            <Row className="border-bottom p-2 pt-0 align-items-center">
+                <Col xs={12} sm={8} className="mb-3">
+                    <div>{handleMessage()}</div>
+                </Col>
+                <Col xs={12} sm={4} className={`mb-2 d-flex justify-content-${width < 768 ? "start" : "end"}`}>
+                    <Button variant="outline-warning" size="sm" className="w-100" onClick={handleShow}>
+                        {`Modify ${property}`}
+                    </Button>
+                </Col>
+            </Row>
+        </Container>
+            
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
                 <Modal.Title>{`Modify ${property}!`}</Modal.Title>
@@ -82,7 +97,7 @@ const SettingsModifyProperty = ({ property, modifiedUser, setModifiedUser }) => 
                     </Form.Group>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer >
                 <Button variant="danger" onClick={handleClose}>
                     Close
                 </Button>
