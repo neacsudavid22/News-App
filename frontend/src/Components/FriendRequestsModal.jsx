@@ -3,24 +3,27 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
 import { getUsername, requestService } from '../Services/userService';
 
-const FriendRequestsModal = ({ show, handleClose }) => {
+const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
     const { user, refresh } = useContext(AuthContext);
-    const [friendRequests, setfriendRequests] = useState(user?.friendRequests);
+    const [friendRequests, setFriendRequests] = useState(user?.friendRequests);
     const [usernames, setUsernames] = useState([]);
 
     const handleRequest = async (requestUserId, action) => {
-        friendRequests.splice(friendRequests.indexOf(requestUserId), 1);
         try{
             const fetchResult = await requestService(user._id, requestUserId, action);
-            if(fetchResult !== null) { refresh(); }
+            if(fetchResult !== null) {
+                refresh(); 
+                setFriendRequests(prevRequests => prevRequests.filter(requestId => requestId !== requestUserId));
+            }
         } catch(err){
             console.error(err);
         }
     }
 
-    useEffect(() =>{
-        setfriendRequests(() => user?.friendRequests)
-    }, [user]);
+    useEffect(() => {
+        setFriendRequests(user?.friendRequests || []);
+        setUnchekedRequest(user?.friendRequests.length > 0);
+    }, [user, setUnchekedRequest]);
 
     useEffect(() => {
         const getUsernameFetch = async (id) => {
