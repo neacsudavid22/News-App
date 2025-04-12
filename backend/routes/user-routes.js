@@ -96,8 +96,8 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/accept-friend-request-by-id').post(async (req, res) => {
-        const result = await acceptFriendRequest(req.params.id, req.body.friendId);
+    usersRouter.route('/user/:id/accept-request/:rid').put(async (req, res) => {
+        const result = await acceptFriendRequest(req.params.id, req.params.rid);
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });
@@ -106,8 +106,8 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/decline-friend-request-by-id').post(async (req, res) => {
-        const result = await declineFriendRequest(req.params.id, req.body.friendId);
+    usersRouter.route('/user/:id/decline-request/:rid').put(async (req, res) => {
+        const result = await declineFriendRequest(req.params.id, req.params.rid);
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });
@@ -138,6 +138,40 @@ const usersRouter = express.Router()
             sameSite: "Lax"
         });
         return res.status(200).json({ message: "Logged out successfully" });
+    });
+    
+    usersRouter.get("/refresh-token", authMiddleware, async (req, res) => {
+        try {
+            const user = await getUserById(req.user._id);
+            if (!user) {
+                return res.status(400).json({ message: "User not found" });
+            }
+            const forRefresh = true;
+            const result = await loginUser(user.username, user.password, forRefresh);
+    
+            res.clearCookie("token", {
+                httpOnly: true,
+                sameSite: "Lax"
+            });
+    
+            res.cookie("token", result.token, {
+                httpOnly: true,
+                sameSite: "Lax",
+                maxAge: 60 * 60 * 1000
+            });
+    
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error("Error refreshing token:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    });
+
+    usersRouter.get("/check-auth", (req, res) => {
+        if (req.cookies.token) {
+            return res.json({ authenticated: true });
+        }
+        return res.json({ authenticated: false });
     });
 
     usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {

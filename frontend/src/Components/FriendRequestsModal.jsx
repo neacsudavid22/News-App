@@ -1,20 +1,26 @@
 import { Modal, Button, ListGroup, Row, Col } from 'react-bootstrap';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
-import { getUsername } from '../Services/userService';
+import { getUsername, requestService } from '../Services/userService';
 
 const FriendRequestsModal = ({ show, handleClose }) => {
-    const { user } = useContext(AuthContext);
-    const friendRequests = user?.friendRequests;
+    const { user, refresh } = useContext(AuthContext);
+    const [friendRequests, setfriendRequests] = useState(user?.friendRequests);
     const [usernames, setUsernames] = useState([]);
 
-    const handleAccept = () => {
-        //TO-DO
+    const handleRequest = async (requestUserId, action) => {
+        friendRequests.splice(friendRequests.indexOf(requestUserId), 1);
+        try{
+            const fetchResult = await requestService(user._id, requestUserId, action);
+            if(fetchResult !== null) { refresh(); }
+        } catch(err){
+            console.error(err);
+        }
     }
 
-    const handleRemove = () => {
-        //TO-DO
-    }
+    useEffect(() =>{
+        setfriendRequests(() => user?.friendRequests)
+    }, [user]);
 
     useEffect(() => {
         const getUsernameFetch = async (id) => {
@@ -49,28 +55,28 @@ const FriendRequestsModal = ({ show, handleClose }) => {
             </Modal.Header>
             <Modal.Body>
                 <ListGroup>
-                    {user?.friendRequests?.length > 0 ? (
-                        user.friendRequests.map((requestId, index) => (
+                    {friendRequests.length > 0 ? (
+                        friendRequests.map((requestUserId, index) => (
                             <ListGroup.Item key={index}>
-                                <Row className="align-items-center">
+                                <Row className="align-items-center justify-content-between">
                                     <Col xs={6} className="text-truncate">
-                                        <strong>{usernames[requestId] || "Loading.."}</strong>
+                                        <strong>{usernames[requestUserId] || "Loading.."}</strong>
                                     </Col>
                                     <Col xs="auto">
                                         <Button
                                             variant="success"
                                             size="sm"
                                             className="me-2"
-                                            onClick={() => handleAccept(requestId)}
+                                            onClick={() => handleRequest(requestUserId, "accept")}
                                         >
                                             Accept
                                         </Button>
                                         <Button
                                             variant="danger"
                                             size="sm"
-                                            onClick={() => handleRemove(requestId)}
+                                            onClick={() => handleRequest(requestUserId, "decline")}
                                         >
-                                            Remove
+                                            Decline
                                         </Button>
                                     </Col>
                                 </Row>

@@ -77,6 +77,29 @@ const getUsername = async (userId) => {
     }
 }
 
+const requestService = async (userId, requestUserId, action = "accept") => {
+    try {
+        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/${action}-request/${requestUserId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || "Unknown error occurred");
+        }
+        return result; 
+
+    } catch (err) {
+        console.error("requestService error:", err);
+        return null;
+    }
+}
+
 const sendFriendRequestById = async (userId, friendId) => {
     try {
         const response = await fetch(`http://localhost:3600/user-api/user/${userId}/friend-request-by-id`, {
@@ -149,5 +172,13 @@ const updateUser = async (userId, user) => {
     }
 };
 
-
-export { authenticateUser, signUpUser, getAuthorName, getUsername, sendFriendRequestById, sendFriendRequestByUsername, updateUser };
+export { 
+    authenticateUser, 
+    signUpUser, 
+    getAuthorName, 
+    getUsername, 
+    sendFriendRequestById, 
+    sendFriendRequestByUsername, 
+    updateUser, 
+    requestService 
+};
