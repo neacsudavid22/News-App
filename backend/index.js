@@ -6,6 +6,7 @@ import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
 import uploadRouter from "./routes/upload-routes.js";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 dotenv.config();
 
@@ -34,4 +35,10 @@ app.use('/upload-api', uploadRouter);
 
 app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
+});
+
+app.use(express.static(path.join(path.dirname, "client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(path.dirname, "client/build", "index.html"));
 });
