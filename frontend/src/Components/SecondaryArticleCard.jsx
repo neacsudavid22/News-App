@@ -26,7 +26,7 @@ const SecondaryArticleCard = ({ article }) => {
     useEffect(() => {
         const getBackground = async () => {
             try {
-                const response = await fetch(`http://localhost:3600/upload-api/get-image/${article.background}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-image/${article.background}`);
                 if (!response.ok) {
                     throw new Error(response?.message || "Failed to get background image");
                 }

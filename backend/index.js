@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["https://newswebapp-qvgp.onrender.com", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], 
   credentials: true,
   allowedHeaders: ["Content-Type"]

@@ -7,7 +7,7 @@ const AuthProvider = ({ children }) => {
 
     const login = async () => {
         try {
-            const response = await fetch("http://localhost:3600/user-api/user-by-token", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
                 method: "GET",
                 credentials: "include"
             });
@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
 
     const refresh = async () => {
         try {
-            const response = await fetch(`http://localhost:3600/user-api/refresh-token`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/refresh-token`, {
                 method: "GET",
                 credentials: "include"
             });
@@ -41,7 +41,7 @@ const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch("http://localhost:3600/user-api/logout", {
+            await fetch(`${import.meta.env.VITE_API_URL}/user-api/logout`, {
                 method: "POST",
                 credentials: "include"
             });
@@ -60,13 +60,13 @@ const AuthProvider = ({ children }) => {
         const checkAuth = async () => {
             try {
                 console.log("cheking")
-                const response = await fetch("http://localhost:3600/user-api/check-auth", {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/check-auth`, {
                     method: "GET",
                     credentials: "include"
                 });
                 const result = await response.json();
                 if (result.authenticated === true) {
-                    const response = await fetch("http://localhost:3600/user-api/user-by-token", {
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
                         method: "GET",
                         credentials: "include"
                     });

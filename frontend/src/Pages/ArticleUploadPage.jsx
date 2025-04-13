@@ -43,7 +43,7 @@ const ArticleUploadPage = () => {
         });
     
         try {
-            const response = await fetch("http://localhost:3600/upload-api/upload-images", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/upload-images`, {
                 method: "POST",
                 body: formData,
             });

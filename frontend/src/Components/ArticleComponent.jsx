@@ -35,7 +35,7 @@ const ArticleComponent = ( {article} ) => {
             for (const item of article.articleContent) {
                 if (item.contentType === "Image") {
                     try {
-                        const response = await fetch(`http://localhost:3600/upload-api/get-image/${item.content}`);
+                        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-image/${item.content}`);
                         const imageBlob = await response.blob();
                         newImageUrls[item.content] = URL.createObjectURL(imageBlob);
                     } catch (err) {

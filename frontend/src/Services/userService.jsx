@@ -1,6 +1,6 @@
 const authenticateUser = async (username, password) => {
     try {
-        const response = await fetch("http://localhost:3600/user-api/login", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
@@ -20,7 +20,7 @@ const authenticateUser = async (username, password) => {
 
 const signUpUser = async (email, phone, name, gender, birthdate, username, password) => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/user`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ const signUpUser = async (email, phone, name, gender, birthdate, username, passw
 
 const getAuthorName = async (authorId) => {
     try{
-        const response = await fetch(`http://localhost:3600/user-api/author/${authorId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/author/${authorId}`);
         if(!response.ok){
             throw new Error(response?.message || "Failed to get author");
         }
@@ -65,7 +65,7 @@ const getAuthorName = async (authorId) => {
 
 const getUsername = async (userId) => {
     try{
-        const response = await fetch(`http://localhost:3600/user-api/username/${userId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/username/${userId}`);
         if(!response.ok){
             throw new Error(response?.message || "Failed to get username");
         }
@@ -79,7 +79,7 @@ const getUsername = async (userId) => {
 
 const requestService = async (userId, requestUserId, action = "accept") => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/${action}-request/${requestUserId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/${action}-request/${requestUserId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -102,7 +102,7 @@ const requestService = async (userId, requestUserId, action = "accept") => {
 
 const sendFriendRequestById = async (userId, friendId) => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/friend-request-by-id`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/friend-request-by-id`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -126,7 +126,7 @@ const sendFriendRequestById = async (userId, friendId) => {
 
 const sendFriendRequestByUsername = async (userId, friendUsername) => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/user/${userId}/friend-request-by-username`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/friend-request-by-username`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -150,7 +150,7 @@ const sendFriendRequestByUsername = async (userId, friendUsername) => {
 
 const updateUser = async (userId, user) => {
     try {
-        const response = await fetch(`http://localhost:3600/user-api/user/${userId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const updateUser = async (userId, user) => {
 
 const shareArticle = async (articleId, friendId) => {
     try{
-        const response = await fetch(`http://localhost:3600/user-api/share-article-to/${friendId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/share-article-to/${friendId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

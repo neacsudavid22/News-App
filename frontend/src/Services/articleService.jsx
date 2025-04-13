@@ -1,7 +1,7 @@
 const getArticles = async (category, page) => {
     try {
         const query = category !== "allNews" ? `category=${category}` : '';
-        const response = await fetch(`http://localhost:3600/article-api/article` + `?page=${page}` + "&" + query);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` + `?page=${page}` + "&" + query);
 
         if (!response.ok) {
             throw new Error("Failed to fetch articles");
@@ -16,7 +16,7 @@ const getArticles = async (category, page) => {
 
 const getArticleById = async (articleId) => {
     try {
-        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch article");
@@ -31,7 +31,7 @@ const getArticleById = async (articleId) => {
 
 const postArticle = async (article) => {
     try {
-        const response = await fetch("http://localhost:3600/article-api/article", {
+        const response = await fetch("${import.meta.env.VITE_API_URL}/article-api/article", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(article),
@@ -47,7 +47,7 @@ const postArticle = async (article) => {
 
 const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo) => {
     try{
-        const response = await fetch(`http://localhost:3600/article-api/article/${interaction}/${articleId}/${userId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${interaction}/${articleId}/${userId}`, {
             method: 'PUT',
             body: JSON.stringify({content, responseTo}),
             headers: {
@@ -68,7 +68,7 @@ const interactOnPost = async (articleId, userId, interaction = "like", content =
 
 const deleteComment = async (articleId, commentId, isLastNode) => {
     try{
-        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}/delete-comment/${commentId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/delete-comment/${commentId}`, {
             method: 'PUT',
             body: JSON.stringify({isLastNode}),
             headers: {
@@ -89,7 +89,7 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
 
 const deleteGarbageComment = async (articleId, commentList) => {
     try{
-        const response = await fetch(`http://localhost:3600/article-api/article/${articleId}/delete-garbage-comments`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/delete-garbage-comments`, {
             method: 'PUT',
             body: JSON.stringify({comments: commentList}),
             headers: {
