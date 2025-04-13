@@ -16,6 +16,7 @@ import Stack from "react-bootstrap/esm/Stack";
 import Collapse from 'react-bootstrap/Collapse';
 import { getUsername } from "../Services/userService";
 import ShareArticle from "../Components/ShareArticle";
+import useWindowSize from "../hooks/useWindowSize";
 
 const ArticlePage = () => { 
 
@@ -301,6 +302,8 @@ const ArticlePage = () => {
             );
         });
     };    
+
+    const {width} = useWindowSize();
     
     return(
         <>
@@ -324,13 +327,7 @@ const ArticlePage = () => {
             <Row className="w-100 justify-content-center mb-3">
                 <Col xs={12} sm={12} md={10} lg={8} xl={7}> 
                    
-                    <Button 
-                            variant="outline-dark"  
-                            disabled
-                            className="me-2 rounded-5"
-                    >
-                         <strong>{likeCount}</strong>
-                    </Button>
+                   
                     <Button
                             variant={ liked ? "danger" : "outline-danger" }   
                             onClick={async () => {
@@ -340,10 +337,12 @@ const ArticlePage = () => {
                                 const interaction = "like";
                                 await interactOnPost(id, user._id, interaction)
                             }}
+                            size={width < 758 ? "sm" : ""}
 
                             className="me-2 rounded-5"
                     >
-                        <strong>Like</strong>  <i className={ liked ? "bi bi-heart-fill" : "bi bi-heart" }></i> 
+                    <strong className="me-2">{likeCount}</strong>
+                    <strong>Like</strong>  <i className={ liked ? "bi bi-heart-fill" : "bi bi-heart" }></i> 
                     </Button>
                     <Button
                             variant={ saved ? "primary" : "outline-primary" }   
@@ -353,6 +352,7 @@ const ArticlePage = () => {
                                 const interaction = "save";
                                 await interactOnPost(id, user._id, interaction);
                             }}
+                            size={width < 758 ? "sm" : ""}
                             className="me-2 rounded-5"
                     >
                          <strong>Save</strong> <i className={ saved ? "bi bi-save-fill" : "bi bi-save"}></i>
@@ -364,6 +364,8 @@ const ArticlePage = () => {
                                 handleShowShare(); 
                             }}
                             className="me-2 rounded-5"
+                            size={width < 758 ? "sm" : ""}
+
                     >
                        <strong>Share</strong> <i className="bi bi-send-fill"></i>
                     </Button>
@@ -396,9 +398,7 @@ const ArticlePage = () => {
                         >
                            <strong>Comment</strong> <i className="mx-1 bi bi-chat-square-text"></i>
                         </Button>   
-                    </div>
-
-                    
+                    </div>                    
 
                     <Container fluid className="fs-6" body>
                         {commentList ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
