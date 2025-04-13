@@ -8,7 +8,7 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
-import MainNavbar from "../Components/MainNavBar";
+import MainNavbar from "../Components/MainNavbar";
 import Modal from "react-bootstrap/Modal";
 import "./ArticleEditorPage.css"
 import { useLocation, useNavigate } from "react-router";
@@ -30,9 +30,7 @@ const ArticleEditorPage = () => {
 
         return (
             <Stack direction="vertical" gap={3} className="justify-content-center  me-5">
-
-                <Stack direction="horizontal" className="justify-content-between" gap={3} >
-                    <Form.Group className="w-75 mb-3 pe-5">
+                    <Form.Group className="w-100 mb-3 pe-5">
                         <Form.Label><b>Image</b></Form.Label>
                         <Form.Control
                             type="file"
@@ -46,19 +44,19 @@ const ArticleEditorPage = () => {
 
                     <Button variant={content ? "outline-success" : "primary"} type="button" 
                             onClick={async () => {
-                                setArticleImages([...articleImages, file])
-                                console.log(file)
-                                console.log(articleImages)
-                                addSelectedComponent("Image", imagePreviewUrl, index)
+                                if(file !== null){
+                                    setArticleImages([...articleImages, file])
+                                    console.log(file)
+                                    console.log(articleImages)
+                                    addSelectedComponent("Image", imagePreviewUrl, index)
+                                }
                             }}
-                            className="mt-3"    
+                            className="mb-1 w-auto text-nowrap"    
                     >
                         {content ? "Save" : "Add Image"}
                     </Button>
-                </Stack>
 
-                {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />} 
-                
+                {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />}      
             </Stack>    
         );
     };
@@ -66,8 +64,8 @@ const ArticleEditorPage = () => {
     const AddHeader = ({ index, content = null }) => {
         const [header, setHeader] = useState(content || "");
         return (
-            <Stack direction="horizontal" className="w-100 justify-content-between" gap={3}>
-                <Form.Group className="w-75 mb-3 pe-5">
+            <Stack direction="vertical" className="w-100 justify-content-between" gap={3}>
+                <Form.Group className="w-100 mb-3 pe-5">
                     <Form.Label><b>Header</b></Form.Label>
                     <Form.Control
                         type="text"
@@ -79,7 +77,7 @@ const ArticleEditorPage = () => {
 
                 <Button variant={content ? "outline-success" : "primary"} type="button" 
                         onClick={() => addSelectedComponent("h2", header, index)}
-                        className="mt-3"    
+                        className="mb-1 w-auto text-nowrap"         
                 >
                     {content ? "Save" : "Add Header"}
                 </Button>
@@ -90,7 +88,7 @@ const ArticleEditorPage = () => {
     const AddParagraph = ({ index, content = null }) => {
         const [paragraph, setParagraph] = useState(content || "");
         return (
-            <Stack direction="horizontal" className="w-100 justify-content-between" gap={3}>
+            <Stack direction="vertical" className="w-100 justify-content-between" gap={3}>
                 <Form.Group className="w-100 mb-3 pe-2">
                     <Form.Label><b>Paragraph</b></Form.Label>
                     <Form.Control
@@ -104,7 +102,7 @@ const ArticleEditorPage = () => {
 
                 <Button variant={content ? "outline-success" : "primary"} type="button" 
                         onClick={() => addSelectedComponent("p", paragraph, index)}
-                        className="mt-3"    
+                        className="mb-1 w-auto text-nowrap"    
                 >
                     {content ? "Save" : "Add Paragraph"}
                 </Button>

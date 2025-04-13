@@ -32,6 +32,7 @@ const ArticleUploadPage = () => {
     const [background, setBackground] = useState();
     const [backgroundPreview, setBackgroundPreview] = useState();
     const [UPLOAD_SUCCESFULL, SET_UPLOAD_SUCCESFULL] = useState(false);
+    const [articleId, setArticleId] = useState("");
 
     const uploadImages = async () => {
         const formData = new FormData();
@@ -61,10 +62,10 @@ const ArticleUploadPage = () => {
         try{
             const uploadedImageUrls = await uploadImages();
     
-            if (uploadedImageUrls.length !== (articleImages.length + 1)) {
-                console.error("Some images failed to upload");
-                return;
-            }
+            // if (uploadedImageUrls.length !== (articleImages.length + 1)) {
+            //     console.error("Some images failed to upload");
+            //     return;
+            // }
         
             // Replace temp URLs with real URLs
             let imgIndex = 0;
@@ -83,6 +84,7 @@ const ArticleUploadPage = () => {
 
             if(UPLOAD_SUCCESFULL) {
                 localStorage.removeItem("article");
+                setArticleId(result._id);
             }
 
             console.log("Article created:", result);
@@ -128,7 +130,7 @@ const ArticleUploadPage = () => {
 
     return (
         <>
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} className="mt-4">
             <Modal.Header closeButton>
                 <Modal.Title>{UPLOAD_SUCCESFULL ? "Success" : "Problem occured" }</Modal.Title> 
             </Modal.Header>
@@ -136,20 +138,27 @@ const ArticleUploadPage = () => {
             <Modal.Body>
                 <p>{UPLOAD_SUCCESFULL ? "Article Published Succesfully" : "Problem at Publishing" }</p>
             </Modal.Body>
+
+            <Modal.Footer>
+                { UPLOAD_SUCCESFULL && 
+                <div>
+                    <Button Button variant="success" onClick={()=>navigate("/dashboard")}>
+                        Go to Dashboard
+                    </Button>
+                    <Button onClick={()=>navigate(`/article/${articleId}`)}>
+                        See Article
+                    </Button>
+                </div> }
+            </Modal.Footer>
         </Modal>
 
         <MainNavbar/>
         
-        <Container fluid className="h-100 mt-4">
+        <Container fluid className="mt-4 border-0 pe-0">
         <Row className="w-100 justify-content-center">
         <Col sm={12} md={10} lg={8} xl={6} className=" h-100"> {/* Responsive form width */}
 
-            <Stack direction="horizontal" className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Article Preview</h1> 
-                <Button variant="danger" type="button" onClick={handleBack}>
-                    Back
-                </Button>
-            </Stack>
+            <h1>Article Preview</h1> 
 
             <Stack sm={12} md={10} lg={8} xl={6} direction="vertical" gap={2} className="border p-3 overflow-y-auto h-75 mb-4">
                 <h1>{title}</h1>
@@ -220,11 +229,17 @@ const ArticleUploadPage = () => {
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
             </Tabs>
             
-            <Button variant="success" type="button" className="mb-5" 
+            <div className="d-flex justify-content-between">
+            <Button variant="success" type="button" className="mb-5 text-nowrap" 
                     onClick={ handlePublish }>
                 Publish Article
             </Button>
+            <Button variant="danger" type="button" onClick={handleBack} className="mb-5 text-nowrap"> 
+                    Go Back to Editing
+            </Button>
     
+            </div>
+            
         </Col>
         </Row>
         </Container>
