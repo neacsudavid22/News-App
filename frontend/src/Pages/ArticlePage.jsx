@@ -195,6 +195,10 @@ const ArticlePage = () => {
             console.error("Error deleting comment:", error);
         }
     }
+
+    const searchbyTag = async () => {
+        //:TO-DO
+    }
     
     const createCommentSection = (commentTreeNode, depth = 0) => {
         
@@ -207,7 +211,7 @@ const ArticlePage = () => {
                     <Row>
                         <Col xs={{ span: Math.max((12 - depth), 9), offset: Math.min(depth, 3) }}
                              className="d-flex flex-column flex-wrap pt-2 border-top">
-
+                            
                             <Stack direction="vertical" className="small mb-1">
                                 <p className="mt-2 text-break">
                                     <strong>{comment.removed ? "deleted" : "@" + (usernames[comment.userId] || "loading..")}</strong>
@@ -364,6 +368,14 @@ const ArticlePage = () => {
                        <strong>Share</strong> <i className="bi bi-send-fill"></i>
                     </Button>
 
+                    <hr></hr>
+                    <strong>Tags:</strong>
+                    <Stack className="mt-2 flex-wrap" direction="horizontal" gap={2}>
+                        {article && article.tags.map((tag)=>
+                        <Button key={tag} size="sm" className="rounded-4 fw-bold w-auto text-nowrap" 
+                        style={{ width: "fit-content" }} onClick={searchbyTag}
+                        >{tag}</Button>)}
+                    </Stack>
 
                     <div className="border-top my-3">
                         <h3 className="mt-4">Comment Section</h3>
@@ -385,7 +397,9 @@ const ArticlePage = () => {
                            <strong>Comment</strong> <i className="mx-1 bi bi-chat-square-text"></i>
                         </Button>   
                     </div>
+
                     
+
                     <Container fluid className="fs-6" body>
                         {commentList ? createCommentSection(commentTree) : <p>Be the first to comment!.</p>}
                     </Container>
