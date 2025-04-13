@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
@@ -11,113 +11,36 @@ import Image from "react-bootstrap/Image";
 import MainNavbar from "../Components/MainNavbar";
 import Modal from "react-bootstrap/Modal";
 import "./ArticleEditorPage.css"
-import { useLocation, useNavigate } from "react-router";
 import useWindowSize from "../hooks/useWindowSize";
+import AddImage from "../Components/AddImage";
+import AddHeader from "../Components/AddHeader";
+import AddParagraph from "../Components/AddParagraph";
+import { useLocation, useNavigate, } from "react-router";
 
-const ArticleEditorPage = () => {
-    const location = useLocation()
+const ArticleEditorPage = ( {article} ) => {
+    const location = useLocation();
     const [selectedComponent, setSelectedComponent] = useState("hideContent");
-    const [title, setTitle] = useState(location.state?.title || "");
-    const [articleContent, setArticleContent] = useState(location.state?.articleContent || []);
-    const [edit, setEdit] = useState([]); // Starea pentru editare
+
+    const [title, setTitle] = useState(article?.title || location.state?.title || "");
+    const [articleContent, setArticleContent] = useState(article?.articleContent || location.state?.articleContent || []);
+    const [articleImages, setArticleImages] = useState(article?.articleImages || location.state?.articleImages || []);
+    const [edit, setEdit] = useState([]);
     const navigate = useNavigate();
-    const [articleImages, setArticleImages] = useState(location.state?.articleImages || []);
 
-    // this is not the main component, scroll down
-    const AddImage = ({ index, content = null }) => {
-        const [imagePreviewUrl, setImagePreviewUrl] = useState(content);
-        const [file, setFile] = useState(null)
+    useEffect(() => {
+    if (article !== null) {
+        setEdit(new Array(articleContent.length).fill(false));
+    }
+    }, [article, articleContent.length]);
 
-        return (
-            <Stack direction="vertical" gap={3} className="justify-content-center  me-5">
-                    <Form.Group className="w-100 mb-3 pe-5">
-                        <Form.Label><b>Image</b></Form.Label>
-                        <Form.Control
-                            type="file"
-                            accept="image/*"
-                            onChange={ (e) => {
-                                setImagePreviewUrl(URL.createObjectURL(e.target.files[0]));
-                                setFile(e.target.files[0])
-                            } }
-                        />
-                    </Form.Group>
-
-                    <Button variant={content ? "outline-success" : "primary"} type="button" 
-                            onClick={async () => {
-                                if(file !== null){
-                                    setArticleImages([...articleImages, file])
-                                    console.log(file)
-                                    console.log(articleImages)
-                                    addSelectedComponent("Image", imagePreviewUrl, index)
-                                }
-                            }}
-                            className="mb-1 w-auto text-nowrap"    
-                    >
-                        {content ? "Save" : "Add Image"}
-                    </Button>
-
-                {imagePreviewUrl && <Image src={imagePreviewUrl} thumbnail fluid className="w-50 p-2" />}      
-            </Stack>    
-        );
-    };
-
-    const AddHeader = ({ index, content = null }) => {
-        const [header, setHeader] = useState(content || "");
-        return (
-            <Stack direction="vertical" className="w-100 justify-content-between" gap={3}>
-                <Form.Group className="w-100 mb-3 pe-5">
-                    <Form.Label><b>Header</b></Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Enter header"
-                        value={header}
-                        onChange={(e) => setHeader(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Button variant={content ? "outline-success" : "primary"} type="button" 
-                        onClick={() => addSelectedComponent("h2", header, index)}
-                        className="mb-1 w-auto text-nowrap"         
-                >
-                    {content ? "Save" : "Add Header"}
-                </Button>
-            </Stack>
-        );
-    };
-
-    const AddParagraph = ({ index, content = null }) => {
-        const [paragraph, setParagraph] = useState(content || "");
-        return (
-            <Stack direction="vertical" className="w-100 justify-content-between" gap={3}>
-                <Form.Group className="w-100 mb-3 pe-2">
-                    <Form.Label><b>Paragraph</b></Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={7}
-                        placeholder="Enter paragraph text"
-                        value={paragraph}
-                        onChange={(e) => setParagraph(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Button variant={content ? "outline-success" : "primary"} type="button" 
-                        onClick={() => addSelectedComponent("p", paragraph, index)}
-                        className="mb-1 w-auto text-nowrap"    
-                >
-                    {content ? "Save" : "Add Paragraph"}
-                </Button>
-            </Stack>
-        );
-    };
-
-    const renderSelectedComponent = (index, content) => {
-        switch (selectedComponent) {
-            case "addImage":
-                return <AddImage index={index} content={content} />;
-            case "addHeader":
-                return <AddHeader index={index} content={content}/>;
-            case "addParagraph":
-                return <AddParagraph index={index} content={content}/>;
+    const renderSelectedComponent = (contentType, index, content) => {
+        switch (contentType) {
+            case "Image":
+                return <AddImage index={index} content={content} articleImages={articleImages} setArticleImages={setArticleImages} addSelectedComponent={addSelectedComponent} />;
+            case "h2":
+                return <AddHeader index={index} content={content} addSelectedComponent={addSelectedComponent} />;
+            case "p":
+                return <AddParagraph index={index} content={content} addSelectedComponent={addSelectedComponent} />;
             case "hideContent":
                 return;
             default:
@@ -130,7 +53,7 @@ const ArticleEditorPage = () => {
 
         if (content !== "" && index === undefined) {
             setArticleContent([...articleContent, { contentType, content }]);
-            setEdit([...edit, false]); // Inițializează `edit` pentru noul element
+            setEdit([...edit, false]); 
         } else if(content !== "" && index !== undefined){ 
             const newArticle = [...articleContent];
             newArticle[index] = { contentType, content };
@@ -172,7 +95,6 @@ const ArticleEditorPage = () => {
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
-    const dict = {p:"addParagraph", h2: "addHeader", Image: "addImage"};
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -198,14 +120,14 @@ const ArticleEditorPage = () => {
             <Container className="justify-content-center w-100 sticky-top sticky-offset py-2 bg-white border-bottom">
 
                 <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 mb-2 ">
-                    <Tab eventKey="addParagraph" title="Paragraph" />
-                    <Tab eventKey="addImage" title="Image" />
-                    <Tab eventKey="addHeader" title="Header" />
+                    <Tab eventKey="p" title="Paragraph" />
+                    <Tab eventKey="Image" title="Image" />
+                    <Tab eventKey="h2" title="Header" />
                     <Tab eventKey="hideContent" title="Hide" />
                 </Tabs>
 
-                { EDIT_MODE ? null : renderSelectedComponent() } 
-            </Container>
+                {EDIT_MODE ? null : renderSelectedComponent(selectedComponent)}
+                </Container>
 
             <br />
             <h2>Article Preview:</h2>
@@ -215,7 +137,7 @@ const ArticleEditorPage = () => {
                     const Tag = item.contentType;
                     return (
                             <div key={index} className="d-flex justify-content-between py-2 border-top">
-                                { edit[index] ? renderSelectedComponent(index, item.content) 
+                                { edit[index] ? renderSelectedComponent(item.contentType, index, item.content) 
                                     : <>
                                        {
                                         Tag === "Image" ? 
@@ -226,7 +148,6 @@ const ArticleEditorPage = () => {
                                        <Stack direction={Tag === "Image" || width < 768 ? "vertical" : "horizontal"} gap={2} className="ms-3 justify-content-center">
                                         <Button variant="outline-success" type="button" 
                                             onClick={() => { 
-                                                setSelectedComponent(dict[item.contentType]); 
                                                 handleEdit(index); 
                                             }}>Modify
                                         </Button>

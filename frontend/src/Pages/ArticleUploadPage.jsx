@@ -127,7 +127,7 @@ const ArticleUploadPage = () => {
 
     useEffect(() => {
         if (!location.state?.fromEditor) {
-            navigate("/author", { state: {...location.state} }); // Dacă nu vine din Author, îl redirecționezi
+            navigate("/author", { state: {...location.state} }); 
             return null;
         }
     }, [location.state, navigate]);
@@ -146,10 +146,10 @@ const ArticleUploadPage = () => {
             <Modal.Footer>
                 { UPLOAD_SUCCESFULL && 
                 <div>
-                    <Button Button variant="success" onClick={()=>navigate("/dashboard")}>
+                    <Button size="sm" Button variant="success" onClick={()=>navigate("/dashboard")}>
                         Go to Dashboard
                     </Button>
-                    <Button onClick={()=>navigate(`/article/${articleId}`)}>
+                    <Button size="sm" onClick={()=>navigate(`/article/${articleId}`)}>
                         See Article
                     </Button>
                 </div> }
