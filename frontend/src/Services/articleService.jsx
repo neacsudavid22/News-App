@@ -31,7 +31,7 @@ const getArticleById = async (articleId) => {
 
 const postArticle = async (article) => {
     try {
-        const response = await fetch("${import.meta.env.VITE_API_URL}/article-api/article", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(article),

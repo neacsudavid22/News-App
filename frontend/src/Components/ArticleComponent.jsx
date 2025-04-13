@@ -28,25 +28,14 @@ const ArticleComponent = ( {article} ) => {
     }, [article]);
 
     useEffect(() => {
-        const fetchImages = async () => {
-            if (!article?.articleContent) return;
-
-            const newImageUrls = {};
-            for (const item of article.articleContent) {
-                if (item.contentType === "Image") {
-                    try {
-                        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-image/${item.content}`);
-                        const imageBlob = await response.blob();
-                        newImageUrls[item.content] = URL.createObjectURL(imageBlob);
-                    } catch (err) {
-                        console.error("Error fetching image:", err);
-                    }
-                }
+        if (!article?.articleContent) return;
+        const newImageUrls = {};
+        for (const item of article.articleContent) {
+            if (item.contentType === "Image") {
+                newImageUrls[item.content] = item.content;
             }
-            setImageUrls(newImageUrls);
-        };
-
-        fetchImages();
+        }
+        setImageUrls(newImageUrls);
     }, [article]);
 
     return (
@@ -68,8 +57,7 @@ const ArticleComponent = ( {article} ) => {
                         <Col xs={12} sm={12} md={8} lg={8} xl={7} className="mb-1" key={index}>
                             {Tag === "Image" ? (
                                 <div key={index} className="d-flex justify-content-center">
-                                    <Image fluid  thumbnail src={imageUrls[a.content] || ""} alt="Image" 
-                                    className="w-auto p-2 my-3"/>
+                                <Image fluid thumbnail src={imageUrls[a.content] || ""} alt="Image" className="w-auto p-2 my-3"/>
                                 </div>
                             ) : (
                                 <div key={index} className=" justify-content-start">

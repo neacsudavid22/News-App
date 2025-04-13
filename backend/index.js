@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from './config/db.js'
 import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
@@ -8,8 +10,6 @@ import uploadRouter from "./routes/upload-routes.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-
-dotenv.config();
 
 await connectDB();
 

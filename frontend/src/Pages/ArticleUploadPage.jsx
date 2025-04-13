@@ -59,42 +59,46 @@ const ArticleUploadPage = () => {
     };
     
     const handlePublish = async () => {
-        try{
+        try {
             const uploadedImageUrls = await uploadImages();
     
-            // if (uploadedImageUrls.length !== (articleImages.length + 1)) {
-            //     console.error("Some images failed to upload");
-            //     return;
-            // }
-        
-            // Replace temp URLs with real URLs
             let imgIndex = 0;
-            const backgroundUrl = uploadedImageUrls[imgIndex++]
+            const backgroundUrl = uploadedImageUrls[imgIndex++];
             const updatedContent = articleContent.map((item) => {
                 if (item.contentType === "Image") {
-                    return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++]}
+                    return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++] };
                 }
                 return item;
             });
-        
-            const article = { title, author: author._id, articleContent: updatedContent, category, tags, background: backgroundUrl };
-
-            const result = await postArticle(article) || "";
-            result ? SET_UPLOAD_SUCCESFULL(true) : SET_UPLOAD_SUCCESFULL(false);
-
-            if(UPLOAD_SUCCESFULL) {
+    
+            const article = {
+                title,
+                author: author._id,
+                articleContent: updatedContent,
+                category,
+                tags,
+                background: backgroundUrl
+            };
+    
+            const result = await postArticle(article);
+    
+            if (result) {
+                SET_UPLOAD_SUCCESFULL(true);
                 localStorage.removeItem("article");
                 setArticleId(result._id);
+            } else {
+                SET_UPLOAD_SUCCESFULL(false);
             }
-
-            console.log("Article created:", result);
-
+    
+            handleShow();
+    
         } catch (error) {
             console.error("Error during article creation:", error);
+            SET_UPLOAD_SUCCESFULL(false);
+            handleShow();
         }
-        
-        handleShow();
     };
+    
 
     const removeTag = () => {
         if (tags.includes(tagSelect)) { 

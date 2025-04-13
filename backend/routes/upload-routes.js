@@ -1,46 +1,37 @@
-import multer from "multer";
-import express from "express"
-import path from "path";
-import url from "url";
- 
-// Configure storage
-const storage = multer.diskStorage({
-    destination: "images",
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname);
-    },
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+import express from 'express';
+
+// Config Cloudinary
+cloudinary.config({
+  cloud_name: 'dappl0lrc',
+  api_key: '931842912256358',
+  api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-// Initialize Multer middleware
-const upload = multer({
-    storage: storage
-}).array("images");
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'images',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+  },
+});
 
-const uploadRouter = express.Router()
+const upload = multer({ storage: storage }).array("images");
 
-// Middleware function
+const uploadRouter = express.Router();
+
 uploadRouter.post("/upload-images", upload, (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: "No images uploaded" });
-    }
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: "No images uploaded" });
+  }
 
-    const imageUrls = req.files.map((file) => `${file.filename}`); // the url of each uploaded image
-    res.status(200).json({ imageUrls });
-});
-
-uploadRouter.get("/get-image/:url", (req, res) => {
-
-    const __filename = url.fileURLToPath(import.meta.url);  // convertește URL-ul fișierului în path absolut.
-
-    const __dirname = path.dirname(__filename); // extrage directorul fișierului curent (upload-routes.js).
-
-    const filePath = path.resolve(__dirname, "../images", req.params.url); // creează un path absolut către imagine.
-
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            res.status(404).json({ message: "No corresponding image for given URL" });
-        }
-    });
+  const imageUrls = req.files.map((file) => file.path); 
+  res.status(200).json({ imageUrls });
 });
 
 export default uploadRouter;

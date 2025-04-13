@@ -24,20 +24,8 @@ const SecondaryArticleCard = ({ article }) => {
     }, [article, setFirstParagraph]);
 
     useEffect(() => {
-        const getBackground = async () => {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-image/${article.background}`);
-                if (!response.ok) {
-                    throw new Error(response?.message || "Failed to get background image");
-                }
-                const backgroundBlob = await response.blob();
-                const backgroundBlobUrl = URL.createObjectURL(backgroundBlob);
-                setBackgroundUrl(backgroundBlobUrl);
-            } catch (err) {
-                console.error("getBackground error: ", err);
-            }
-        };
-        getBackground();
+        if (!article?.background) return;    
+        setBackgroundUrl(article.background);
     }, [article.background]);
 
     const handleNavigation = () => {

@@ -8,18 +8,8 @@ const ArticleViewCard = ({ article, isBig }) => {
     const [backgroundPreview, setBackgroundPreview] = useState()
 
     useEffect( () => {
-        const fetchBackgroundImage = async () => {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-image/${article.background}`);
-                const imageBlob = await response.blob(); // Convert response to blob
-                setBackgroundPreview(URL.createObjectURL(imageBlob)); // Set the image URL
-            } catch(err) {
-                console.error("cardImage error: " + err);
-            }
-        };
-    
-        fetchBackgroundImage();
-
+        if (!article?.background) return;    
+        setBackgroundPreview(article.background); 
     }, [article])
 
     return (
