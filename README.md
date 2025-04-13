@@ -8,3 +8,7 @@ Technologies used:
 front-end: React.js + Bootstrap-react
 back-end: Node.js Express
 databases: Mongodb
+
+The Web Application is deployed and hosted by Render and can be accessed via https://newswebapp-qvgp.onrender.com
+The Media content is hostead on Cloaddinary
+The database is hosted by Atlas
