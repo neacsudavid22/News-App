@@ -1,22 +1,18 @@
 const authenticateUser = async (username, password) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-            credentials: "include"
-        });
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
+    });
 
-        if (!response.ok) {
-            throw new Error("Failed to authenticate user, either the username or password is wrong");
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error("authenticateUser error:", err);
-        return null;
+    if (!response.ok) {
+        throw new Error("Failed to authenticate user, either the username or password is wrong");
     }
+
+    return await response.json();
 };
+
 
 const signUpUser = async (email, phone, name, gender, birthdate, username, password) => {
     try {

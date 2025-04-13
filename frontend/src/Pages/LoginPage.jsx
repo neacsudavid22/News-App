@@ -53,8 +53,13 @@ const LoginPage = () => {
             }
     
             try {
-                const { token } = await authenticateUser(username, password);
-                if (token) {
+                const response = await authenticateUser(username, password);
+
+                if (!response || !response.token) {
+                    throw new Error("No token received");
+                }
+
+                if (response.token) {
                     await login();
                     if(user.account === "author")
                         navigate("/dashboard");
