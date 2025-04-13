@@ -23,7 +23,7 @@ const LoginPage = () => {
     const [validated, setValidated] = useState(false);
 
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext);
+    const { login, user } = useContext(AuthContext);
 
     // Validation helpers
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -55,8 +55,10 @@ const LoginPage = () => {
             try {
                 const { token } = await authenticateUser(username, password);
                 if (token) {
-                    login();
-                    navigate("/");
+                    await login();
+                    if(user.account === "author")
+                        navigate("/dashboard");
+                    else navigate(-1);
                 }
             } catch (err) {
                 console.error("Login error:", err);

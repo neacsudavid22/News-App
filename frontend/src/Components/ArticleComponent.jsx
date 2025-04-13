@@ -4,12 +4,10 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Image from "react-bootstrap/Image";
 import { getAuthorName } from "../Services/userService";
-import useWindowSize from "../hooks/useWindowSize";
 
 const ArticleComponent = ( {article} ) => { 
     const [imageUrls, setImageUrls] = useState({}); // Store image URLs
     const [author, setAuthor] = useState(null);
-    const {width} = useWindowSize();
 
     useEffect(() => {
         const fetchAuthor = async () => {
@@ -71,11 +69,11 @@ const ArticleComponent = ( {article} ) => {
                             {Tag === "Image" ? (
                                 <div key={index} className="d-flex justify-content-center">
                                     <Image fluid  thumbnail src={imageUrls[a.content] || ""} alt="Image" 
-                                    className={width > 768 ? "w-75 p-2 my-3" : "w-100 p-2 my-3" } />
+                                    className="w-auto p-2 my-3"/>
                                 </div>
                             ) : (
                                 <div key={index} className=" justify-content-start">
-                                    <Tag className="p-2 my-2" style={{textAlign: "justify", texJustify: "auto   ", fontSize: "1.2rem"}}>{a.content}</Tag>
+                                    <Tag className="p-2 my-2" style={{textAlign: "justify", texJustify: "auto"}}>{a.content}</Tag>
                                 </div>
                             )}
                         </Col>
