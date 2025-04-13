@@ -75,6 +75,12 @@ const MainNavbar = () => {
                                     <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
                                 )}
                             </Dropdown.Item>
+                            { user?.account === "author" &&
+                            <>
+                            <Dropdown.Divider />
+                            <Dropdown.Item type="button" variant="danger" onClick={() => navigate("/dashboard")}>Go to Dashboard</Dropdown.Item>
+                            </>
+                            }
                             <Dropdown.Divider />
                             <Dropdown.Item type="button" as={Link} to="/" onClick={handleLogout}>Logout</Dropdown.Item>
                         </SplitButton>

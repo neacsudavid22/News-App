@@ -20,27 +20,38 @@ const DashboardPage = () => {
     return(
     <div className="vh-100 bg-light">
     <MainNavbar/>
-    <Container fluid className="d-flex justify-content-center">
+    <Container fluid className="py-5 d-flex justify-content-center bg-light">
         <Row className="w-100 justify-content-center">
-            <Col xs={12} sm={12} md={8} lg={8} xl={8}>
-            <Stack gap={5} className="p-5 my-4 bg-white shadow rounded-3">
-                <h1 className="fs-2">{user && "Welcome " + user?.name + ", you are registered as " + user?.account + "!"}</h1>
-                <Stack direction="horizontal" className=" justify-content-evenly">
-                <Button size="lg" variant="primary" onClick={handleCreateArticle}>
+            <Col xs={12} md={10} lg={8}>
+            <Stack gap={4} className="p-5 bg-white shadow rounded-4">
+                <h1 className="text-center fs-2 mb-0">
+                {user && `Welcome ${user.name}, you are registered as ${user.account}!`}
+                </h1>
+
+                <Row className="g-3 justify-content-center">
+                <Col xs={12} sm="auto">
+                    <Button size="lg" variant="primary" onClick={handleCreateArticle} className="w-100">
                     Create Article
-                </Button>
-                <Button size="lg" variant="warning">
+                    </Button>
+                </Col>
+                <Col xs={12} sm="auto">
+                    <Button size="lg" variant="warning" className="w-100">
                     Modify Article
-                </Button>
-                { user?.account === "admin" && 
-                <Button size="lg" variant="outline-warning">
-                    Create Author Account
-                </Button> }
-                </Stack>
+                    </Button>
+                </Col>
+                {user?.account === "admin" && (
+                    <Col xs={12} sm="auto">
+                    <Button size="lg" variant="outline-warning" className="w-100">
+                        Create Author Account
+                    </Button>
+                    </Col>
+                )}
+                </Row>
             </Stack>
             </Col>
         </Row>
-    </Container>
+        </Container>
+
     </div>
     );
 }
