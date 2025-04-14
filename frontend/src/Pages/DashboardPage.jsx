@@ -22,9 +22,9 @@ const DashboardPage = () => {
     <MainNavbar/>
     <Container fluid className="py-5 d-flex justify-content-center bg-light">
         <Row className="w-100 justify-content-center">
-            <Col xs={12} md={10} lg={8}>
+            <Col xs={12} md={10} lg={8} xl={6}>
             <Stack gap={4} className="p-5 bg-white shadow rounded-4">
-                <h1 className="text-center fs-2 mb-0">
+                <h1 className="text-center fs-2 mb-2">
                 {user && `Welcome ${user.name}, you are registered as ${user.account}!`}
                 </h1>
 
