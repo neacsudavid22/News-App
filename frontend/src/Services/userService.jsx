@@ -94,13 +94,14 @@ const getUsername = async (userId) => {
     }
 }
 
-const requestService = async (userId, requestUserId, action = "accept") => {
+const requestService = async (requestUserId, action = "accept") => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/${action}-request/${requestUserId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/handle-request/${requestUserId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({action}),
             credentials: "include"
         });
 
@@ -117,38 +118,15 @@ const requestService = async (userId, requestUserId, action = "accept") => {
     }
 }
 
-const sendFriendRequestById = async (userId, friendId) => {
+const sendFriendRequest = async (friend, method = "id") => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/friend-request-by-id`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/friend-request/${friend}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ friendId })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok && !data.show) {
-            throw new Error(data.message || "Unknown error occurred");
-        }
-
-        return data; 
-
-    } catch (err) {
-        console.error("sendFriendRequestService error:", err);
-        return { error: true, message: err.message };
-    }
-};
-
-const sendFriendRequestByUsername = async (userId, friendUsername) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/${userId}/friend-request-by-username`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ friendUsername })
+            body: JSON.stringify({ method }),
+            credentials: "include"
         });
 
         const data = await response.json();
@@ -189,6 +167,26 @@ const updateUser = async (userId, user) => {
     }
 };
 
+const toggleShareRead = async (sharedItemId) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/set-share-notification/${sharedItemId}`, {method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });      const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unknown error occurred");
+        }
+        return result; 
+
+    } catch (err) {
+        console.error("setNotificationRead error:", err);
+        return { error: true, message: err.message };
+    }
+}
+
 const shareArticle = async (articleId, friendId) => {
     try{
         const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/share-article-to/${friendId}`, {
@@ -218,10 +216,10 @@ export {
     signUpUser, 
     getAuthorName, 
     getUsername, 
-    sendFriendRequestById, 
-    sendFriendRequestByUsername, 
+    sendFriendRequest,  
     updateUser, 
     requestService,
     shareArticle,
-    removeFriend
+    removeFriend,
+    toggleShareRead
 };
