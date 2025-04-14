@@ -1,20 +1,17 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { sendFriendRequestById, sendFriendRequestByUsername } from "../Services/userService";
-import { AuthContext } from './AuthProvider';
+import { sendFriendRequest } from "../Services/userService";
 
 const AddFriendModal = ({ show, handleClose }) => {
-    const { user } = useContext(AuthContext);
     const [friendId, setFriendId] = useState("");
     const [friendUsername, setFriendUsername] = useState("");
     const [IS_BY_ID, SET_IS_BY_ID] = useState(true);
     const [friendRequest, setFriendRequest] = useState({});
     const [content, setContent] = useState("");
 
-    const sendFriendRequest = async () => {
-        const response = IS_BY_ID
-            ? await sendFriendRequestById(user._id, friendId)
-            : await sendFriendRequestByUsername(user._id, friendUsername);
+    const handleSendFriendRequest = async () => {
+        const method = IS_BY_ID ? "id" : "username";
+        const response = await sendFriendRequest(IS_BY_ID ? friendId : friendUsername, method)
 
         if (response.message) {
             setFriendRequest({ message: response.message, error: response.error });
@@ -68,7 +65,7 @@ const AddFriendModal = ({ show, handleClose }) => {
                     <Button variant="secondary" onClick={handleClose} className="me-2">
                         Close
                     </Button>
-                    <Button variant="danger" onClick={sendFriendRequest}>
+                    <Button variant="danger" onClick={handleSendFriendRequest}>
                         Send Request
                     </Button>
                 </div>
