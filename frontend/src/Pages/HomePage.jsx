@@ -6,7 +6,7 @@ import MainNavbar from "../Components/MainNavbar";
 import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
-import CategoryBar from "./CategoryBar";
+import CategoryBar from "../Components/CategoryBar";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
@@ -30,9 +30,11 @@ const HomePage = () => {
 
   return (
     <Stack direction="vertical" className="w-100 bg-light">
-      <MainNavbar />
-
-      <CategoryBar category={category} setCategory={setCategory}></CategoryBar>
+      <div className="fixed-top">
+        <MainNavbar />
+        <CategoryBar category={category} setCategory={setCategory}></CategoryBar>
+      </div>
+      <div style={{height:"8rem"}}></div>
 
       <Container fluid> 
         {articles.map((a) => a.main ? <MainArticleCard key={a._id} article={a}/> 
