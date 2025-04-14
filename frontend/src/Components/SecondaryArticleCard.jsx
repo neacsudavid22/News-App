@@ -19,12 +19,18 @@ const SecondaryArticleCard = ({ article }) => {
     }
   }, [article]);
 
-  const formattedDate = new Intl.DateTimeFormat("ro-RO", {  
+  const formattedUpdateDate = new Intl.DateTimeFormat("ro-RO", {  
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(article.updatedAt));
 
-  const status = article.createdAt !== article.updatedAt ? "UPDATED" : "PUBLISHED";
+  
+  const formattedCreateDate = new Intl.DateTimeFormat("ro-RO", {  
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(article.createdAt));
+
+  const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
   return (
     <Row className="mb-3 justify-content-center">
@@ -37,7 +43,7 @@ const SecondaryArticleCard = ({ article }) => {
           {/* Left: Text content */}
           <div className="d-flex flex-column justify-content-between p-3" style={{ width: "55%" }}>
             <div className="d-flex align-items-center gap-2 text-muted small mb-1">
-              <span className="fw-medium">{formattedDate}</span>
+              <span className="fw-medium">{formattedUpdateDate}</span>
               <span className="px-2 py-1 fw-semibold border rounded-pill text-uppercase" style={{ fontSize: "0.75rem" }}>
                 {status}
               </span>

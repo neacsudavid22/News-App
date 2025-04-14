@@ -27,7 +27,7 @@ const MainArticleCard = ({ article }) => {
     navigate(`/article/${article._id}`);
   };
 
-  const formattedDate = new Intl.DateTimeFormat("ro-RO", {
+  const formattedUpdateDate = new Intl.DateTimeFormat("ro-RO", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -35,7 +35,15 @@ const MainArticleCard = ({ article }) => {
     minute: "2-digit",
   }).format(new Date(article.updatedAt));
 
-  const status = article.createdAt !== article.updatedAt ? "UPDATED" : "PUBLISHED";
+  const formattedCreateDate = new Intl.DateTimeFormat("ro-RO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(article.createdAt));
+
+  const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
   return (
     <Row className="mb-3 justify-content-center">
@@ -58,7 +66,7 @@ const MainArticleCard = ({ article }) => {
 
           <Card.Body className="pt-3 px-3 pb-4">
             <div className="d-flex align-items-center gap-3 mb-2 text-muted small">
-              <span className="fw-medium">{formattedDate}</span>
+              <span className="fw-medium">{formattedUpdateDate}</span>
               <span className="px-2 py-1 fw-medium border rounded-pill" style={{fontSize: "0.9rem"}}>
                 {status}
               </span>
