@@ -298,9 +298,9 @@ const shareArticle = async (userId, articleId, friendId) => {
         if (!article) return { error: true, message: "Article doesn't exist" };
 
         const result = await User.updateOne(
-            { _id: user._id },
+            { _id: friend._id },
             {$addToSet: { 
-                shareList: {articleShared: article._id, userFrom: friend._id} 
+                shareList: {sharedArticle: article._id, userFrom: user._id} 
             }}
         );
 
@@ -310,6 +310,25 @@ const shareArticle = async (userId, articleId, friendId) => {
         return { error: true, message: "Internal Server Error" };
     }
 }
+
+const toggleShareRead = async (userId, shareId) => {
+    try {
+        const user = await User.findById(userId).select("_id shareList").exec();
+        if (!user) return { error: true, message: "User doesn't exist" };
+
+        const shareItem = user.shareList.id(shareId);
+        if (!shareItem) return { error: true, message: "Share not found" };
+
+        shareItem.read = !shareItem.read;
+
+        await user.save();
+
+        return { success: true, shareItem };
+    } catch (err) {
+        console.error("toggleShareRead error: ", err);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
 
 export {
     getUsers,
@@ -323,5 +342,6 @@ export {
     acceptFriendRequest,
     declineFriendRequest,
     shareArticle,
-    removeFriend
+    removeFriend,
+    toggleShareRead
 }
