@@ -282,7 +282,7 @@ const ArticlePage = () => {
                                     handleReplyForm(nodeId);
                                     setTimeout(() => handleOpen(nodeId), 600);
                                 }}
-                                disabled={commentContent !== ""}
+                                disabled={commentContent === ""}
                                 className="me-2 mb-3 rounded-4"
                             >
                                 <strong className="pe-2">Comment</strong><i className="bi bi-chat-square-text"></i>
@@ -308,6 +308,7 @@ const ArticlePage = () => {
     return(
         <>
         <MainNavbar />
+        <div style={{height:"0.1rem"}}/>
         {article && <ArticleComponent key={article?._id} article={article}/>}
 
         <Modal 

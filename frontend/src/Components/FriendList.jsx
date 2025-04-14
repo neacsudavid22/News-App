@@ -84,7 +84,7 @@ const FriendList = ({ show, handleClose }) => {
                         </Button>
                     </div>
                 )) ) : (
-                    <p className="text-center text-muted">No friend requests.</p>
+                    <p className="text-center text-muted">No friends to list.</p>
                 )}
                 </Stack>
             </Offcanvas.Body>

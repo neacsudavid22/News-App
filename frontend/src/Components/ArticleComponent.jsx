@@ -39,7 +39,7 @@ const ArticleComponent = ( {article} ) => {
     }, [article]);
 
     return (
-        <Container className="w-100 my-4">
+        <Container className="w-100 my-4 ps-4">
             <Row className="w-100 justify-content-center ms-1 mb-3">
                 <Col xs={12} sm={12} md={8} lg={8} xl={7} > 
                     <h1>{article?.title || "Loading..."}</h1>

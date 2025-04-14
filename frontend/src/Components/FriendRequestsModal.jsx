@@ -10,7 +10,7 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
 
     const handleRequest = async (requestUserId, action) => {
         try{
-            const fetchResult = await requestService(user._id, requestUserId, action);
+            const fetchResult = await requestService(requestUserId, action);
             if(fetchResult !== null) {
                 refresh(); 
                 setFriendRequests(prevRequests => prevRequests.filter(requestId => requestId !== requestUserId));
