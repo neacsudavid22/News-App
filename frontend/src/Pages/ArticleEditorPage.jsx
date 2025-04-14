@@ -10,12 +10,12 @@ import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
 import MainNavbar from "../Components/MainNavbar";
 import Modal from "react-bootstrap/Modal";
-import "./ArticleEditorPage.css"
 import useWindowSize from "../hooks/useWindowSize";
 import AddImage from "../Components/AddImage";
 import AddHeader from "../Components/AddHeader";
 import AddParagraph from "../Components/AddParagraph";
 import { useLocation, useNavigate, } from "react-router";
+import "./ArticleRedactationForm.css";
 
 const ArticleEditorPage = ( {article} ) => {
     const location = useLocation();
@@ -108,18 +108,18 @@ const ArticleEditorPage = ( {article} ) => {
 
         <Container fluid className="d-flex justify-content-center h-100 pt-4">
         <Row className="w-100 justify-content-center">
-        <Col sm={11} md={10} lg={8} xl={6}> {/* Responsive form width */}
-            <h1 className="mb-4">Article Redactation Form</h1>
+        <Col sm={11} md={10} lg={8} xl={8}>
             <Form className="justify-content-center">
                 <Form.Group className="mb-3">
-                    <Form.Label><b>Title</b></Form.Label>
-                    <Form.Control type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Form.Label><h2>Article Title</h2></Form.Label>
+                    <Form.Control type="text" placeholder="Enter article title" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </Form.Group>
             </Form>
 
-            <Container className="justify-content-center w-100 sticky-top sticky-offset py-2 bg-white border-bottom">
+            <Container className="justify-content-center sticky-offset py-2 bg-white border-bottom">
 
-                <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} className="w-100 mb-2 ">
+                <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} 
+                    className="w-100 mb-2 ">
                     <Tab eventKey="p" title="Paragraph" />
                     <Tab eventKey="Image" title="Image" />
                     <Tab eventKey="h2" title="Header" />
@@ -127,7 +127,7 @@ const ArticleEditorPage = ( {article} ) => {
                 </Tabs>
 
                 {EDIT_MODE ? null : renderSelectedComponent(selectedComponent)}
-                </Container>
+            </Container>
 
             <br />
             <h2>Article Preview:</h2>

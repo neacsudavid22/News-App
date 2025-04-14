@@ -9,11 +9,11 @@ import Tabs from "react-bootstrap/Tabs";
 import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
 import { useContext, useEffect, useState } from "react";
-import "./ArticleUploadPage.css";
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavbar";
 import { postArticle } from "../Services/articleService";
 import Modal from "react-bootstrap/esm/Modal";
+import "./ArticleRedactationForm.css";
 
 const ArticleUploadPage = () => {
     const location = useLocation();
@@ -77,7 +77,8 @@ const ArticleUploadPage = () => {
                 articleContent: updatedContent,
                 category,
                 tags,
-                background: backgroundUrl
+                background: backgroundUrl,
+                main: mainArticle
             };
     
             const result = await postArticle(article);
@@ -132,6 +133,8 @@ const ArticleUploadPage = () => {
         }
     }, [location.state, navigate]);
 
+    const [mainArticle, setMainArticle] = useState(false);
+
     return (
         <>
         <Modal show={show} onHide={handleClose} className="mt-4">
@@ -145,14 +148,14 @@ const ArticleUploadPage = () => {
 
             <Modal.Footer>
                 { UPLOAD_SUCCESFULL && 
-                <div>
+                <Stack direction="horizontal" gap={2}>
                     <Button size="sm" Button variant="success" onClick={()=>navigate("/dashboard")}>
                         Go to Dashboard
                     </Button>
                     <Button size="sm" onClick={()=>navigate(`/article/${articleId}`)}>
                         See Article
                     </Button>
-                </div> }
+                </Stack> }
             </Modal.Footer>
         </Modal>
 
@@ -160,12 +163,12 @@ const ArticleUploadPage = () => {
         
         <Container fluid className="mt-4 border-0 pe-0">
         <Row className="w-100 justify-content-center">
-        <Col sm={12} md={10} lg={8} xl={6} className=" h-100"> {/* Responsive form width */}
+        <Col sm={12} md={10} lg={8} xl={7} className=" h-100"> {/* Responsive form width */}
 
-            <h1>Article Preview</h1> 
+            <h1 className="my-4">Article Preview</h1> 
 
             <Stack sm={12} md={10} lg={8} xl={6} direction="vertical" gap={2} className="border p-3 overflow-y-auto h-75 mb-4">
-                <h1>{title}</h1>
+                <h2>{title}</h2>
                 { articleContent.map( (item, index) => {
                     const Tag = item.contentType
                         return (
@@ -187,7 +190,7 @@ const ArticleUploadPage = () => {
             </Stack>
 
             <Stack direction="verical" className="d-flex justify-content-center border-top py-3 mb-1" gap={3} >
-                <Form.Group className="w-75 mb-3 pe-5">
+                <Form.Group className="w-100 mb-3 pe-5">
                     <Form.Label><b>Background</b></Form.Label>
                     <Form.Control
                         type="file"
@@ -199,7 +202,29 @@ const ArticleUploadPage = () => {
                     />
                 </Form.Group>
 
-                { backgroundPreview && <Image src={backgroundPreview} thumbnail fluid className="w-75 p-2" /> }
+                {backgroundPreview && (
+                <>
+                <p className="text-muted">This is how the background will look like on cards</p>
+                <div
+                    className="w-100 mb-3 overflow-hidden border"
+                    style={{
+                    width: "100%",
+                    height: "12rem", 
+                    minHeight:"25vw",
+                    }}
+                    >
+                    <Image
+                    thumbnail
+                    src={backgroundPreview}
+                    alt="Background Preview"
+                    className="w-100 h-100"
+                    style={{
+                        objectFit: "cover",
+                    }}
+                    />
+                </div>
+                </>
+                )}
    
             </Stack>
 
@@ -211,6 +236,15 @@ const ArticleUploadPage = () => {
                 <option value="tech">tech</option>
                 <option value="lifestyle">lifestyle</option>
             </Form.Select>
+
+            <Form.Check 
+            className="my-4"
+                type="switch"
+                id={`main-switch-${articleId}`}
+                label={mainArticle ? "Main Article" : "Secondary Article"}
+                onChange={()=>setMainArticle(prev=>!prev)}
+                onClick={(e) => e.stopPropagation()}
+            />
 
             <Stack direction="horizontal" className="mt-4 mb-3" gap={3}>
                 <Form.Control
@@ -231,7 +265,7 @@ const ArticleUploadPage = () => {
                 onSelect={(e) => setTagSelect(e)}
                 onDoubleClick={ () => removeTag() }
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
-            </Tabs>
+            </Tabs> 
             
             <div className="d-flex justify-content-between">
             <Button variant="success" type="button" className="mb-5 text-nowrap" 
