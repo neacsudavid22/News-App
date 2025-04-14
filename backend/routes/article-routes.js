@@ -1,5 +1,17 @@
 import express from 'express';
-import { getArticles, getArticleById, createArticle, deleteArticle, updateArticle, savePost, likePost, postComment, deleteComment, deleteGarbageComments } from '../controllers/article-controller.js'
+import { 
+        getArticles,
+        getArticleById, 
+        createArticle, 
+        deleteArticle, 
+        updateArticle, 
+        savePost, 
+        likePost, 
+        postComment, 
+        deleteComment, 
+        getAllImageUrls
+    } from '../controllers/article-controller.js'
+import authMiddleware from '../middlewares/authMiddleware.js';
 
 const articlesRouter = express.Router()
 
@@ -166,6 +178,21 @@ articlesRouter.route('/article/:articleId/delete-garbage-comments').put(async (r
 
     } catch(err){
         console.error("deleteGarbageComments error:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/article/get-all-cloudinary-urls').get(authMiddleware , async(req, res)=>{
+    try{
+        const result = await getAllImageUrls();
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.status(200).json({ imageUrls: result });
+
+    } catch(err){
+        console.error("getAllImageUrls error:", err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 })

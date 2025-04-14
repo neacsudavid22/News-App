@@ -188,6 +188,23 @@ const deleteGarbageComments = async (articleId, comments) => {
     }
 };
 
+const getAllImageUrls = async () => {
+    try {
+      const allArticles = await Article.find().select("articleContent");
+  
+      const imageUrls = allArticles.flatMap((article) =>
+        article.articleContent
+          .filter((contentBlock) => contentBlock.contentType === "Image")
+          .map((contentBlock) => contentBlock.content)
+      );
+  
+      return imageUrls;
+    } catch (err) {
+      console.error(`getAllImageUrls Error: ${err.message}`);
+      return { error: true, message: "Internal Server Error" };
+    }
+};
+
 export {
     getArticles,
     getArticleById,
@@ -198,5 +215,6 @@ export {
     savePost,
     postComment,
     deleteComment,
-    deleteGarbageComments
+    deleteGarbageComments,
+    getAllImageUrls
 }
