@@ -12,6 +12,7 @@ import ShareIdModal from './ShareIdModal';
 import FriendRequestsModal from './FriendRequestsModal';
 import Collapse  from 'react-bootstrap/Collapse';
 import FriendList from "./FriendList";
+import SharedList from "./SharedList";
 
 const MainNavbar = () => {
     const { user, logout } = useContext(AuthContext); 
@@ -24,7 +25,7 @@ const MainNavbar = () => {
     const [showShareId, setShowShareId] = useState(false);
     const [showFriendRequests, setShowFriendRequests] = useState(false);
     const [showFriendList, setShowFriendList] = useState(false);
-
+    const [showShareNotifications, setShowShareNotifications] = useState(false);
 
     const navigate = useNavigate();
 
@@ -49,7 +50,8 @@ const MainNavbar = () => {
     }, [unchekedRequest]);
 
     return(
-        <Navbar sticky="top" bg="dark" variant="dark" expand="lg" className="w-100 m-0 p-2 px-3">
+        <>
+        <Navbar fixed="top" bg="dark" variant="dark" expand="lg" className="w-100 p-2 px-3">
             <Stack direction="horizontal" className="d-flex justify-content-between w-100">
 
                 <Navbar.Brand as={Link} to="/"> NewsWebApp </Navbar.Brand>
@@ -71,7 +73,6 @@ const MainNavbar = () => {
                         >
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowAddFriend(true)}>Add a friend</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendRequests(true)}>
                                 View friend requests
                                 {unchekedRequest && (
@@ -79,10 +80,14 @@ const MainNavbar = () => {
                                 )}
                             </Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendList(true)}>Show friend list</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareNotifications(true)}>Articles from friends</Dropdown.Item>
 
                             { user?.account === "author" &&
                             <>
                             <Dropdown.Divider />
+                            <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
+                            <Dropdown.Divider />
+
                             <Dropdown.Item type="button" variant="danger" onClick={() => navigate("/dashboard")}>Go to Dashboard</Dropdown.Item>
                             </>
                             }
@@ -97,14 +102,17 @@ const MainNavbar = () => {
                             setUnchekedRequest={setUnchekedRequest}
                             handleClose={() => setShowFriendRequests(false)} 
                         />
-                        <FriendList show={showFriendList} handleClose={() => setShowFriendList(false)}></FriendList>
-
+                        <FriendList show={showFriendList} handleClose={() => setShowFriendList(false)}/>
+                        <SharedList show={showShareNotifications} handleClose={() => setShowShareNotifications(false)}/>
                     </Stack>
                 ) : (
                     <Button className="text-light" variant="danger" as={NavLink} to="/login">Login</Button>
                 )}
             </Stack>
         </Navbar>
+        <div className="mb-5" style={{height:"0.5rem"}}></div>
+        </>
+
     );
 }
 
