@@ -58,13 +58,8 @@ const LoginPage = () => {
                 if (!response || !response.token) {
                     throw new Error("No token received");
                 }
+                await login();     
 
-                if (response.token) {
-                    await login();
-                    if(user.account === "author")
-                        navigate("/dashboard");
-                    else navigate(-1);
-                }
             } catch (err) {
                 console.error("Login error:", err);
                 setErrorMsg("Incorrect username or password.");
@@ -95,6 +90,11 @@ const LoginPage = () => {
         }
     };
     
+    useEffect(()=>{
+        if(user !== null){
+            user.account === "author" ? navigate("/dashboard") : navigate("/")
+        }
+    }, [user, navigate])
 
     return (
         <Container fluid className="d-flex justify-content-center vh-100 pt-5">
