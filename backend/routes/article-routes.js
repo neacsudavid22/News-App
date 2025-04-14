@@ -34,6 +34,21 @@ articlesRouter.route('/article/:id').get(async (req, res) => {
     }
 })
 
+articlesRouter.route('/article-title/:id').get(async (req, res) => {
+    try{
+        const result = await getArticleById(req.params.id);
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+        const {title} = result;
+    
+        return res.status(200).json(title);
+    } catch (err) {
+        console.error(`Error fetching article: ${err.message}`);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 articlesRouter.route('/article/:id').delete(async (req, res) => {
     try{
         const result = await deleteArticle(req.params.id)

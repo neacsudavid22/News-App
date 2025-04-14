@@ -29,6 +29,21 @@ const getArticleById = async (articleId) => {
     }
 }
 
+const getTitle = async (articleId) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article-title/${articleId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch article");
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("getTitle error:", err);
+        return null;
+    }
+}
+
 const postArticle = async (article) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article`, {
@@ -114,5 +129,6 @@ export {
     getArticleById,
     interactOnPost,
     deleteComment,
-    deleteGarbageComment
+    deleteGarbageComment,
+    getTitle
 }
