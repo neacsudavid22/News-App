@@ -23,6 +23,11 @@
     margin-top: 10px;
 }
 
-.sticky-top-offset {
-    top: 56px;
+.sticky-offset {
+    position: sticky;
+    top: 3.55rem;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1030;
 }
