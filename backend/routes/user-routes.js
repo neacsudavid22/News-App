@@ -1,6 +1,20 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
-import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest, shareArticle, removeFriend } from '../controllers/user-controller.js'
+import { 
+        getUsers, 
+        getUserById,    
+        createUser, 
+        deleteUser, 
+        updateUser, 
+        loginUser, 
+        sendFriendRequestById, 
+        sendFriendRequestByUsername, 
+        declineFriendRequest, 
+        acceptFriendRequest, 
+        shareArticle, 
+        removeFriend, 
+        toggleShareRead 
+    } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
 
@@ -76,8 +90,26 @@ const usersRouter = express.Router()
         return res.status(200).json(result);
     })
 
-    usersRouter.route('/user/:id/friend-request-by-id').post(authMiddleware, async (req, res) => {
-        const result = await sendFriendRequestById(req.params.id, req.body.friendId);
+    usersRouter.route('/user/friend-request/:fid').post(authMiddleware, async (req, res) => {
+        const method = req.body.method;
+        
+        const result = method === "id" ?
+                await sendFriendRequestById(req.user._id, req.params.fid)
+                : await sendFriendRequestByUsername(req.user._id, req.params.fid);
+
+        if (result.error && !result.show) {
+            return res.status(400).json({ show: false, message: result.message });
+        }
+    
+        return res.status(200).json(result); 
+    });
+
+    usersRouter.route('/user/handle-request/:rid').put(authMiddleware, async (req, res) => {
+        const action = req.body.action;
+        
+        const result = action === "accept" ?
+                        await acceptFriendRequest(req.user._id, req.params.rid)
+                        : await declineFriendRequest(req.user._id, req.params.rid);
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });
@@ -86,35 +118,6 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/friend-request-by-username').post(authMiddleware, async (req, res) => {
-        const result = await sendFriendRequestByUsername(req.params.id, req.body.friendUsername);
-    
-        if (result.error && !result.show) {
-            return res.status(400).json({ show: false, message: result.message });
-        }
-    
-        return res.status(200).json(result); 
-    });
-
-    usersRouter.route('/user/:id/accept-request/:rid').put(authMiddleware, async (req, res) => {
-        const result = await acceptFriendRequest(req.params.id, req.params.rid);
-    
-        if (result.error && !result.show) {
-            return res.status(400).json({ show: false, message: result.message });
-        }
-    
-        return res.status(200).json(result); 
-    });
-
-    usersRouter.route('/user/:id/decline-request/:rid').put(authMiddleware, async (req, res) => {
-        const result = await declineFriendRequest(req.params.id, req.params.rid);
-    
-        if (result.error && !result.show) {
-            return res.status(400).json({ show: false, message: result.message });
-        }
-    
-        return res.status(200).json(result); 
-    });
 
     usersRouter.route('/remove-friend/:fid').put(authMiddleware, async (req, res) => {
         const result = await removeFriend(req.user._id, req.params.fid);
@@ -188,9 +191,22 @@ const usersRouter = express.Router()
         return res.status(200).json({ user: req.user });
     });
 
-    usersRouter.put("/share-article-to/:id", authMiddleware, async (req, res) => {
+    usersRouter.put("/share-article-to/:fid", authMiddleware, async (req, res) => {
         try {
-            const result = await shareArticle(req.user._id, req.body.articleId, req.params.id);
+            const result = await shareArticle(req.user._id, req.body.articleId, req.params.fid);
+            if (result.error) {
+                return res.status(400).json({ message: result.message });
+            }
+    
+            return res.status(200).json(result);
+        } catch(err){
+            console.error(err);
+        }
+    })
+
+    usersRouter.put("/set-share-notification/:snid", authMiddleware, async (req, res) => {
+        try {
+            const result = await toggleShareRead(req.user._id, req.params.snid);
             if (result.error) {
                 return res.status(400).json({ message: result.message });
             }
