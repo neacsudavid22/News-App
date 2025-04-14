@@ -24,7 +24,7 @@ const User = model("User", new Schema({
     name: String,
     account:{
         type: String,
-        enum: ['standard','premium','author','admin'],
+        enum: ['standard','author','admin'],
         default: 'standard',
         required: true
     },
@@ -35,14 +35,18 @@ const User = model("User", new Schema({
     },
     shareList: {
         type: [{
-            _id: false,
+            read: {
+                type: Boolean,
+                default: false
+            },
             userFrom: {
-            type: SchemaTypes.ObjectId,   
-            ref: 'User'},
-            articleShared: {
+                type: SchemaTypes.ObjectId,   
+                ref: 'User'},
+            sharedArticle: {
                 type: SchemaTypes.ObjectId,   
                 ref: 'Article'},
         }],
+        timestamps: true,
         default: []
     },
     friendRequests: {
