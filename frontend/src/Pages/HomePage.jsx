@@ -7,10 +7,10 @@ import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
 import CategoryBar from "../Components/CategoryBar";
+import { AuthContext } from "../Components/AuthProvider";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
-
   const [articles, setArticles] = useState([])
 
   useEffect( () => {

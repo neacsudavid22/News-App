@@ -12,15 +12,18 @@ const AuthProvider = ({ children }) => {
                 credentials: "include"
             });
 
-            if (response.ok){
+            if (response.ok) {
                 const result = await response.json();
                 setUser(result.user);
+            } else {
+                setUser(null);
             }
         } catch (error) {
             console.error("Error fetching user:", error);
             setUser(null);
         }
-    };  
+    };
+
 
     const refresh = async () => {
         try {
@@ -28,16 +31,16 @@ const AuthProvider = ({ children }) => {
                 method: "GET",
                 credentials: "include"
             });
-
-            if (!response.ok) throw new Error(response.message || "Failed to refresh user");
-
+    
+            if (!response.ok) throw new Error("Failed to refresh user");
+    
             await login();
-
         } catch (error) {
             console.error("Error refreshing user:", error);
             setUser(null);
         }
     };
+    
 
     const logout = async () => {
         try {
@@ -47,41 +50,41 @@ const AuthProvider = ({ children }) => {
             });
 
             setUser(null);
-            
-            window.location.reload(); 
+            window.location.reload();
         } catch (error) {
             console.error("Error logging out:", error);
         }
     };
 
-    
-
     useEffect(() => {
+        let intervalId;
+    
         const checkAuth = async () => {
             try {
-                console.log("cheking")
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/check-auth`, {
                     method: "GET",
                     credentials: "include"
                 });
                 const result = await response.json();
-                if (result.authenticated === true) {
-                    const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
-                        method: "GET",
-                        credentials: "include"
-                    });
-        
-                    if (response.ok){
-                        const result = await response.json();
-                        setUser(result.user);
-                    }
+                if (result.authenticated) {
+                    await login();
+                    intervalId = setInterval(refresh, 10000);
+                } else {
+                    setUser(null);
                 }
             } catch (err) {
                 console.error("Auth check error:", err);
             }
         };
+    
         checkAuth();
+    
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    
 
     return (
         <AuthContext.Provider value={{ user, login, logout, refresh }}>
