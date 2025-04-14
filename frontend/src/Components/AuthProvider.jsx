@@ -4,7 +4,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const intervalRef = useRef(null); // using ref to persist interval without rerenders
+    const refreshInterval = useRef(null);
 
     const login = useCallback(async () => {
         try {
@@ -16,53 +16,43 @@ const AuthProvider = ({ children }) => {
             if (response.ok) {
                 const result = await response.json();
                 setUser(result.user);
-
-                // Start interval if not already started
-                if (!intervalRef.current) {
-                    intervalRef.current = setInterval(refresh, 10000);
-                }
-            } else {
-                setUser(null);
+                return true;
             }
-        } catch (error) {
-            console.error("Error fetching user:", error);
             setUser(null);
+            return false;
+        } catch (error) {
+            console.error("Login error:", error);
+            setUser(null);
+            return false;
         }
-    }, [refresh]);
+    }, []);
 
     const refresh = useCallback(async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/refresh-token`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/user-api/refresh-token`, {
                 method: "GET",
                 credentials: "include"
             });
 
-            if (!response.ok) throw new Error("Failed to refresh user");
-
-            await login();
         } catch (error) {
-            console.error("Error refreshing user:", error);
-            setUser(null);
+            console.error("Refresh failed:", error);
         }
-    }, [login]);
+    }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/user-api/logout`, {
                 method: "POST",
                 credentials: "include"
             });
-
+        } finally {
             setUser(null);
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
+            if (refreshInterval.current) {
+                clearInterval(refreshInterval.current);
+                refreshInterval.current = null;
             }
-            window.location.reload();
-        } catch (error) {
-            console.error("Error logging out:", error);
         }
-    };
+    }, []);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -74,21 +64,28 @@ const AuthProvider = ({ children }) => {
 
                 const result = await response.json();
                 if (result.authenticated) {
-                    await login(); // login handles interval too
+                    await login();
+
+                    if (!refreshInterval.current) {
+                        refreshInterval.current = setInterval(refresh, 20000); 
+                    }
                 } else {
                     setUser(null);
                 }
             } catch (err) {
                 console.error("Auth check error:", err);
+                setUser(null);
             }
         };
 
         checkAuth();
 
         return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
+            if (refreshInterval.current) {
+                clearInterval(refreshInterval.current);
+            }
         };
-    }, [login]);
+    }, [login, refresh]);
 
     return (
         <AuthContext.Provider value={{ user, login, logout, refresh }}>

@@ -9,6 +9,7 @@ const ShareNotification = ({ sharedItemId, articleId, articleTitle, userFrom, re
     const navigate = useNavigate();
 
     const handleNavigation = async () => {
+        handleSwitchChange();
         navigate("/article/" + articleId);
     };
 
