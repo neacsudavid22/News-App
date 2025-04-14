@@ -11,6 +11,7 @@ import AddFriendModal from './AddFriendModal';
 import ShareIdModal from './ShareIdModal';
 import FriendRequestsModal from './FriendRequestsModal';
 import Collapse  from 'react-bootstrap/Collapse';
+import FriendList from "./FriendList";
 
 const MainNavbar = () => {
     const { user, logout } = useContext(AuthContext); 
@@ -22,6 +23,8 @@ const MainNavbar = () => {
     const [showAddFriend, setShowAddFriend] = useState(false);
     const [showShareId, setShowShareId] = useState(false);
     const [showFriendRequests, setShowFriendRequests] = useState(false);
+    const [showFriendList, setShowFriendList] = useState(false);
+
 
     const navigate = useNavigate();
 
@@ -75,6 +78,8 @@ const MainNavbar = () => {
                                     <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
                                 )}
                             </Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendList(true)}>Show friend list</Dropdown.Item>
+
                             { user?.account === "author" &&
                             <>
                             <Dropdown.Divider />
@@ -92,6 +97,7 @@ const MainNavbar = () => {
                             setUnchekedRequest={setUnchekedRequest}
                             handleClose={() => setShowFriendRequests(false)} 
                         />
+                        <FriendList show={showFriendList} handleClose={() => setShowFriendList(false)}></FriendList>
 
                     </Stack>
                 ) : (

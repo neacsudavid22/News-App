@@ -1,6 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
-import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest, shareArticle } from '../controllers/user-controller.js'
+import { getUsers, getUserById, createUser, deleteUser, updateUser, loginUser, sendFriendRequestById, sendFriendRequestByUsername, declineFriendRequest, acceptFriendRequest, shareArticle, removeFriend } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
 
@@ -76,7 +76,7 @@ const usersRouter = express.Router()
         return res.status(200).json(result);
     })
 
-    usersRouter.route('/user/:id/friend-request-by-id').post(async (req, res) => {
+    usersRouter.route('/user/:id/friend-request-by-id').post(authMiddleware, async (req, res) => {
         const result = await sendFriendRequestById(req.params.id, req.body.friendId);
     
         if (result.error && !result.show) {
@@ -86,7 +86,7 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/friend-request-by-username').post(async (req, res) => {
+    usersRouter.route('/user/:id/friend-request-by-username').post(authMiddleware, async (req, res) => {
         const result = await sendFriendRequestByUsername(req.params.id, req.body.friendUsername);
     
         if (result.error && !result.show) {
@@ -96,7 +96,7 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/accept-request/:rid').put(async (req, res) => {
+    usersRouter.route('/user/:id/accept-request/:rid').put(authMiddleware, async (req, res) => {
         const result = await acceptFriendRequest(req.params.id, req.params.rid);
     
         if (result.error && !result.show) {
@@ -106,8 +106,18 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/:id/decline-request/:rid').put(async (req, res) => {
+    usersRouter.route('/user/:id/decline-request/:rid').put(authMiddleware, async (req, res) => {
         const result = await declineFriendRequest(req.params.id, req.params.rid);
+    
+        if (result.error && !result.show) {
+            return res.status(400).json({ show: false, message: result.message });
+        }
+    
+        return res.status(200).json(result); 
+    });
+
+    usersRouter.route('/remove-friend/:fid').put(authMiddleware, async (req, res) => {
+        const result = await removeFriend(req.user._id, req.params.fid);
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });

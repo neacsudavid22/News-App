@@ -220,6 +220,44 @@ const declineFriendRequest = async (id, friendId) => {
     }
 };
 
+const removeFriend = async (id, friendId) => {
+    try {
+        const user = await User.findById(id).select('_id friendList');
+        if (!user) {
+            return { error: true, message: "Error: current user id not found" };
+        }
+
+        const userFriend = await User.findById(friendId).select('_id friendList');
+        if (!userFriend) {
+            return { error: true, message: "Friend not found, wrong id!" };
+        }
+
+        if (!user.friendList || !user.friendList.includes(friendId)) {
+            return { error: true, message: "The user to be removed was not found in friendList!" };
+        }
+
+        if (!userFriend.friendList || !userFriend.friendList.includes(id)) {
+            return { error: true, message: "The current user was not found in the user to be removed friendList!" };
+        }
+
+
+        await User.updateOne(
+            { _id: id },
+            { $pull: { friendList: friendId } }
+        );
+
+        await User.updateOne(
+            { _id: friendId },
+            { $pull: { friendList: id } }
+        );
+
+        return { error: false, message: "Friend removed from friendList successfully!" };
+    } catch (err) {
+        console.error(`removeFriend Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
 const loginUser = async (username, password, forRefresh = false) => {
     try {
         const user = await User.findOne({ username }).exec();
@@ -284,5 +322,6 @@ export {
     sendFriendRequestByUsername,
     acceptFriendRequest,
     declineFriendRequest,
-    shareArticle
+    shareArticle,
+    removeFriend
 }

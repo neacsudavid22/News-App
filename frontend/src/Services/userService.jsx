@@ -12,7 +12,28 @@ const authenticateUser = async (username, password) => {
 
     return await response.json();
 };
+const removeFriend = async (friendId) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/remove-friend/${friendId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });
 
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || "Unknown error occurred");
+        }
+        return result; 
+
+    }catch(err){
+        console.error(err);
+        return null;
+    }
+}
 
 const signUpUser = async (email, phone, name, gender, birthdate, username, password) => {
     try {
@@ -201,5 +222,6 @@ export {
     sendFriendRequestByUsername, 
     updateUser, 
     requestService,
-    shareArticle
+    shareArticle,
+    removeFriend
 };
