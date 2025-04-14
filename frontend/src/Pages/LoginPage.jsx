@@ -135,7 +135,7 @@ const LoginPage = () => {
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 onKeyDown={(e) => {
-                                                    const allowedKeys = [ "Backspace", "Delete", "ArrowLeft", "ArrowRight" ];
+                                                    const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight" ];
                                                     if (!/^[0-9]$/.test(e.key) && !allowedKeys.includes(e.key)) {
                                                       e.preventDefault();
                                                     }
@@ -156,7 +156,7 @@ const LoginPage = () => {
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 onKeyDown={(e) => {
-                                                    const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight"];
+                                                    const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight"];
                                                     if (!/^[a-zA-Z]$/.test(e.key) && !allowedKeys.includes(e.key)) {
                                                       e.preventDefault();
                                                     }
