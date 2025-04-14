@@ -6,8 +6,7 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { extractPublicId } from 'cloudinary-build-url';
 import multer from 'multer';
 import express from 'express';
-import authMiddleware from '../middlewares/authMiddleware';
-
+  
 // Config Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -32,7 +31,7 @@ uploadRouter.post("/upload-images", upload, (req, res) => {
     return res.status(400).json({ message: "No images uploaded" });
 }});
 
-uploadRouter.post("/cleanup-unused-images", authMiddleware, async (req, res) => {
+uploadRouter.post("/cleanup-unused-images", async (req, res) => {
   try {
     const unusedPublicIds = req.body.unusedPublicIds;
 
@@ -53,7 +52,7 @@ uploadRouter.post("/cleanup-unused-images", authMiddleware, async (req, res) => 
   }
 });
 
-uploadRouter.post('/get-unused-images-public-ids',  authMiddleware, async (req, res) => {
+uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
   try {
     const savedUrls = req.body.imageUrls;
     const result = await cloudinary.search
