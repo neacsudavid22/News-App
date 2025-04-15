@@ -88,7 +88,8 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
             body: JSON.stringify({isLastNode}),
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: "include"
         });
         if(!response.ok){
             throw new Error(response?.message || "Failed to delete comment");
@@ -123,6 +124,71 @@ const deleteGarbageComment = async (articleId, commentList) => {
     }
 }
 
+const getDatabaseImageUrls = async () => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/get-all-cloudinary-urls`,
+           { method: "GET",
+            headers: { 'Content-Type': 'application/json'},
+            credentials: "include"}
+        );
+
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to get all image urls from database");
+        }
+        const result = await response.json();
+        return result;
+
+    } catch(err){
+        console.error("getDatabaseImageUrls error:", err);
+        return null;
+    }
+}
+
+const getUnsuedImagePublicIds = async (imageUrls) => {
+    try{
+        console.log(imageUrls);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-unused-images-public-ids`,{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({imageUrls}),
+            credentials: "include"
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to get unsued image urls from cloudinary");
+        }
+        const result = await response.json();
+        return result;
+
+    } catch(err){
+        console.error("getUnsuedImagePublicIds error:", err);
+        return null;
+    }
+}
+
+const cleanUpUnsuedImages = async (unusedPublicIds) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/cleanup-unused-images`,{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({unusedPublicIds}),
+            credentials: "include"
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to delete unsued images from cloudinary");
+        }
+        const result = await response.json();
+        return result;
+
+    } catch(err){
+        console.error("cleanUpUnsuedImages error:", err);
+        return null;
+    }
+}
+
 export {
     getArticles,
     postArticle,
@@ -130,5 +196,8 @@ export {
     interactOnPost,
     deleteComment,
     deleteGarbageComment,
-    getTitle
+    getTitle,
+    getDatabaseImageUrls,
+    getUnsuedImagePublicIds,
+    cleanUpUnsuedImages
 }

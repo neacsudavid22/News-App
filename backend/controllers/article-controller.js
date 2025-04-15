@@ -1,4 +1,5 @@
-import Article from '../models/Article.js';
+import Article from "../models/Article.js";
+
 const getArticles = async (filterCategory, page = 1) => {
     try {
         const articles = await Article.find(filterCategory ? { category: filterCategory } : {})
@@ -190,15 +191,19 @@ const deleteGarbageComments = async (articleId, comments) => {
 
 const getAllImageUrls = async () => {
     try {
-      const allArticles = await Article.find().select("articleContent");
+      const allArticles = await Article.find({}).select("_id articleContent background");
   
-      const imageUrls = allArticles.flatMap((article) =>
+      const contentImageUrls = allArticles.flatMap((article) =>
         article.articleContent
           .filter((contentBlock) => contentBlock.contentType === "Image")
           .map((contentBlock) => contentBlock.content)
       );
-  
-      return imageUrls;
+
+      const backgroundUrls = allArticles.flatMap((article) => article.background);
+
+      const imageUrls = [...contentImageUrls, ...backgroundUrls];
+      
+      return imageUrls
     } catch (err) {
       console.error(`getAllImageUrls Error: ${err.message}`);
       return { error: true, message: "Internal Server Error" };

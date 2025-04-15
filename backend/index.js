@@ -19,6 +19,7 @@ const app = express();
 
 app.use(cookieParser()); 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const corsOptions = {
   origin: ["https://newswebapp-qvgp.onrender.com", "http://localhost:5173"],
@@ -29,8 +30,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use('/article-api', express.json(), articlesRouter);
-app.use('/user-api', express.json(), usersRouter);
+app.use('/article-api', articlesRouter);
+app.use('/user-api', usersRouter);
 
 app.use('/upload-api', uploadRouter);
 

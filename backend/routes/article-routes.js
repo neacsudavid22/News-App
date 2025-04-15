@@ -182,7 +182,7 @@ articlesRouter.route('/article/:articleId/delete-garbage-comments').put(async (r
     }
 })
 
-articlesRouter.route('/article/get-all-cloudinary-urls').get(authMiddleware , async(req, res)=>{
+articlesRouter.route('/get-all-cloudinary-urls').get(authMiddleware , async(req, res)=>{
     try{
         const result = await getAllImageUrls();
 

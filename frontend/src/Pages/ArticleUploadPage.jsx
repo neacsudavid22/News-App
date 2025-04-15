@@ -46,12 +46,13 @@ const ArticleUploadPage = () => {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/upload-images`, {
                 method: "POST",
                 body: formData,
+                credentials: "include"
             });
     
             if (!response.ok) throw new Error("Image upload failed");
     
-            const data = await response.json(); // Expecting an array of URLs
-            return data.imageUrls; // Return array of uploaded image URLs
+            const data = await response.json(); 
+            return data.imageUrls; 
         } catch (error) {
             console.error("Error uploading images:", error);
             return [];
