@@ -15,7 +15,7 @@ function App() {
 
   function ProtectedRoute({ children }) {
     const { user } = useContext(AuthContext);
-    return user?.account === "author" ? children : <LoginPage />;
+    return (user?.account === "author" || user?.account === "admin") ? children : <LoginPage />;
   }
 
   function ProtectedRouteLoggedIn({ children }) {

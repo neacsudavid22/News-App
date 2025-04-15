@@ -82,7 +82,7 @@ const MainNavbar = () => {
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendList(true)}>Show friend list</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareNotifications(true)}>Articles from friends</Dropdown.Item>
 
-                            { user?.account === "author" &&
+                            { (user?.account === "author" || user?.account === "admin") &&
                             <>
                             <Dropdown.Divider />
                             <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
