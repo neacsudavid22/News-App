@@ -61,7 +61,7 @@ const usersRouter = express.Router()
     
     usersRouter.route('/author/:id').get(async (req, res) => {
         const result = await getUserById(req.params.id)
-        if(result.account !== "author"){
+        if(result.account !== "author" && result.account !== "admin"){
             return res.status(400).json({ message: "User is not an author" });
         }
 
