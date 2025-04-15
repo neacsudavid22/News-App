@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const { Schema, SchemaTypes, model } = mongoose
+const { Schema, model } = mongoose
 
 const User = model("User", new Schema({
     email: { 
@@ -29,7 +29,7 @@ const User = model("User", new Schema({
         required: true
     },
     friendList: {
-        type: [SchemaTypes.ObjectId],   
+        type: [Schema.Types.ObjectId],   
         ref: 'User',
         default: []
     },
@@ -40,23 +40,23 @@ const User = model("User", new Schema({
                 default: false
             },
             userFrom: {
-                type: SchemaTypes.ObjectId,   
+                type: Schema.Types.ObjectId,   
                 ref: 'User'},
             sharedArticle: {
-                type: SchemaTypes.ObjectId,   
+                type: Schema.Types.ObjectId,   
                 ref: 'Article'},
         }],
         timestamps: true,
         default: []
     },
     friendRequests: {
-        type: [SchemaTypes.ObjectId],   
+        type: [Schema.Types.ObjectId],   
         ref: 'User',
         default: []
     },
     savedPosts: {
-        type: [SchemaTypes.ObjectId],
-        ref: 'Post',
+        type: [Schema.Types.ObjectId],
+        ref: 'Article',
         default: []
     },
     birthdate: {

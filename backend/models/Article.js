@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const { Schema, SchemaTypes, model } = mongoose;
+const { Schema, model } = mongoose;
 
 const Article = model('Article', new Schema({
   title:  {
@@ -9,10 +9,9 @@ const Article = model('Article', new Schema({
     minlength: [10, 'Title must be at least 10 characters long']
   },
   author: {
-    type: SchemaTypes.ObjectId,
+    type: Schema.Types.ObjectId, 
     ref: 'User',
     required: [true, "Author is required"],
-    minlength: 3
   },
   main: { type: Boolean, default: false },
   category: { 
@@ -29,23 +28,23 @@ const Article = model('Article', new Schema({
     content: String,
     contentType: {
       type: String,
-      enum: ['p', 'h2', 'Image'], // others to come
+      enum: ['p', 'h2', 'Image'], 
       default: 'p'
     }
   }],
   background: { type: String, required: true },
   likes: {
-    type: [SchemaTypes.ObjectId],
+    type: [Schema.Types.ObjectId],
     ref: 'User', 
     default: []
   },
   saves: {
-      type: [SchemaTypes.ObjectId],
+      type: [Schema.Types.ObjectId],
       ref: 'User', 
       default: []
   },
   shares: {
-      type: [SchemaTypes.ObjectId],
+      type: [Schema.Types.ObjectId],
       ref: 'User', 
       default: []
   },
@@ -54,7 +53,7 @@ const Article = model('Article', new Schema({
           content: String,
           removed: {type: Boolean, default: false }, 
           userId: {
-              type: SchemaTypes.ObjectId,
+              type: Schema.Types.ObjectId,
               ref: 'User', 
           },
           responseTo: { 
