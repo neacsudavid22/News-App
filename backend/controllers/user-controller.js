@@ -83,7 +83,7 @@ const updateUser = async (id, user) => {
     }
 }
 
-const sendFriendRequestById = async (id, friendId) => {
+const sendFriendRequest = async (id, friendId, method="id") => {
     try {
         if(!mongoose.Types.ObjectId.isValid(friendId)){
             return { error: true, message: "Must provide an valid id!" };
@@ -98,17 +98,23 @@ const sendFriendRequestById = async (id, friendId) => {
             return { error: true, message: "This is your account" };
         }
 
-        const userFriend = await User.findById(friendId).select('friendRequests');
+        const userFriend = method === "id" ? await User.findById(friendId).select('friendRequests') 
+                                : (method === "username" 
+                                ? await User.findOne({username: friendUsername}).select('friendRequests')
+                                : null);
+
         if (!userFriend) {
-            return { error: true, show: true, message: "Friend not found, wrong id!" };
+            return { error: true, show: true, message: "Friend not found, wrong id or username!" };
         }
 
-        if(user.friendList && user.friendList.includes(userFriend._id)){
+        const currentUserFriendsSet = new Set(user.friendList.map(id => id.toString()));
+        if (currentUserFriendsSet.has(friendId)) {
             return { error: true, show: true, message: "You are already friend with this user!" };
         }
 
+        const currentUserFriendRequestsSet = new Set(userFriend.friendRequests.map(id => id.toString()));
 
-        if (userFriend.friendRequests && userFriend.friendRequests.includes(user._id)) {
+        if (currentUserFriendRequestsSet.has(id)) {
             return { error: true, show: true, message: "Friend request already sent!" };
         }
 
@@ -116,45 +122,12 @@ const sendFriendRequestById = async (id, friendId) => {
 
         return { error: false, message: "Friend request sent succesfully!" };
     } catch (err) {
-        console.error(`sendFriendRequestById Error: ${err.message}`);
+        console.error(`sendFriendRequest Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
 };
 
-const sendFriendRequestByUsername = async (id, friendUsername) => {
-    try {
-        const user = await User.findById(id);
-        if (!user) {
-            return { error: true, message: "Error: current user id not found" };
-        }
-
-        const userFriend = await User.findOne({username: friendUsername}).select('friendRequests');
-        if (!userFriend) {
-            return { error: true, show: true, message: "Friend not found, wrong username!" };
-        }
-
-        if(user.username === friendUsername){
-            return { error: true, message: "This is your account" };
-        }
- 
-        if(user.friendList && user.friendList.includes(userFriend._id)){
-            return { error: true, show: true, message: "You are already friend with this user!" };
-        }
-
-        if (userFriend.friendRequests && userFriend.friendRequests.includes(user._id)) {
-            return { error: true, show: true, message: "Friend request already sent!" };
-        }
-
-        await User.updateOne({ _id: userFriend._id }, { $addToSet: { friendRequests: user._id } });
-
-        return { error: false, message: "Friend request sent succesfully!" };
-    } catch (err) {
-        console.error(`sendFriendRequestByUsername Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-};
-
-const acceptFriendRequest = async (id, friendId) => {
+const handleFriendRequest = async (id, friendId, action = "accept") => {
     try {
         const user = await User.findById(id).select('_id friendRequests friendList');
         if (!user) {
@@ -166,45 +139,8 @@ const acceptFriendRequest = async (id, friendId) => {
             return { error: true, message: "Friend not found, wrong id!" };
         }
 
-        if (user.friendList && user.friendList.includes(friendId)) {
-            return { error: true, message: "You are already friends with this user!" };
-        }
-
-        if (!user.friendRequests || !user.friendRequests.includes(friendId)) {
-            return { error: true, message: "No friend request found from this user!" };
-        }
-
-        await User.updateOne(
-            { _id: id },
-            { $pull: { friendRequests: friendId }, $addToSet: { friendList: friendId } }
-        );
-
-        await User.updateOne(
-            { _id: friendId },
-            { $addToSet: { friendList: id } }
-        );
-
-        return { error: false, message: "Friend request accepted successfully!" };
-    } catch (err) {
-        console.error(`acceptFriendRequest Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-};
-
-
-const declineFriendRequest = async (id, friendId) => {
-    try {
-        const user = await User.findById(id).select('_id friendRequests');
-        if (!user) {
-            return { error: true, message: "Error: current user id not found" };
-        }
-
-        const userFriend = await User.findById(friendId).select('_id friendRequests');
-        if (!userFriend) {
-            return { error: true, message: "Friend not found, wrong id!" };
-        }
-
-        if (!user.friendRequests || !user.friendRequests.includes(friendId)) {
+        const friendSetFriendRequests = new Set( user.friendRequests.map(r=>r.toString()));
+        if (!friendSetFriendRequests.has(friendId)) {
             return { error: true, message: "No friend request found from this user!" };
         }
 
@@ -213,12 +149,25 @@ const declineFriendRequest = async (id, friendId) => {
             { $pull: { friendRequests: friendId } }
         );
 
-        return { error: false, message: "Friend request declined successfully!" };
+        if (action === 'accept') {
+            await User.updateOne(
+                    { _id: id },
+                    { $push: { friendList: friendId } }
+                );
+            await User.updateOne(
+                    { _id: friendId },
+                    { $push: { friendList: id } }
+                );
+        }
+        const message = `Friend request ${action}ed successfully!`;
+        return { error: false, message: message };
+
     } catch (err) {
-        console.error(`declineFriendRequest Error: ${err.message}`);
+        console.error(`handleFriendRequest Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
 };
+
 
 const removeFriend = async (id, friendId) => {
     try {
@@ -232,14 +181,17 @@ const removeFriend = async (id, friendId) => {
             return { error: true, message: "Friend not found, wrong id!" };
         }
 
-        if (!user.friendList || !user.friendList.includes(friendId)) {
+        const currentUserFriendsSet = new Set(user.friendList.map(id => id.toString()));
+
+        if (!currentUserFriendsSet.has(friendId)) {
             return { error: true, message: "The user to be removed was not found in friendList!" };
         }
 
-        if (!userFriend.friendList || !userFriend.friendList.includes(id)) {
-            return { error: true, message: "The current user was not found in the user to be removed friendList!" };
-        }
+        const friendUserFriendsSet = new Set(userFriend.friendList.map(id => id.toString()));
 
+        if (!friendUserFriendsSet.has(id)) {
+            return { error: true, message: "The current user was not found in the removed user's friendList!" };
+        }
 
         await User.updateOne(
             { _id: id },
@@ -300,7 +252,7 @@ const shareArticle = async (userId, articleId, friendId) => {
         const result = await User.updateOne(
             { _id: friend._id },
             {$addToSet: { 
-                shareList: {sharedArticle: article._id, userFrom: user._id} 
+                shareList: {sharedArticle: article._id, userFrom: user._id, sentAt: Date.now()} 
             }}
         );
 
@@ -337,10 +289,8 @@ export {
     deleteUser,
     updateUser,
     loginUser,
-    sendFriendRequestById,
-    sendFriendRequestByUsername,
-    acceptFriendRequest,
-    declineFriendRequest,
+    sendFriendRequest,
+    handleFriendRequest,
     shareArticle,
     removeFriend,
     toggleShareRead
