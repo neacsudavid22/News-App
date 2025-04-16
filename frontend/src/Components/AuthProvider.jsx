@@ -63,7 +63,7 @@ const AuthProvider = ({ children }) => {
                 });
 
                 const result = await response.json();
-                if (result.authenticated) {
+                if (result.authenticated === true) {
                     await login();
 
                     if (!refreshInterval.current) {
