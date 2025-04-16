@@ -7,6 +7,7 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
     const { user, refresh } = useContext(AuthContext);
     const [friendRequests, setFriendRequests] = useState(user?.friendRequests);
     const [usernames, setUsernames] = useState([]);
+    const [updateNotification, setUpdateNotification] = useState(false);
 
     const handleRequest = async (requestUserId, action) => {
         try{
@@ -14,6 +15,7 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
             if(fetchResult !== null) {
                 refresh(); 
                 setFriendRequests(prevRequests => prevRequests.filter(requestId => requestId !== requestUserId));
+                setUpdateNotification(prev=>!prev)
             }
         } catch(err){
             console.error(err);
@@ -21,9 +23,10 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
     }
 
     useEffect(() => {
+        updateNotification;
         setFriendRequests(user?.friendRequests || []);
         setUnchekedRequest(user?.friendRequests.length > 0);
-    }, [user, setUnchekedRequest]);
+    }, [user, setUnchekedRequest, updateNotification]);
 
     useEffect(() => {
         const getUsernameFetch = async (id) => {
