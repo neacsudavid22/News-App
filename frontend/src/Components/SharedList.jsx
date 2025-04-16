@@ -5,7 +5,7 @@ import { getUsername } from '../Services/userService';
 import { Stack } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import { getTitle } from '../Services/articleService';
-import ShareNotification from './ShareNotification';
+import ShareCard from './ShareCard';
 
 const SharedList = ({ show, handleClose }) => {
     const { user } = useContext(AuthContext);
@@ -15,7 +15,7 @@ const SharedList = ({ show, handleClose }) => {
 
     useEffect(() => {
         if (user?.shareList) {
-            setShareList(user.shareList);
+            setShareList(user.shareList.sort((a,b)=> new Date(b.sentAt) - new Date(a.sentAt) ));
         } else {
             setShareList([]);
         }
@@ -70,10 +70,11 @@ const SharedList = ({ show, handleClose }) => {
                 <Stack gap={2} className='overflow-auto'>
                     {shareList.length > 0 ?
                     shareList.map((sharedItem) => (
-                        <ShareNotification
+                        <ShareCard
                             sharedItemId={sharedItem["_id"]}
                             articleId={sharedItem["sharedArticle"]} 
                             articleTitle={titles[sharedItem["sharedArticle"]] || "Unknown Title"}
+                            sentAt={sharedItem["sentAt"]}
                             userFrom={usernames[sharedItem["userFrom"]] || "Unknown User"}
                             read={sharedItem["read"] || false}
                             key={sharedItem["_id"]}
