@@ -7,10 +7,8 @@ import {
         deleteUser, 
         updateUser, 
         loginUser, 
-        sendFriendRequestById, 
-        sendFriendRequestByUsername, 
-        declineFriendRequest, 
-        acceptFriendRequest, 
+        sendFriendRequest,
+        handleFriendRequest,
         shareArticle, 
         removeFriend, 
         toggleShareRead 
@@ -93,9 +91,7 @@ const usersRouter = express.Router()
     usersRouter.route('/user/friend-request/:fid').post(authMiddleware, async (req, res) => {
         const method = req.body.method;
         
-        const result = method === "id" ?
-                await sendFriendRequestById(req.user._id, req.params.fid)
-                : await sendFriendRequestByUsername(req.user._id, req.params.fid);
+        const result = await sendFriendRequest(req.user._id, req.params.fid, method);
 
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });
@@ -104,12 +100,10 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/handle-request/:rid').put(authMiddleware, async (req, res) => {
+    usersRouter.route('/user/handle-request/:fid').put(authMiddleware, async (req, res) => {
         const action = req.body.action;
         
-        const result = action === "accept" ?
-                        await acceptFriendRequest(req.user._id, req.params.rid)
-                        : await declineFriendRequest(req.user._id, req.params.rid);
+        const result = await handleFriendRequest(req.user._id, req.params.fid, action)
     
         if (result.error && !result.show) {
             return res.status(400).json({ show: false, message: result.message });
