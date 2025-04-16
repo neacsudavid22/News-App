@@ -74,7 +74,8 @@ const likePost = async (articleId, userId) => {
     try{
         const { likes } = await Article.findById(articleId).select('likes');
         
-        likes.includes(userId) ? likes.remove(userId)
+        const likesSet = new Set(likes);
+        likesSet.has(userId) ? likes.remove(userId)
                                     : likes.push(userId)
 
         const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { likes: likes } })
@@ -93,7 +94,8 @@ const savePost = async (articleId, userId) => {
     try{
         const { saves } = await Article.findById(articleId).select('saves');
         
-        saves.includes(userId) ? saves.remove(userId)
+        const savesSet = new Set(likes);
+        savesSet.has(userId) ? saves.remove(userId)
                                     : saves.push(userId)
 
         const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { saves: saves } }
@@ -166,28 +168,26 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
         return { error: true, message: "Internal Server Error" };
     }
 };
-
-const deleteGarbageComments = async (articleId, comments) => {
+const deleteGarbageComments = async (articleId, deleteIds) => {
     try {
-
-        const updatedArticlePost = await Article.findOneAndUpdate(
-            { _id: articleId},
-            { $set: { comments: comments } },
-            { new: true }
-        );
-        
-
-        if (!updatedArticlePost) {
-            return { error: true, message: "Error deleting garbage comments on article post" };
+      const result = await Article.updateOne(
+        { _id: articleId },
+        {
+          $pull: {
+            comments: {
+              _id: { $in: deleteIds },
+            },
+          },
         }
-
-        return updatedArticlePost.comments; 
-    } 
-    catch (err) {
-        console.error(`deleteGarbageComments Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
+      );
+  
+      return {result};
+    } catch (err) {
+      console.error(`deleteGarbageComments Error: ${err.message}`);
+      return { error: true, message: "Internal Server Error" };
     }
-};
+  };
+  
 
 const getAllImageUrls = async () => {
     try {
