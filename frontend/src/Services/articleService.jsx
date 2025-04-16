@@ -60,7 +60,7 @@ const postArticle = async (article) => {
     }
 }
 
-const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo) => {
+const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo = null) => {
     try{
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${interaction}/${articleId}/${userId}`, {
             method: 'PUT',
@@ -103,14 +103,15 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
     }
 }
 
-const deleteGarbageComment = async (articleId, commentList) => {
+const deleteGarbageComment = async (articleId, deleteIds) => {
     try{
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/delete-garbage-comments`, {
             method: 'PUT',
-            body: JSON.stringify({comments: commentList}),
+            body: JSON.stringify({deleteIds: deleteIds}),
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials:"include"
         });
         if(!response.ok){
             throw new Error(response?.message || "Failed to delete garbage comments");
