@@ -9,6 +9,7 @@ import useWindowSize from "../hooks/useWindowSize";
 
 const SecondaryArticleCard = ({ article }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
+  const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
   const { width } = useWindowSize();
 
@@ -16,6 +17,7 @@ const SecondaryArticleCard = ({ article }) => {
     if (article) {
       const firstP = article.articleContent.find((item) => item.contentType === "p");
       if (firstP) setFirstParagraph(firstP.content);
+      setBackgroundUrl(article.background);
     }
   }, [article]);
 
@@ -64,7 +66,7 @@ const SecondaryArticleCard = ({ article }) => {
           </div>
 
           {/* Right: Image */}
-          {article?.background && (
+          {backgroundUrl && (
             <div
               className="d-flex align-items-center justify-content-center"
               style={{
@@ -72,7 +74,7 @@ const SecondaryArticleCard = ({ article }) => {
               }}
             >
               <Image
-                src={article.background}
+                src={backgroundUrl}
                 alt={article.title}
                 style={{
                   width: "100%",
