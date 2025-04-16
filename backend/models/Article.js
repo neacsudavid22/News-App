@@ -34,18 +34,24 @@ const Article = model('Article', new Schema({
   }],
   background: { type: String, required: true },
   likes: {
-    type: [Schema.Types.ObjectId],
-    ref: 'User', 
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
     default: []
   },
   saves: {
-      type: [Schema.Types.ObjectId],
-      ref: 'User', 
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
       default: []
   },
   shares: {
-      type: [Schema.Types.ObjectId],
-      ref: 'User', 
+      type: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      }], 
       default: []
   },
   comments: {

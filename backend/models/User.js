@@ -19,7 +19,7 @@ const User = model("User", new Schema({
     username: { 
         type: String, 
         unique: true,
-        minlength: [5, "The username must have at least 10 characters"]
+        minlength: [10, "The username must have at least 10 characters"]
      },
     name: String,
     account:{
@@ -29,8 +29,10 @@ const User = model("User", new Schema({
         required: true
     },
     friendList: {
-        type: [Schema.Types.ObjectId],   
-        ref: 'User',
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],   
         default: []
     },
     shareList: {
@@ -45,18 +47,24 @@ const User = model("User", new Schema({
             sharedArticle: {
                 type: Schema.Types.ObjectId,   
                 ref: 'Article'},
+            sentAt: {
+                type: Date,
+                default: Date.now() }            
         }],
-        timestamps: true,
         default: []
     },
     friendRequests: {
-        type: [Schema.Types.ObjectId],   
-        ref: 'User',
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],   
         default: []
     },
     savedPosts: {
-        type: [Schema.Types.ObjectId],
-        ref: 'Article',
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Article'
+        }],   
         default: []
     },
     birthdate: {
