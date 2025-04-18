@@ -3,30 +3,22 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
 import { getUsername, requestService } from '../Services/userService';
 
-const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
+const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest }) => {
     const { user, refresh } = useContext(AuthContext);
-    const [friendRequests, setFriendRequests] = useState(user?.friendRequests);
-    const [usernames, setUsernames] = useState([]);
-    const [updateNotification, setUpdateNotification] = useState(false);
+    const [friendRequests, setFriendRequests] = useState([]);
+    const [usernames, setUsernames] = useState({});
+    const [handledRequests, setHandledRequests] = useState(0);
 
-    const handleRequest = async (requestUserId, action) => {
-        try{
-            const fetchResult = await requestService(requestUserId, action);
-            if(fetchResult !== null) {
-                refresh(); 
-                setFriendRequests(prevRequests => prevRequests.filter(requestId => requestId !== requestUserId));
-                setUpdateNotification(prev=>!prev)
-            }
-        } catch(err){
-            console.error(err);
+    const handleClose = () => {
+        setShowFriendRequests(false);
+        if(handledRequests > 0){
+            window.location.reload();
         }
     }
-
     useEffect(() => {
-        updateNotification;
         setFriendRequests(user?.friendRequests || []);
-        setUnchekedRequest(user?.friendRequests.length > 0);
-    }, [user, setUnchekedRequest, updateNotification]);
+        setUncheckedRequest(user?.friendRequests.length > 0);
+    }, [user, setUncheckedRequest]);
 
     useEffect(() => {
         const getUsernameFetch = async (id) => {
@@ -54,8 +46,30 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
         fetchUsernames();
     }, [friendRequests]);
 
+    const handleRequest = async (requestUserId, action) => {
+        try {
+            const fetchResult = await requestService(requestUserId, action);
+            if (fetchResult !== null) {
+                setFriendRequests(prev => prev.filter(id => id !== requestUserId));
+
+                setUsernames(prev => {
+                    const updated = { ...prev };
+                    delete updated[requestUserId];
+                    return updated;
+                });
+
+                setHandledRequests(prev=>prev+1);
+
+                setUncheckedRequest(prev => prev && friendRequests.length - 1 > 0);
+                await refresh();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
-        <Modal show={show} className='mt-4' onHide={handleClose} >
+        <Modal show={show} className='mt-4' onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Friend Requests</Modal.Title>
             </Modal.Header>
@@ -66,7 +80,7 @@ const FriendRequestsModal = ({ show, handleClose, setUnchekedRequest }) => {
                             <ListGroup.Item key={index}>
                                 <Row className="align-items-center justify-content-between">
                                     <Col xs={6} className="text-truncate">
-                                        <strong>{usernames[requestUserId] || "Loading.."}</strong>
+                                        <strong>{usernames[requestUserId] || "Loading..."}</strong>
                                     </Col>
                                     <Col xs="auto">
                                         <Button

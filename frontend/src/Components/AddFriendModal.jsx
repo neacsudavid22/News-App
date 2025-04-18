@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { sendFriendRequest } from "../Services/userService";
 
-const AddFriendModal = ({ show, handleClose }) => {
+const AddFriendModal = ({ show, setShowAddFriend }) => {
     const [friendId, setFriendId] = useState("");
     const [friendUsername, setFriendUsername] = useState("");
-    const [IS_BY_ID, SET_IS_BY_ID] = useState(true);
+    const [IS_BY_ID, SET_IS_BY_ID] = useState(false);
     const [friendRequest, setFriendRequest] = useState({});
     const [content, setContent] = useState("");
+    const [ANY_SUCCESSFUL_REQUEST, SET_ANY_SUCCESSFUL_REQUEST] = useState(false);
 
     const handleSendFriendRequest = async () => {
         const method = IS_BY_ID ? "id" : "username";
@@ -16,7 +17,18 @@ const AddFriendModal = ({ show, handleClose }) => {
         if (response.message) {
             setFriendRequest({ message: response.message, error: response.error });
         }
+
+        if(!response.error){
+            SET_ANY_SUCCESSFUL_REQUEST(true);
+        }
     };
+
+    const handleClose = () => {
+        setShowAddFriend(false); 
+        if(ANY_SUCCESSFUL_REQUEST){
+            window.location.reload();
+        }
+    }
 
     return (
         <Modal show={show} onHide={handleClose} centered>

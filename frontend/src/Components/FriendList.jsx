@@ -7,85 +7,103 @@ import { Stack } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import Form from "react-bootstrap/Form";
 
-const FriendList = ({ show, handleClose }) => {
+const FriendList = ({ show, setShowFriendList }) => {
     const { user, refresh } = useContext(AuthContext);
-    const [usernames, setUsernames] = useState([]);
-    const [friends, setFriends] = useState(user?.friendList || []);
+    const [friendList, setFriendList] = useState(user?.friendList || []); // Start with user data or empty array
+    const [usernames, setUsernames] = useState({});
+    const [filterName, setFilterName] = useState("");
+    const { width } = useWindowSize();
+    const [ANY_FRIEND_REMOVED, SET_ANY_FRIEND_REMOVED] = useState(false);
 
-    const handleRemoveFriend = async (friendId)     => {
-        try {
-            const fetchResult = await removeFriend(friendId);
-            if(fetchResult !== null) { refresh() }
-        } catch (err) {
-            console.error(err);
+    const handleClose = () =>{ 
+        setShowFriendList(false);
+        if(ANY_FRIEND_REMOVED){
+            window.location.reload();
         }
-    };
+    }
 
     useEffect(() => {
-        const getUsernameFetch = async (id) => {
-            try {
-                const username = await getUsername(id);
-                return username;
-            } catch (err) {
-                console.error(err);
-            }
-        };
+        if (user?.friendList) {
+            setFriendList(user.friendList);
+        }
+    }, [user]);
 
+    useEffect(() => {
         const fetchUsernames = async () => {
             const tempUsernames = {};
             await Promise.all(
-                (user.friendList || []).map(async (fr) => {
-                    const username = await getUsernameFetch(fr);
-                    tempUsernames[fr] = username;
+                friendList.map(async (id) => {
+                    try {
+                        const username = await getUsername(id);
+                        tempUsernames[id] = username;
+                    } catch (err) {
+                        console.error(err);
+                        tempUsernames[id] = "Unknown";
+                    }
                 })
             );
             setUsernames(tempUsernames);
         };
 
-        if (user) fetchUsernames();
-    }, [user]);
-
-    const [filterName, setFilterName] = useState("");
-
-    useEffect(()=>{
-        if(user && filterName !== ""){
-            const tempFriends = user.friendList.filter(friend => usernames[friend].includes(filterName));
-            setFriends(tempFriends);
+        if (friendList.length > 0) {
+            fetchUsernames();
         }
-        else if(user){
-            setFriends(user.friendList);
-        }
-    }, [user, filterName, usernames]);
+    }, [friendList]);
 
-    const {width} = useWindowSize();
+    const handleRemoveFriend = async (friendId) => {
+        try {
+            const result = await removeFriend(friendId);
+            if (result !== null) {
+                setFriendList(prev => prev.filter(id => id !== friendId)); 
+                SET_ANY_FRIEND_REMOVED(true);
+                await refresh(); 
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const filteredFriends = friendList.filter(friendId =>
+        usernames[friendId]?.toLowerCase().includes(filterName.toLowerCase())
+    );
 
     return (
-        <Offcanvas show={show} onHide={handleClose} placement="end" className={`h-100 w-${width < 768 ? 100 : 50}`}>
-            <Offcanvas.Header closeButton 
-                className=' w-100 px-3 border-bottom my-2'>
-                <Form.Control type="text" className='w-50' placeholder="search user" 
-                    onChange={(e)=>setFilterName(e.target.value)}
+        <Offcanvas
+            show={show}
+            onHide={handleClose}
+            placement="end"
+            className={`h-100 w-${width < 768 ? 100 : 50}`}
+        >
+            <Offcanvas.Header closeButton className='w-100 px-3 border-bottom my-2'>
+                <Form.Control
+                    type="text"
+                    className='w-50'
+                    placeholder="Search user"
+                    value={filterName}
+                    onChange={(e) => setFilterName(e.target.value)}
                 />
             </Offcanvas.Header>
             <Offcanvas.Body>
                 <Stack gap={2} className='overflow-auto'>
-                {friends.length > 0 ? (
-                friends.map((friendId, index) => (
-                    <div key={index} className={`px-${width < 768 ? "2": "5"} d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom`}>
-                        <strong className='fs-5'>{usernames[friendId] || "Loading..."}</strong>
-                        <Button
-                            className="rounded-4"
-                            variant="outline-danger"
-                            onClick={() => {
-                                handleRemoveFriend(friendId);
-                            }}
-                        >
-                           <strong>Remove</strong> <i className="ps-1 bi bi-trash-fill"></i>
-                        </Button>
-                    </div>
-                )) ) : (
-                    <p className="text-center text-muted">No friends to list.</p>
-                )}
+                    {filteredFriends.length > 0 ? (
+                        filteredFriends.map((friendId, index) => (
+                            <div
+                                key={index}
+                                className={`px-${width < 768 ? "2" : "5"} d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom`}
+                            >
+                                <strong className='fs-5'>{usernames[friendId] || "loading..."}</strong>
+                                <Button
+                                    className="rounded-4"
+                                    variant="outline-danger"
+                                    onClick={() => handleRemoveFriend(friendId)}
+                                >
+                                    <strong>Remove</strong> <i className="ps-1 bi bi-trash-fill"></i>
+                                </Button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-muted">No friends to list.</p>
+                    )}
                 </Stack>
             </Offcanvas.Body>
         </Offcanvas>

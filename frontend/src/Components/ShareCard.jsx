@@ -1,65 +1,71 @@
 import { useNavigate } from "react-router";
 import { Card, Form } from "react-bootstrap";
 import "./textMultilineTruncate.css";
-import { useState } from "react";
-import { toggleShareRead } from "../Services/userService";
+import { useContext, useState } from "react";
+import { markAsRead } from "../Services/userService";
+import { AuthContext } from "./AuthProvider";
 
-const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sentAt }) => {
-    const [WAS_READ, SET_WAS_READ] = useState(read);
+const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sentAt, handleClose }) => {
+    const { refresh } = useContext(AuthContext);
+    const [wasRead, setWasRead] = useState(read);
     const navigate = useNavigate();
 
-    const handleNavigation = async () => {
-        handleSwitchChange();
-        navigate("/article/" + articleId);
+    const handleSwitchChange = async () => {
+        const result = await markAsRead(sharedItemId);
+        if (!result.error) {
+            setWasRead(true);
+            await refresh();
+        } else {
+            console.warn("Could not mark as read:", result.message);
+        }
     };
 
-    const handleSwitchChange = async () => {
-        await toggleShareRead(sharedItemId);
-        SET_WAS_READ(prev=>!prev);
+    const handleNavigation = async () => {
+        handleClose();
+        if (!wasRead) await handleSwitchChange();
+        navigate("/article/" + articleId);
+        window.location.reload();
     };
 
     const formattedSentTime = new Intl.DateTimeFormat("ro-RO", {  
         hour: "2-digit",
         minute: "2-digit",
-      }).format(new Date(sentAt));
+    }).format(new Date(sentAt));
 
-      const formattedSentDate = new Intl.DateTimeFormat("ro-RO", {  
+    const formattedSentDate = new Intl.DateTimeFormat("ro-RO", {  
         day: "2-digit",
         month: "2-digit",
         year: "2-digit",
-      }).format(new Date(sentAt));
+    }).format(new Date(sentAt));
+
+    const isToday = new Date(sentAt).toDateString() === new Date().toDateString();
 
     return (
         <Card
             onClick={handleNavigation}
-            className={`shadow-sm border-1 hover-shadow transition mb-2 ${WAS_READ ? 'bg-light' : ''}`}
+            className={`shadow-sm border-1 hover-shadow transition mb-2 ${wasRead ? 'bg-light' : ''}`}
             style={{ cursor: "pointer" }}
         >
-        <Card.Body className="d-flex flex-column align-items-start">
-            <Card.Subtitle className="mb-3 text-muted">
-                <strong>{"Shared by: " + userFrom}</strong> 
-            </Card.Subtitle>
-            <Card.Title className="fs-5 mb-2 text-multiline-truncate-2">
-                {articleTitle}
-            </Card.Title>
-
-            
-        </Card.Body>
-        <Card.Footer className="text-muted d-flex w-100 justify-content-between">
-        <Form.Check 
-                className="text-muted"
-                type="switch"
-                id={`read-switch-${articleId}`}
-                label={!read ? "unread" : "read"}
-                disabled={WAS_READ}
-                checked={WAS_READ}
-                onChange={handleSwitchChange}
-                onClick={(e) => e.stopPropagation()}
-            />
-        <strong>{"Sent at: " + formattedSentTime 
-                + (new Date(sentAt).getDate() !== new Date().getDate() ? formattedSentDate : "")
-                }</strong>
-        </Card.Footer>
+            <Card.Body className="d-flex flex-column align-items-start">
+                <Card.Subtitle className="mb-3 text-muted">
+                    <strong>{"Shared by: " + userFrom}</strong> 
+                </Card.Subtitle>
+                <Card.Title className="fs-5 mb-2 text-multiline-truncate-2">
+                    {articleTitle}
+                </Card.Title>
+            </Card.Body>
+            <Card.Footer className="text-muted d-flex w-100 justify-content-between">
+                <Form.Check 
+                    className="text-muted"
+                    type="switch"
+                    label={wasRead ? "read" : "unread"}
+                    disabled={wasRead}
+                    checked={wasRead}
+                    onChange={handleSwitchChange}
+                    onClick={(e) => e.stopPropagation()}
+                />
+                <strong>{"Sent at: " + formattedSentTime + (isToday ? "" : ` (${formattedSentDate})`)}</strong>
+            </Card.Footer>
         </Card>
     );
 };

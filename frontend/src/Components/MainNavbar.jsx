@@ -35,31 +35,32 @@ const MainNavbar = () => {
         return;
     }
 
-    const [unchekedRequest, setUnchekedRequest] = useState(false);
     const [fadeIn, setFadeIn] = useState(false);
+    const [uncheckedRequest, setUncheckedRequest] = useState(false);
+    const [uncheckedShare, setUncheckedShare] = useState(false);
 
     useEffect(() => {
-        if (unchekedRequest) {
+        if (uncheckedRequest || uncheckedShare) {
             const timeout = setTimeout(() => {
                 setFadeIn(true);
-            }, 1000);
-            return () => clearTimeout(timeout); 
+            }, 2000);
+            return () => clearTimeout(timeout);
         } else {
-            setFadeIn(false); 
+            setFadeIn(false);
         }
-    }, [unchekedRequest]);
-
+    }, [uncheckedRequest, uncheckedShare]);
+    
     return(
         <>
         <Navbar fixed="top" bg="dark" variant="dark" expand="lg" className="w-100 p-2 px-3">
             <Stack direction="horizontal" className="d-flex justify-content-between w-100">
 
-                <Navbar.Brand as={Link} to="/"> NewsWebApp </Navbar.Brand>
+                <Navbar.Brand as={Link} to="/"> NewsApp </Navbar.Brand>
             
                 {user ? (
                     <Stack direction="horizontal">
-                    {unchekedRequest && (
-                       <Collapse  in={fadeIn}>
+                    {(uncheckedRequest || uncheckedShare) && (
+                       <Collapse in={fadeIn}>
                         <Badge pill bg="danger" className="mx-2">
                             <i className="bi bi-bell small"/>
                         </Badge> 
@@ -75,12 +76,17 @@ const MainNavbar = () => {
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendRequests(true)}>
                                 View friend requests
-                                {unchekedRequest && (
+                                {uncheckedRequest && (
                                     <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
                                 )}
                             </Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendList(true)}>Show friend list</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareNotifications(true)}>Articles from friends</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareNotifications(true)}>
+                                Articles from friends
+                                {uncheckedShare && (
+                                    <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
+                                )}
+                            </Dropdown.Item>
 
                             { (user?.account === "author" || user?.account === "admin") &&
                             <>
@@ -95,15 +101,33 @@ const MainNavbar = () => {
                             <Dropdown.Item type="button" as={Link} to="/" onClick={handleLogout}>Logout</Dropdown.Item>
                         </SplitButton>
 
-                        <AddFriendModal show={showAddFriend} handleClose={() => setShowAddFriend(false)} />
-                        <ShareIdModal show={showShareId} handleClose={() => setShowShareId(false)} userId={user._id} />
+                        <AddFriendModal 
+                            show={showAddFriend} 
+                            setShowAddFriend={setShowAddFriend}
+                        />
+                        <ShareIdModal 
+                            show={showShareId} 
+                            handleClose={() => {
+                                setShowShareId(false);
+                            }} 
+                            userId={user._id} 
+                        />
                         <FriendRequestsModal 
                             show={showFriendRequests} 
-                            setUnchekedRequest={setUnchekedRequest}
-                            handleClose={() => setShowFriendRequests(false)} 
+                            setUncheckedRequest={setUncheckedRequest}
+                            setShowFriendRequests={setShowFriendRequests} 
                         />
-                        <FriendList show={showFriendList} handleClose={() => setShowFriendList(false)}/>
-                        <SharedList show={showShareNotifications} handleClose={() => setShowShareNotifications(false)}/>
+                        <FriendList 
+                            show={showFriendList} 
+                            setShowFriendList={setShowFriendList}
+                        />
+                        <SharedList 
+                            show={showShareNotifications} 
+                            setUncheckedShare={setUncheckedShare}
+                            handleClose={() => {
+                                setShowShareNotifications(false);
+                            }}
+                        />
                     </Stack>
                 ) : (
                     <Button className="text-light" variant="danger" as={NavLink} to="/login">Login</Button>
