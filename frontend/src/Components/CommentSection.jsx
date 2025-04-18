@@ -9,6 +9,7 @@ import { AuthContext } from "../Components/AuthProvider";
 import { deleteComment, deleteGarbageComment } from "../Services/articleService";
 import { getUsername } from "../Services/userService";
 import CommentForm from "../Components/CommentForm";
+import Card from "react-bootstrap/Card";
 
 const CommentSection = ({ articleId, comments }) => {
   const { user } = useContext(AuthContext);
@@ -235,7 +236,11 @@ const CommentSection = ({ articleId, comments }) => {
         {commentList.length > 0 ? (
           createCommentSection(commentTree)
         ) : (
-          <p>Be the first to comment!</p>
+          <Card className=" border-1 round-5 shadow-sm bg-light">
+            <Card.Body className="d-flex justify-content-center">
+              <Card.Title className="fs-3"> Be the first to comment!</Card.Title>
+            </Card.Body>
+          </Card>
         )}
       </Container>
     </Container>
