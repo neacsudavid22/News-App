@@ -7,7 +7,6 @@ import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
 import CategoryBar from "../Components/CategoryBar";
-import { AuthContext } from "../Components/AuthProvider";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
@@ -37,8 +36,8 @@ const HomePage = () => {
       <div style={{height:"8rem"}}></div>
 
       <Container fluid> 
-        {articles.map((a) => a.main ? <MainArticleCard key={a._id} article={a}/> 
-                                    : <SecondaryArticleCard key={a._id} article={a}/>)}
+        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()} article={a}/> 
+                                    : <SecondaryArticleCard key={a._id.toString()} article={a}/>)}
       </Container>
 
     </Stack>
