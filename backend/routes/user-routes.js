@@ -11,7 +11,7 @@ import {
         handleFriendRequest,
         shareArticle, 
         removeFriend, 
-        toggleShareRead 
+        markAsRead 
     } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()
@@ -88,7 +88,7 @@ const usersRouter = express.Router()
         return res.status(200).json(result);
     })
 
-    usersRouter.route('/user/friend-request/:fid').post(authMiddleware, async (req, res) => {
+    usersRouter.route('/friend-request/:fid').post(authMiddleware, async (req, res) => {
         const method = req.body.method;
         
         const result = await sendFriendRequest(req.user._id, req.params.fid, method);
@@ -100,7 +100,7 @@ const usersRouter = express.Router()
         return res.status(200).json(result); 
     });
 
-    usersRouter.route('/user/handle-request/:fid').put(authMiddleware, async (req, res) => {
+    usersRouter.route('/handle-request/:fid').put(authMiddleware, async (req, res) => {
         const action = req.body.action;
         
         const result = await handleFriendRequest(req.user._id, req.params.fid, action)
@@ -198,9 +198,9 @@ const usersRouter = express.Router()
         }
     })
 
-    usersRouter.put("/set-share-notification/:snid", authMiddleware, async (req, res) => {
+    usersRouter.put("/mark-as-read/:snid", authMiddleware, async (req, res) => {
         try {
-            const result = await toggleShareRead(req.user._id, req.params.snid);
+            const result = await markAsRead(req.user._id, req.params.snid);
             if (result.error) {
                 return res.status(400).json({ message: result.message });
             }

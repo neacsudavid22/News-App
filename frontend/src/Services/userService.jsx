@@ -96,7 +96,7 @@ const getUsername = async (userId) => {
 
 const requestService = async (requestUserId, action = "accept") => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/handle-request/${requestUserId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/handle-request/${requestUserId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -120,7 +120,7 @@ const requestService = async (requestUserId, action = "accept") => {
 
 const sendFriendRequest = async (friend, method = "id") => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user/friend-request/${friend}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/friend-request/${friend}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -167,14 +167,15 @@ const updateUser = async (userId, user) => {
     }
 };
 
-const toggleShareRead = async (sharedItemId) => {
+const markAsRead = async (sharedItemId) => {
     try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/set-share-notification/${sharedItemId}`, {method: "PUT",
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/mark-as-read/${sharedItemId}`, {method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             credentials: "include"
-        });      const result = await response.json();
+        });      
+        const result = await response.json();
 
         if (!response.ok) {
             throw new Error(result.message || "Unknown error occurred");
@@ -221,5 +222,5 @@ export {
     requestService,
     shareArticle,
     removeFriend,
-    toggleShareRead
+    markAsRead
 };
