@@ -83,49 +83,50 @@ const updateUser = async (id, user) => {
     }
 }
 
-const sendFriendRequest = async (id, friendId, method="id") => {
+const sendFriendRequest = async (id, friend, method = "id") => {
     try {
-        if(!mongoose.Types.ObjectId.isValid(friendId)){
-            return { error: true, message: "Must provide an valid id!" };
+        if (method === "id" && !mongoose.Types.ObjectId.isValid(friend)) {
+            return { error: true, message: "Must provide a valid id!" };
         }
 
-        const user = await User.findById(id).select('_id');
+        const user = await User.findById(id).select('_id friendList');
         if (!user) {
             return { error: true, message: "Error: current user id not found" };
         }
 
-        if (id === friendId) {
+        if (id === friend) {
             return { error: true, message: "This is your account" };
         }
 
-        const userFriend = method === "id" ? await User.findById(friendId).select('friendRequests') 
-                                : (method === "username" 
-                                ? await User.findOne({username: friendUsername}).select('friendRequests')
-                                : null);
+        const queryKey = method === "id" ? "_id" : "username";
+        const userFriend = await User.findOne({ [queryKey]: friend }).select('friendRequests');
 
         if (!userFriend) {
             return { error: true, show: true, message: "Friend not found, wrong id or username!" };
         }
 
-        const currentUserFriendsSet = new Set(user.friendList.map(id => id.toString()));
-        if (currentUserFriendsSet.has(friendId)) {
+        const isAlreadyFriend = user.friendList?.some(fId => fId.toString() === userFriend._id.toString());
+        if (isAlreadyFriend) {
             return { error: true, show: true, message: "You are already friend with this user!" };
         }
 
-        const currentUserFriendRequestsSet = new Set(userFriend.friendRequests.map(id => id.toString()));
-
-        if (currentUserFriendRequestsSet.has(id)) {
+        const requestAlreadySent = userFriend.friendRequests?.some(reqId => reqId.toString() === user._id.toString());
+        if (requestAlreadySent) {
             return { error: true, show: true, message: "Friend request already sent!" };
         }
 
-        await User.updateOne({ _id: friendId }, { $addToSet: { friendRequests: user._id } });
+        await User.updateOne(
+            { [queryKey]: friend },
+            { $addToSet: { friendRequests: user._id } }
+        );
 
-        return { error: false, message: "Friend request sent succesfully!" };
+        return { error: false, message: "Friend request sent successfully!" };
     } catch (err) {
         console.error(`sendFriendRequest Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
 };
+
 
 const handleFriendRequest = async (id, friendId, action = "accept") => {
     try {
@@ -263,7 +264,7 @@ const shareArticle = async (userId, articleId, friendId) => {
     }
 }
 
-const toggleShareRead = async (userId, shareId) => {
+const markAsRead = async (userId, shareId) => {
     try {
         const user = await User.findById(userId).select("_id shareList").exec();
         if (!user) return { error: true, message: "User doesn't exist" };
@@ -271,13 +272,13 @@ const toggleShareRead = async (userId, shareId) => {
         const shareItem = user.shareList.id(shareId);
         if (!shareItem) return { error: true, message: "Share not found" };
 
-        shareItem.read = !shareItem.read;
+        shareItem.read = true;
 
         await user.save();
 
         return { success: true, shareItem };
     } catch (err) {
-        console.error("toggleShareRead error: ", err);
+        console.error("markAsRead error: ", err);
         return { error: true, message: "Internal Server Error" };
     }
 };
@@ -293,5 +294,5 @@ export {
     handleFriendRequest,
     shareArticle,
     removeFriend,
-    toggleShareRead
+    markAsRead
 }
