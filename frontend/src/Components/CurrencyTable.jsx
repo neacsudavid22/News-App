@@ -158,8 +158,8 @@ const CurrencyTable = () => {
                 </td>
                 {currencyList.map((base) => (
                   <td key={`${target}-${base}`} className="text-center">
-                    {base === target ? "1.00000" : 
-                    (rates[base]?.[target] ? (1 / rates[base][target]).toFixed(5) : "...")}
+                    {base === target ? "1.000" : 
+                    (rates[base]?.[target] ? (1 / rates[base][target]).toFixed(3) : "...")}
                   </td>
                 ))}
               </tr>
