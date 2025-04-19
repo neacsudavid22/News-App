@@ -77,7 +77,7 @@ const CurrencyTable = () => {
   useEffect(() => {
     const filterCurrencies = () => {
       const allCurrencies = Object.keys(currencies.current);
-      
+
       if (!filterName) {
         setCurrencyList(allCurrencies);
         return;
@@ -119,7 +119,7 @@ const CurrencyTable = () => {
         <Table striped bordered hover variant="dark" size="sm">
           <thead>
             <tr>
-              <th>Form/To</th>
+              <th>From/To</th>
             </tr>
           </thead>
           <tbody>
@@ -156,7 +156,7 @@ const CurrencyTable = () => {
         <Table responsive striped bordered hover variant="dark" size="sm">
           <thead>
             <tr>
-              <th>Form/To</th>
+              <th>From/To</th>
               {currencyList.map((base) => (
                 <th key={base}>
                   <OverlayTrigger
