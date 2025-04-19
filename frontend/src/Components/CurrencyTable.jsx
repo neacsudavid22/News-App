@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Table, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Table, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
 
 const CurrencyTable = () => {
   const [rates, setRates] = useState({});
@@ -66,25 +66,57 @@ const CurrencyTable = () => {
     return () => clearInterval(intervalId);
   }, [targetCurrencyList]);
 
-  const currencyList = Object.keys(currencies.current);
-
   const marginLeft = 1.6;
-  const marginTop = 8.3;
+  const marginTop = 12;
   const divHeight = 90;
+
+  const [filterName, setFilterName] = useState("");
+
+  const [currencyList, setCurrencyList] = useState(Object.keys(currencies.current));
+
+  useEffect(() => {
+    const filterCurrencies = () => {
+      const allCurrencies = Object.keys(currencies.current);
+      
+      if (!filterName) {
+        setCurrencyList(allCurrencies);
+        return;
+      }
+      
+      const filtered = allCurrencies.filter(currency => 
+        currency.toLowerCase().includes(filterName.toLowerCase()) ||
+        currencies.current[currency].toLowerCase().includes(filterName.toLowerCase())
+      );
+      
+      setCurrencyList(filtered);
+    };
+
+    filterCurrencies();
+  }, [filterName]);
 
   return (
     <>
       {/* Fixed First Column */}
+      <Form.Control 
+          type="text" className="w-25 position-fixed" placeholder="search currency" 
+          size="sm"
+          onChange={(e)=>setFilterName(e.target.value)}
+          style={{
+            marginLeft: (0.5 + marginLeft).toString() + "vw",
+            marginTop: (marginTop - 3.5).toString() + "rem",
+          }}
+      />
       <div
         className="position-fixed rounded-start-4 overflow-hidden z-1"
         style={{
           marginLeft: marginLeft.toString() + "vw",
           marginTop: marginTop.toString() + "rem",
-          width: "5.2rem",
-          height: (divHeight - 20).toString() + "vh"
+          width: "4rem",
+          height: (divHeight - 40).toString() + "vh"
         }}
       >
-        <Table striped bordered hover variant="dark">
+       
+        <Table striped bordered hover variant="dark" size="sm">
           <thead>
             <tr>
               <th>Form/To</th>
@@ -121,7 +153,7 @@ const CurrencyTable = () => {
           height: divHeight.toString() + "vh"
         }}
       >
-        <Table responsive striped bordered hover variant="dark">
+        <Table responsive striped bordered hover variant="dark" size="sm">
           <thead>
             <tr>
               <th>Form/To</th>
