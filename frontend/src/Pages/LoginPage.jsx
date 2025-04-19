@@ -67,9 +67,12 @@ const LoginPage = () => {
                 if (!response || !response.token) {
                     throw new Error("No token received");
                 }
-                const result = await login();     
-                if(!result.ok){
-                    user.account === "standard" ? navigate("/") : navigate("/dashboard");
+                const LOGIN_SUCCESSESFUL = await login();     
+                if(LOGIN_SUCCESSESFUL === true){
+                    user?.account === "standard" ? navigate("/") : navigate("/dashboard");
+                }
+                else{
+                    throw new Error("couldn't login")
                 }
 
             } catch (err) {

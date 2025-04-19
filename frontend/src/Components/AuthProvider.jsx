@@ -7,6 +7,8 @@ const AuthProvider = ({ children }) => {
     const refreshInterval = useRef(null);
 
     const login = useCallback(async () => {
+        const settingUser = async (value) => setUser(value);
+
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
                 method: "GET",
@@ -15,7 +17,7 @@ const AuthProvider = ({ children }) => {
 
             if (response.ok) {
                 const result = await response.json();
-                setUser(result.user);
+                await settingUser(result.user);
                 return true;
             }
             setUser(null);
