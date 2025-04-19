@@ -15,7 +15,7 @@ const DashboardPage = () => {
     const [LOADING_ALL_URLS, SET_LOADING_ALL_URLS] = useState(false);
     const [LOADING_UNUSED_URLS, SET_LOADING_UNUSED_URLS] = useState(false);
 
-    const navigation = useNavigate();
+    const navigate = useNavigate();
     const [imageUrls, setImageUrls] = useState([]);
     const [unusedPublicIds, setUnusedPublicIds] = useState([]);
 
@@ -71,7 +71,7 @@ const DashboardPage = () => {
     } 
 
     const handleCreateArticle = () => {
-        navigation("/author");
+        navigate("/author");
     }
 
     return(
@@ -99,8 +99,9 @@ const DashboardPage = () => {
                 {user?.account === "admin" && (
                     <>
                     <Col xs={12} sm="auto">
-                    <Button size="lg" variant="success" className="w-100">
-                        Create Author
+                    <Button size="lg" variant="success" className="w-100" 
+                        onClick={() => navigate("/login", {state: {admin: true}})}
+                    > Create Author
                     </Button>
                     </Col>
                     <Col xs={12} sm="auto">

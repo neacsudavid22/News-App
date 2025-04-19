@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { authenticateUser, signUpUser } from "../Services/userService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 import Button from 'react-bootstrap/Button';
@@ -9,6 +9,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { AuthContext } from "../Components/AuthProvider";
+import MainNavbar from "../Components/MainNavbar";
+import { Modal } from "react-bootstrap";
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
@@ -18,19 +20,22 @@ const LoginPage = () => {
     const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
     const [birthdate, setBirthdate] = useState("");
-    const [TRY_TO_LOGIN, SET_TRY_TO_LOGIN] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
     const [validated, setValidated] = useState(false);
 
     const navigate = useNavigate();
     const { login, user } = useContext(AuthContext);
+    const location = useLocation();
+    const admin = location.state?.admin || false
+
+    const [TRY_TO_LOGIN, SET_TRY_TO_LOGIN] = useState(!admin);
 
     // Validation helpers
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPhoneValid = /^[0-9]{10}$/.test(phone);
     const isPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/.test(password);
 
-    useEffect(() => {
+    const emptyFields = () => {
         setUsername("");
         setEmail("");
         setPhone("");
@@ -40,13 +45,17 @@ const LoginPage = () => {
         setBirthdate("");
         setErrorMsg("");
         setValidated(false);
+    }
+
+    useEffect(() => {
+        emptyFields();
     }, [TRY_TO_LOGIN]);
 
     const handleAuth = async () => {
         setValidated(true);
         setErrorMsg("");
     
-        if (TRY_TO_LOGIN) {
+        if (TRY_TO_LOGIN && !admin) {
             if (!username || !password) {
                 setErrorMsg("Please fill in all fields correctly.");
                 return;
@@ -58,7 +67,10 @@ const LoginPage = () => {
                 if (!response || !response.token) {
                     throw new Error("No token received");
                 }
-                await login();     
+                const result = await login();     
+                if(!result.ok){
+                    user.account === "standard" ? navigate("/") : navigate("/dashboard");
+                }
 
             } catch (err) {
                 console.error("Login error:", err);
@@ -78,10 +90,16 @@ const LoginPage = () => {
             }
     
             try {
-                const { token } = await signUpUser(email, phone, name, gender, birthdate, username, password);
+                const { token } = await signUpUser(email, phone, name, gender, birthdate, username, password, admin);
                 if (token) {
                     login();
-                    navigate("/");
+                    if(admin){
+                        handleShow();
+                        emptyFields();
+                    }
+                    else{
+                        user.account === "standard" ? navigate("/") : navigate("/dashboard")
+                    }
                 }
             } catch (err) {
                 console.error("Signup error:", err);
@@ -89,20 +107,26 @@ const LoginPage = () => {
             }
         }
     };
-    
-    useEffect(()=>{
-        if(user !== null){
-            user.account === "author" ? navigate("/dashboard") : navigate("/")
-        }
-    }, [user, navigate])
+
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     return (
-        <Container fluid className="d-flex justify-content-center vh-100 pt-5">
+        <Container fluid className="d-flex justify-content-center vh-100 pt-4">
             <Row className="w-100 justify-content-center">
                 <Col sm={12} md={8} lg={8} xl={6}>
+                <Modal show={show} onHide={handleClose} className="mt-4">
+                    <Modal.Header closeButton>
+                        <Modal.Title>New author account added successfuly!</Modal.Title>
+                    </Modal.Header>
+                </Modal>
+                    {admin && <MainNavbar/>}
                     <Form className="fs-6 p-2 mt-2 mb-5 shadow rounded bg-white">
                         <Stack direction="vertical" gap={4} className="text-center m-4">
-                            <h2>{TRY_TO_LOGIN ? "Login Form" : "Sign Up Form"}</h2>
+                            <h2>{admin ? "Create Author Form" :(TRY_TO_LOGIN ? "Log Form" : "Sign Form")}</h2>
+                            {admin && <h3 className="fs-5">{`Welcome administrator, ${user.name}!`}</h3>}
+
 
                             {errorMsg && (
                                 <Form.Text className="text-danger fs-6">
@@ -110,7 +134,7 @@ const LoginPage = () => {
                                 </Form.Text>
                             )}
 
-                            {!TRY_TO_LOGIN && (
+                            {(!TRY_TO_LOGIN || admin) && (
                                 <>
                                     <Form.Group>
                                         <FloatingLabel label="Email address">
@@ -247,15 +271,16 @@ const LoginPage = () => {
                             </Form.Group>
 
                             <Stack direction="horizontal" gap={3} className="d-flex justify-content-between">
-                                <Form.Check
+                                { !admin &&
+                                    <Form.Check
                                     type="switch"
                                     id="toggleAuth"
                                     label={TRY_TO_LOGIN ? "Sign up" : "Log in"}
                                     checked={!TRY_TO_LOGIN}
                                     onChange={() => SET_TRY_TO_LOGIN((prev) => !prev)}
-                                />
+                                />}
                                 <Button size="sm" variant="primary" onClick={handleAuth} className="fs-5">
-                                    {TRY_TO_LOGIN ? "Log In" : "Sign Up"}
+                                    {admin? "Create Author" : (TRY_TO_LOGIN ? "Log In" : "Sign Up")}
                                 </Button>
                             </Stack>
                         </Stack>
