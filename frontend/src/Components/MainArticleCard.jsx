@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import Figure from "react-bootstrap/Figure";
 import { useNavigate } from "react-router";
 import "./textMultilineTruncate.css";
 
@@ -47,24 +48,27 @@ const MainArticleCard = ({ article }) => {
 
   return (
     <Row className="mb-3 justify-content-center">
-      <Col xs={12} sm={12} md={10} lg={8} xl={6}>
+      <Col xs={12} sm={12} md={10} lg={5} xl={5}>
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
-          style={{ cursor: "pointer", height: "auto", minHeight:"35vw" }}
+          style={{ cursor: "pointer", height: "32rem" }} // You can adjust this total height
           onClick={handleNavigation}
         >
           {backgroundUrl && (
-            <Card.Img
+            <Figure.Image
               src={backgroundUrl}
+              className="w-100 m-0"
               style={{
-                width: "100%",
-                height: "12rem", minHeight:"20vw",
+                height: "60%", // Image takes 60% of card height
                 objectFit: "cover",
               }}
             />
           )}
 
-          <Card.Body className="pt-3 px-3 pb-4">
+          <Card.Body 
+            className="pt-3 px-3 pb-4"
+            style={{ height: "40%" }} // Content takes remaining 40%
+          >
             <div className="d-flex align-items-center gap-3 mb-2 text-muted small">
               <span className="fw-medium">{formattedUpdateDate}</span>
               <span className="px-2 py-1 fw-medium border rounded-pill" style={{fontSize: "0.9rem"}}>

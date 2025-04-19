@@ -7,6 +7,8 @@ import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
 import CategoryBar from "../Components/CategoryBar";
+import CurrencyTable from "../Components/CurrencyTable";
+import useWindowSize from "../hooks/useWindowSize";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
@@ -27,13 +29,17 @@ const HomePage = () => {
     handleArticles()
   }, [category])   
 
+  const {width} = useWindowSize();
+
   return (
     <Stack direction="vertical" className="w-100 bg-light">
+      
       <div className="fixed-top">
         <MainNavbar />
         <CategoryBar category={category} setCategory={setCategory}></CategoryBar>
       </div>
-      <div style={{height:"8rem"}}></div>
+      <div style={{height:"7.5rem"}}></div>
+      { width>991 && <CurrencyTable/>}
 
       <Container fluid> 
         {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()} article={a}/> 

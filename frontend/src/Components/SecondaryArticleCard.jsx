@@ -36,10 +36,10 @@ const SecondaryArticleCard = ({ article }) => {
 
   return (
     <Row className="mb-3 justify-content-center">
-      <Col xs={12} md={10} lg={8} xl={6}>
-        <Card
+      <Col xs={12} sm={12} md={10} lg={5} xl={5}>
+      <Card
           className="d-flex flex-row shadow-sm rounded-4 overflow-hidden"
-          style={{ cursor: "pointer", maxHeight: "13rem", height: "auto" }}
+          style={{ cursor: "pointer", height: width < 758 ? "9rem" : "12rem"}}
           onClick={() => navigate(`/article/${article._id}`)}
         >
           {/* Left: Text content */}
