@@ -10,6 +10,7 @@ import uploadRouter from "./routes/upload-routes.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import locationRouter from "./routes/location-routes.js";
 
 await connectDB();
 
@@ -32,7 +33,7 @@ app.use(cors(corsOptions));
 
 app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);
-
+app.use('/location-api', locationRouter)
 app.use('/upload-api', uploadRouter);
 
 app.listen(port, () => {
