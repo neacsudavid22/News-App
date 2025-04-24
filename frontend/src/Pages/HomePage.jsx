@@ -7,8 +7,9 @@ import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
 import SecondaryArticleCard from "../Components/SecondaryArticleCard";
 import CategoryBar from "../Components/CategoryBar";
-import CurrencyTable from "../Components/CurrencyTable";
+import CurrencyConverter from "../Components/CurrencyConverter";
 import useWindowSize from "../hooks/useWindowSize";
+import LocationAndWeather from "../Components/LocationAndWeather";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
@@ -39,7 +40,9 @@ const HomePage = () => {
         <CategoryBar category={category} setCategory={setCategory}></CategoryBar>
       </div>
       <div style={{height:"7.5rem"}}></div>
-      { width>991 && <CurrencyTable/>}
+      { width>991 && <CurrencyConverter/>}
+      { width>991 && <LocationAndWeather/>}
+
 
       <Container fluid> 
         {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()} article={a}/> 
