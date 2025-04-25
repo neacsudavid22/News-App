@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import Container from 'react-bootstrap/Container';
 import "./HomePage.css";
-import { getArticles, getAuthorsArticles } from "../Services/articleService";
+import { getArticles } from "../Services/articleService";
 import MainNavbar from "../Components/MainNavbar";
 import MainArticleCard from "../Components/MainArticleCard";
 import Stack from "react-bootstrap/esm/Stack";
@@ -10,56 +10,55 @@ import CategoryBar from "../Components/CategoryBar";
 import CurrencyConverter from "../Components/CurrencyConverter";
 import useWindowSize from "../hooks/useWindowSize";
 import LocationAndWeather from "../Components/LocationAndWeather";
-import { useLocation } from "react-router";
 import { AuthContext } from "../Components/AuthProvider";
 import useElementInView from "../hooks/useElementInView";
+import { Button, Card, Spinner } from "react-bootstrap";
+import { useSearchParams } from "react-router-dom";
 
 const HomePage = () => {
+  const [searchParams] = useSearchParams();
+  const toModify = searchParams.get("toModify") === "true";
   const [category, setCategory] = useState('allNews');  
   const [articles, setArticles] = useState([])
-  const location = useLocation();
-  const toModify = location.state?.toModify || false;
   const {user} = useContext(AuthContext);
-  const [tag, setTag] = useState("");
-  const [page, setPage] = useState(1);
-  const [targetRef, isInView] = useElementInView({ threshold: 1 });
-  
+  const [tag, setTag] = useState(location.state?.tag || "");
+  const [page, setPage] = useState(0);
+  const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
+  const {width} = useWindowSize();
 
-  useEffect( () => {
-    const handleArticles = async () => { 
-      try {
-          const data = (toModify === true && user !== null) ? await getAuthorsArticles(user._id) 
-          : await getArticles(category, tag, page);
-
-          if (data) {
-            setArticles(prev => page === 1 ? data : [...prev, ...data]);
-          }
-      } catch (err) {
-          console.error("Error during getting articles:", err);
-      }
-    }
-    handleArticles()
-  }, [category, toModify, user, tag, page])   
 
   useEffect(() => {
-    setArticles([]);
-    setPage(1);
-  }, [category, tag]);
-
-  useEffect(() => {
-    if (isInView) {
+    if (isInView && articles.length >= 20) {
       setPage(prev => prev + 1);
     }
-  }, [isInView]);
+  }, [isInView, articles]);
+
+  useEffect(() => {
+    const handleArticles = async () => {
+      if (toModify && !user) {
+        return;
+      }
   
-  const {width} = useWindowSize();
+      try {
+        const data = await getArticles(category, tag, page, toModify ? user?._id : '');
+        setArticles(prev => page === 0 ? data : [...prev, ...data]);
+  
+      } catch (err) {
+        console.error("Error during getting articles:", err);
+      }
+    };
+      
+    handleArticles();
+  
+  }, [category, user, tag, page, toModify]);
+
 
   return (
     <Stack direction="vertical" className="w-100 bg-light">
       
       <div className="fixed-top">
-        <MainNavbar />
-        {!toModify && <CategoryBar category={category} setCategory={setCategory} setTag={setTag}></CategoryBar>}
+        <MainNavbar toModify={toModify} />
+        <CategoryBar category={category} setCategory={setCategory} setTag={setTag}></CategoryBar>
       </div>
       <div style={{height:"7.5rem"}}></div>
 
@@ -68,9 +67,10 @@ const HomePage = () => {
 
 
       <Container fluid className="h-100"> 
-        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()+page} article={a} toModify={toModify}/> 
-                                    : <SecondaryArticleCard key={a._id.toString()+page} article={a} toModify={toModify}/>)}
-        <div ref={targetRef}></div>
+        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString() } article={a} toModify={toModify}/> 
+                                    : <SecondaryArticleCard key={a._id.toString()} article={a} toModify={toModify}/>)}
+        
+        {articles.length >= 20 && <div ref={targetRef}></div>}
       </Container>
 
     </Stack>

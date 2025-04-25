@@ -7,19 +7,16 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Modal from "react-bootstrap/Modal";
 import { AuthContext } from "../Components/AuthProvider";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { getArticleById, interactOnPost } from "../Services/articleService";
 import ShareArticle from "../Components/ShareArticle";
 import useWindowSize from "../hooks/useWindowSize";
-import CommentForm from "../Components/CommentForm";
 import CommentSection from "../Components/CommentSection";
 
 const ArticlePage = () => { 
   const { id } = useParams(); 
   const [article, setArticle] = useState(null);
   const [likeCount, setLikeCount] = useState(article?.likes.length || 0);
-
-  const [IS_ARTICLE_FETCH_NEDEED, SET_IS_ARTICLE_FETCH_NEDEED] = useState(false);
 
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -50,7 +47,7 @@ const ArticlePage = () => {
     };
     
     if (id) fetchArticle();
-  }, [id, IS_ARTICLE_FETCH_NEDEED]);
+  }, [id]);
 
   useEffect(() => {
     if (user && article) {
@@ -58,7 +55,9 @@ const ArticlePage = () => {
       setSaved(article.saves.includes(user._id));
     }
   }, [user, article]);
-  
+
+  const navigate = useNavigate();
+
   return(
     <>
       <MainNavbar />
@@ -129,9 +128,9 @@ const ArticlePage = () => {
               <Button 
                 key={tag} 
                 size="sm" 
-                className="rounded-4 fw-bold w-auto text-nowrap" 
+                className="rounded-4 fw-bold w-auto text-nowrap me-2" 
                 style={{ width: "fit-content" }} 
-                onClick={() => {}}
+                onClick={() => navigate("/", {state: {tag}})}
               >
                 {tag}
               </Button>

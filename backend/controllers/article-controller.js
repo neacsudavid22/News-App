@@ -1,24 +1,39 @@
 import Article from "../models/Article.js";
 import User from "../models/User.js";
+import mongoose from 'mongoose';
 
-const getArticles = async (category, tag = "", page = 1) => {
+const getArticles = async (category, tag = "", page = 0, authorId = '') => {
     try {
-        const searchObject = {};
-        if (category) searchObject.category = category;
-        if (tag) searchObject.tags = { $in: [tag] };
-
-        const articles = await Article.find(searchObject)
-                                      .skip((page - 1) * 20)
-                                      .limit(20)
-                                      .exec();
-
-        return articles;
+      const searchObject = {};
+  
+      if (category) searchObject.category = category;
+      if (tag) searchObject.tags = { $in: [tag] };
+  
+      if (authorId) {
+        if (!mongoose.Types.ObjectId.isValid(authorId)) {
+          return { error: true, message: "Must provide a valid id for author!" };
+        }
+  
+        const author = await User.findById(authorId);
+        if (!author || author.account !== "author") {
+          return { error: true, message: "Author not found or not valid!" };
+        }
+  
+        searchObject.author = authorId;
+      }
+  
+      const articles = await Article.find(searchObject)
+                                    .skip((page) * 20)
+                                    .limit(20)
+                                    .exec();
+  
+      return articles;
+  
     } catch (err) {
-        console.error(`getArticles Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
+      console.error(`getArticles Error: ${err.message}`);
+      return { error: true, message: "Internal Server Error" };
     }
-};
-
+  };
 
 const getArticleById = async (id) => {
     try{
@@ -250,5 +265,4 @@ export {
     deleteComment,
     deleteGarbageComments,
     getAllImageUrls,
-    getArticlesByAuthor
 }

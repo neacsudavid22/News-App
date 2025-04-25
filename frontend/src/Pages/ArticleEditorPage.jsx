@@ -98,7 +98,8 @@ const ArticleEditorPage = () => {
                                                 articleImages, 
                                                 fromEditor: true,
                                                 id: article?._id || null ,
-                                                background: article?.background
+                                                background: article?.background,
+                                                tags: article?.tags
                                             }
                                         });
     }

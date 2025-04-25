@@ -14,7 +14,7 @@ import Collapse  from 'react-bootstrap/Collapse';
 import FriendList from "./FriendList";
 import SharedList from "./SharedList";
 
-const MainNavbar = () => {
+const MainNavbar = ({toModify = false}) => {
     const { user, logout } = useContext(AuthContext); 
 
     const handleLogout = () => {
@@ -67,7 +67,7 @@ const MainNavbar = () => {
                         </Collapse>
                     )}
                         <SplitButton
-                        variant="danger"
+                        variant={toModify ? "warning" : "danger"}
                         align="end"
                         title={('@' + user?.username) || "loading.." }
                         id="dropdown-menu-align-end"

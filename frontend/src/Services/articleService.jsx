@@ -1,9 +1,10 @@
 
-const getArticles = async (category = '', tag = '', page = '') => {
+const getArticles = async (category = '', tag = '', page = '', authorId = '') => {
+
     try {
-        if(category === "allNews") category = ""
+        if(category === "allNews") category = "";
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` 
-            + `?page=${page}&category=${category}&tag=${tag}`);
+            + `?page=${page}&category=${category}&tag=${tag}&authorId=${authorId}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch articles");
@@ -12,25 +13,6 @@ const getArticles = async (category = '', tag = '', page = '') => {
         return await response.json();
     } catch (err) {
         console.error("getArticles error:", err);
-        return null; 
-    }
-}
-
-const getAuthorsArticles = async (authorId, page = 1) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/author/${authorId}/articles?page=${page}`,
-            {
-                credentials: "include"
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch author's articles");
-        }
-        const result = await response.json();
-        return result;
-    } catch (err) {
-        console.error("getAuthorsArticles error:", err);
         return null; 
     }
 }
@@ -240,6 +222,5 @@ export {
     getDatabaseImageUrls,
     getUnsuedImagePublicIds,
     cleanUpUnsuedImages,
-    getAuthorsArticles,
     putArticle
 }
