@@ -10,7 +10,8 @@ import {
         postComment, 
         deleteComment, 
         deleteGarbageComments,
-        getAllImageUrls
+        getAllImageUrls,
+        getArticlesByAuthor
     } from '../controllers/article-controller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
 
@@ -93,7 +94,22 @@ articlesRouter.route('/article').post(async (req, res) => {
     }
 })
 
-articlesRouter.route('/article/:id').put(async (req, res) => {
+articlesRouter.route('/author/:id/articles').get(authMiddleware, async (req, res) => {
+    try {
+        const result = await getArticlesByAuthor(req.params.id);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(`getArticlesByAuthor Error: ${err.message}`);   
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/article/:id').put(authMiddleware, async (req, res) => {
     try
     {
         const result = await updateArticle(req.params.id, req.body);

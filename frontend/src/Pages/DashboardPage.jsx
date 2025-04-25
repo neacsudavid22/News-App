@@ -92,7 +92,9 @@ const DashboardPage = () => {
                     </Button>
                 </Col>
                 <Col xs={12} sm="auto">
-                    <Button size="lg" variant="warning" className="w-100">
+                    <Button size="lg" variant="warning" className="w-100"
+                        onClick={() => navigate("/", {state: {toModify: true}})}
+                    >
                     Modify Article
                     </Button>
                 </Col>

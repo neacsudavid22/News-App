@@ -1,4 +1,5 @@
 import Article from "../models/Article.js";
+import User from "../models/User.js";
 
 const getArticles = async (filterCategory, page = 1) => {
     try {
@@ -24,6 +25,25 @@ const getArticleById = async (id) => {
     }
     catch (err) {
         console.error(`getArticleById Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+}
+
+const getArticlesByAuthor = async (authorId) => {
+    try{
+        const author = await User.findById(authorId);
+        if(!author){
+            return { error: true, message: "Author not found" };
+        }
+
+        const articles = await Article.find({author: author._id});
+        if(!articles){
+            return { error: true, message: "Articles not found" };
+        }
+        return articles
+    }
+    catch (err) {
+        console.error(`getArticlesByAuthor Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
 }
@@ -221,5 +241,6 @@ export {
     postComment,
     deleteComment,
     deleteGarbageComments,
-    getAllImageUrls
+    getAllImageUrls,
+    getArticlesByAuthor
 }

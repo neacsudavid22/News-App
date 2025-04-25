@@ -29,18 +29,25 @@ const ArticleUploadPage = () => {
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState(""); 
     const [tagSelect, setTagSelect] = useState(""); 
-    const [background, setBackground] = useState();
-    const [backgroundPreview, setBackgroundPreview] = useState();
+    const [background, setBackground] = useState(location.state?.background || null);
+    const [backgroundPreview, setBackgroundPreview] = useState(location.state?.background || null);
     const [UPLOAD_SUCCESFULL, SET_UPLOAD_SUCCESFULL] = useState(false);
-    const [articleId, setArticleId] = useState("");
+    const [articleId, setArticleId] = useState(location.state?.id || null);
 
     const uploadImages = async () => {
         const formData = new FormData();
-
-        formData.append("images", background);
+    
+        if (typeof background !== "string") {
+            formData.append("images", background);
+        }
+    
         articleImages.forEach((file) => {
-            formData.append("images", file);
+            if (file instanceof File) {
+                formData.append("images", file);
+            }
         });
+    
+        if (formData.getAll("images").length === 0) return [];
     
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/upload-images`, {
@@ -51,22 +58,27 @@ const ArticleUploadPage = () => {
     
             if (!response.ok) throw new Error("Image upload failed");
     
-            const data = await response.json(); 
-            return data.imageUrls; 
+            const data = await response.json();
+            return data.imageUrls;
         } catch (error) {
             console.error("Error uploading images:", error);
             return [];
         }
     };
     
+    
     const handlePublish = async () => {
         try {
-            const uploadedImageUrls = await uploadImages();
+            const uploadedImageUrls = await uploadImages(); 
     
             let imgIndex = 0;
-            const backgroundUrl = uploadedImageUrls[imgIndex++];
+    
+            const backgroundUrl = typeof background === "string"
+                ? background
+                : uploadedImageUrls[imgIndex++];
+    
             const updatedContent = articleContent.map((item) => {
-                if (item.contentType === "Image") {
+                if (item.contentType === "Image" && !item.content.startsWith("http")) {
                     return { contentType: item.contentType, content: uploadedImageUrls[imgIndex++] };
                 }
                 return item;
@@ -82,24 +94,24 @@ const ArticleUploadPage = () => {
                 main: mainArticle
             };
     
-            const result = await postArticle(article);
+            const result = articleId ? await putArticle(article, articleId) : await postArticle(article);
     
             if (result) {
                 SET_UPLOAD_SUCCESFULL(true);
                 localStorage.removeItem("article");
-                setArticleId(result._id);
+                if(result._id)setArticleId(result._id);
             } else {
                 SET_UPLOAD_SUCCESFULL(false);
             }
     
             handleShow();
-    
         } catch (error) {
             console.error("Error during article creation:", error);
             SET_UPLOAD_SUCCESFULL(false);
             handleShow();
         }
     };
+    
     
 
     const removeTag = () => {
@@ -124,12 +136,12 @@ const ArticleUploadPage = () => {
     const handleShow = () => setShow((prev) => !prev);
 
     const handleBack = () => {
-        navigate("/author", { state: {...location.state} });
+        navigate("/author", { state: {article: location.state} });
     }
 
     useEffect(() => {
         if (!location.state?.fromEditor) {
-            navigate("/author", { state: {...location.state} }); 
+            navigate("/author", { state: {article: location.state} }); 
             return null;
         }
     }, [location.state, navigate]);

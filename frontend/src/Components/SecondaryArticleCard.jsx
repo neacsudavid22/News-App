@@ -7,7 +7,7 @@ import "./textMultilineTruncate.css";
 import { useEffect, useState } from "react";
 import useWindowSize from "../hooks/useWindowSize";
 
-const SecondaryArticleCard = ({ article }) => {
+const SecondaryArticleCard = ({ article, toModify = false }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
   const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
@@ -34,13 +34,18 @@ const SecondaryArticleCard = ({ article }) => {
 
   const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
+  const handleNavigation = () => {
+    if(!toModify) navigate(`/article/${article._id}`);
+    else navigate(`/author`, {state: {article: article}});
+  };
+
   return (
     <Row className="mb-3 justify-content-center">
       <Col xs={12} sm={12} md={10} lg={5} xl={5}>
       <Card
           className="d-flex flex-row shadow-sm rounded-4 overflow-hidden"
           style={{ cursor: "pointer", height: width < 758 ? "9rem" : "12rem"}}
-          onClick={() => navigate(`/article/${article._id}`)}
+          onClick={handleNavigation}
         >
           {/* Left: Text content */}
           <div className="d-flex flex-column justify-content-between p-3" style={{ width: "55%" }}>

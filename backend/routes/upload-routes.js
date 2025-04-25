@@ -56,10 +56,8 @@ uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
       .execute();
 
     const allPublicIds = result.resources.map(resource => resource.public_id);
-    console.log(allPublicIds)
 
     const imageUrlsSet = new Set(imageUrls.map(url => extractPublicId(url)));
-
 
     const unusedUrls = allPublicIds.filter((url) => !imageUrlsSet.has(url));
 
@@ -82,7 +80,6 @@ uploadRouter.post("/cleanup-unused-images", async (req, res) => {
     }
 
     const result = await cloudinary.api.delete_resources(unusedPublicIds);
-    console.log(result);
 
     res.status(200).json({
       message: 'Unused images deleted successfully',

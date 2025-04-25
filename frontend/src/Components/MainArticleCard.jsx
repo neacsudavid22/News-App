@@ -6,7 +6,7 @@ import Figure from "react-bootstrap/Figure";
 import { useNavigate } from "react-router";
 import "./textMultilineTruncate.css";
 
-const MainArticleCard = ({ article }) => {
+const MainArticleCard = ({ article, toModify = false }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
   const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
@@ -25,7 +25,8 @@ const MainArticleCard = ({ article }) => {
   }, [article?.background]);
 
   const handleNavigation = () => {
-    navigate(`/article/${article._id}`);
+    if(!toModify) navigate(`/article/${article._id}`);
+    else navigate(`/author`, {state: {article: article}});
   };
 
   const formattedUpdateDate = new Intl.DateTimeFormat("ro-RO", {

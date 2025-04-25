@@ -14,6 +14,25 @@ const getArticles = async (category, page) => {
     }
 }
 
+const getAuthorsArticles = async (authorId) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/author/${authorId}/articles`,
+            {
+                credentials: "include"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch author's articles");
+        }
+        const result = await response.json();
+        return result;
+    } catch (err) {
+        console.error("getAuthorsArticles error:", err);
+        return null; 
+    }
+}
+
 const getArticleById = async (articleId) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`);
@@ -48,7 +67,25 @@ const postArticle = async (article) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article`, {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(article),
+        });
+
+        if (!response.ok) throw new Error("Article creation failed");
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error publishing article:", error);
+    }
+}
+
+const putArticle = async (article, articleId) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify(article),
         });
 
@@ -200,5 +237,7 @@ export {
     getTitle,
     getDatabaseImageUrls,
     getUnsuedImagePublicIds,
-    cleanUpUnsuedImages
+    cleanUpUnsuedImages,
+    getAuthorsArticles,
+    putArticle
 }

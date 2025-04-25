@@ -17,13 +17,14 @@ import AddParagraph from "../Components/AddParagraph";
 import { useLocation, useNavigate, } from "react-router";
 import "./ArticleRedactationForm.css";
 
-const ArticleEditorPage = ( {article} ) => {
+const ArticleEditorPage = () => {
     const location = useLocation();
+    const article = location.state?.article || null;
     const [selectedComponent, setSelectedComponent] = useState("hideContent");
 
-    const [title, setTitle] = useState(article?.title || location.state?.title || "");
-    const [articleContent, setArticleContent] = useState(article?.articleContent || location.state?.articleContent || []);
-    const [articleImages, setArticleImages] = useState(article?.articleImages || location.state?.articleImages || []);
+    const [title, setTitle] = useState(article?.title ||  "");
+    const [articleContent, setArticleContent] = useState(article?.articleContent || []);
+    const [articleImages, setArticleImages] = useState(article?.articleImages || []);
     const [edit, setEdit] = useState([]);
     const navigate = useNavigate();
 
@@ -91,7 +92,15 @@ const ArticleEditorPage = ( {article} ) => {
 
     const handleSubmit = () => {
         if(title.length < 10) handleShow()
-        else navigate("/author/upload", { state: {articleContent, title, articleImages, fromEditor: true}});
+        else navigate("/author/upload", { state: {
+                                                articleContent,
+                                                title,
+                                                articleImages, 
+                                                fromEditor: true,
+                                                id: article?._id || null ,
+                                                background: article?.background
+                                            }
+                                        });
     }
 
     const [EDIT_MODE, SET_EDIT_MODE] = useState(false);
