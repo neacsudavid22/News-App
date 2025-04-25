@@ -1,3 +1,4 @@
+
 const getArticles = async (category = '', tag = '', page = '') => {
     try {
         if(category === "allNews") category = ""
@@ -15,9 +16,9 @@ const getArticles = async (category = '', tag = '', page = '') => {
     }
 }
 
-const getAuthorsArticles = async (authorId) => {
+const getAuthorsArticles = async (authorId, page = 1) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/author/${authorId}/articles`,
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/author/${authorId}/articles?page=${page}`,
             {
                 credentials: "include"
             }

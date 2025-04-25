@@ -34,14 +34,17 @@ const getArticleById = async (id) => {
     }
 }
 
-const getArticlesByAuthor = async (authorId) => {
+const getArticlesByAuthor = async (authorId, page) => {
     try{
         const author = await User.findById(authorId);
         if(!author){
             return { error: true, message: "Author not found" };
         }
 
-        const articles = await Article.find({author: author._id});
+        const articles = await Article.find({author: author._id})
+                                      .skip((page - 1) * 20)
+                                      .limit(20)
+                                      .exec();
         if(!articles){
             return { error: true, message: "Articles not found" };
         }

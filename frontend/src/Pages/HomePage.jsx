@@ -12,7 +12,7 @@ import useWindowSize from "../hooks/useWindowSize";
 import LocationAndWeather from "../Components/LocationAndWeather";
 import { useLocation } from "react-router";
 import { AuthContext } from "../Components/AuthProvider";
-import SearchBar from "../Components/SearchBar";
+import useElementInView from "../hooks/useElementInView";
 
 const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
@@ -21,23 +21,37 @@ const HomePage = () => {
   const toModify = location.state?.toModify || false;
   const {user} = useContext(AuthContext);
   const [tag, setTag] = useState("");
+  const [page, setPage] = useState(1);
+  const [targetRef, isInView] = useElementInView({ threshold: 1 });
+  
 
   useEffect( () => {
     const handleArticles = async () => { 
       try {
           const data = (toModify === true && user !== null) ? await getAuthorsArticles(user._id) 
-          : await getArticles(category, tag);
+          : await getArticles(category, tag, page);
 
           if (data) {
-              setArticles(data)
+            setArticles(prev => page === 1 ? data : [...prev, ...data]);
           }
       } catch (err) {
           console.error("Error during getting articles:", err);
       }
     }
     handleArticles()
-  }, [category, toModify, user, tag])   
+  }, [category, toModify, user, tag, page])   
 
+  useEffect(() => {
+    setArticles([]);
+    setPage(1);
+  }, [category, tag]);
+
+  useEffect(() => {
+    if (isInView) {
+      setPage(prev => prev + 1);
+    }
+  }, [isInView]);
+  
   const {width} = useWindowSize();
 
   return (
@@ -53,9 +67,10 @@ const HomePage = () => {
       { width>991 && <LocationAndWeather/>}
 
 
-      <Container fluid className="vh-100"> 
-        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()} article={a} toModify={toModify}/> 
-                                    : <SecondaryArticleCard key={a._id.toString()} article={a} toModify={toModify}/>)}
+      <Container fluid className="h-100"> 
+        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString()+page} article={a} toModify={toModify}/> 
+                                    : <SecondaryArticleCard key={a._id.toString()+page} article={a} toModify={toModify}/>)}
+        <div ref={targetRef}></div>
       </Container>
 
     </Stack>

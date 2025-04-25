@@ -21,8 +21,9 @@ articlesRouter.route('/article').get(async (req, res) => {
     try {
         const category = req.query.category; 
         const tag = req.query.tag; 
+        const page = req.query.page; 
 
-        const result = await getArticles(category, tag); 
+        const result = await getArticles(category, tag, page); 
 
         if (result.error) {
             return res.status(400).json({ message: result.message });
@@ -97,7 +98,7 @@ articlesRouter.route('/article').post(async (req, res) => {
 
 articlesRouter.route('/author/:id/articles').get(authMiddleware, async (req, res) => {
     try {
-        const result = await getArticlesByAuthor(req.params.id);
+        const result = await getArticlesByAuthor(req.params.id, req.query.page);
 
         if (result.error) {
             return res.status(400).json({ message: result.message });
