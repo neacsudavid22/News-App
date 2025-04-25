@@ -11,7 +11,7 @@ import Image from "react-bootstrap/Image";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavbar";
-import { postArticle } from "../Services/articleService";
+import { postArticle, putArticle } from "../Services/articleService";
 import Modal from "react-bootstrap/esm/Modal";
 import "./ArticleRedactationForm.css";
 
@@ -26,7 +26,7 @@ const ArticleUploadPage = () => {
     const title = location.state.title || "";
 
     const [category, setCategory] = useState("politics")
-    const [tags, setTags] = useState([]);
+    const [tags, setTags] = useState(location.state?.tags || []);
     const [tagInput, setTagInput] = useState(""); 
     const [tagSelect, setTagSelect] = useState(""); 
     const [background, setBackground] = useState(location.state?.background || null);
