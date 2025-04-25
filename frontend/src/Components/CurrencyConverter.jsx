@@ -85,7 +85,7 @@ const CurrencyConverter = () => {
   const toCurrencyName = currencies.current[to];
 
   return (
-    <Card className="w-25 shadow position-fixed rounded-4" style={{ left: "2rem", marginTop: "8rem" }}>
+    <Card className="w-25 shadow position-fixed rounded-4" style={{ left: "2rem", marginTop: "11.5rem" }}>
       <h5 className="mb-4 text-center pt-4">Currency Converter</h5>
       <Row className="mb-3 px-4 g-2">
         <Col>

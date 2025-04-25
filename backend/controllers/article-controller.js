@@ -1,11 +1,15 @@
 import Article from "../models/Article.js";
 import User from "../models/User.js";
 
-const getArticles = async (filterCategory, page = 1) => {
+const getArticles = async (category, tag = "", page = 1) => {
     try {
-        const articles = await Article.find(filterCategory ? { category: filterCategory } : {})
-                                      .skip((page - 1) * 20)  // Skip previous pages
-                                      .limit(20)  // Limit results per page
+        const searchObject = {};
+        if (category) searchObject.category = category;
+        if (tag) searchObject.tags = { $in: [tag] };
+
+        const articles = await Article.find(searchObject)
+                                      .skip((page - 1) * 20)
+                                      .limit(20)
                                       .exec();
 
         return articles;
@@ -14,6 +18,7 @@ const getArticles = async (filterCategory, page = 1) => {
         return { error: true, message: "Internal Server Error" };
     }
 };
+
 
 const getArticleById = async (id) => {
     try{

@@ -1,7 +1,10 @@
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import SearchBar from './SearchBar';
+import { useState } from 'react';
+import { Collapse, Fade } from 'react-bootstrap';
 
-const CategoryBar = ({category, setCategory}) => {
+const CategoryBar = ({category, setCategory, setTag}) => {
 
   const CATEGORIES = {
     allNews: ["gray"] ,
@@ -16,6 +19,7 @@ const CategoryBar = ({category, setCategory}) => {
   const handleCategoryChange = (category) => {
     setCategory(category);
   }
+  const [toogleOn, setToogleOn] = useState(true);
 
   const handleTitle = (title) => {
     return <span style={{color: title === category ? "black": "whitesmoke"}}>
@@ -26,7 +30,17 @@ const CategoryBar = ({category, setCategory}) => {
       <Navbar style={{ background: CATEGORIES[category]?.[0] || "gray" }} expand="lg" 
               className="w-100 p-2 p-lg-0 z-index-1000"
       >
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle 
+          aria-controls="basic-navbar-nav" 
+          onClick={()=>setToogleOn(prev=>!prev)}
+          />
+          
+        <Fade in={toogleOn}>
+          <div>
+            <SearchBar setTag={setTag} />
+          </div>
+        </Fade>
+
         <Navbar.Collapse className="py-1 p-lg-0">
           <Nav 
             variant="tabs" 

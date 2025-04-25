@@ -1,7 +1,8 @@
-const getArticles = async (category, page) => {
+const getArticles = async (category = '', tag = '', page = '') => {
     try {
-        const query = category !== "allNews" ? `category=${category}` : '';
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` + `?page=${page}` + "&" + query);
+        if(category === "allNews") category = ""
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` 
+            + `?page=${page}&category=${category}&tag=${tag}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch articles");

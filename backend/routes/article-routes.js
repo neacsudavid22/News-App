@@ -20,8 +20,9 @@ const articlesRouter = express.Router()
 articlesRouter.route('/article').get(async (req, res) => {
     try {
         const category = req.query.category; 
+        const tag = req.query.tag; 
 
-        const result = await getArticles(category); 
+        const result = await getArticles(category, tag); 
 
         if (result.error) {
             return res.status(400).json({ message: result.message });
