@@ -12,7 +12,6 @@ import useWindowSize from "../hooks/useWindowSize";
 import LocationAndWeather from "../Components/LocationAndWeather";
 import { AuthContext } from "../Components/AuthProvider";
 import useElementInView from "../hooks/useElementInView";
-import { Button, Card, Spinner } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 
 const HomePage = () => {
