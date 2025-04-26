@@ -3,7 +3,7 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { useNavigate } from "react-router";
-import { Button } from "react-bootstrap";
+import { Button, Figure } from "react-bootstrap";
 import { deleteArticle } from "../Services/articleService";
 import "./textMultilineTruncate.css";
 import useWindowSize from "../hooks/useWindowSize";
@@ -54,7 +54,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
       <Col xs={12} sm={12} md={10} lg={5} xl={5}>
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
-          style={{ cursor: "pointer", height: width > 758 ? "12rem" : "9rem" }}
+          style={{ cursor: "pointer", height: "auto" }}
         >
           <Row className="g-0 h-100">
 
@@ -89,20 +89,22 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
               </Card.Body>
             </Col>
 
-            {/* Image Side */}
-            <Col xs={5} className="d-flex align-items-center justify-content-center p-2 h-100" >
-              <Card.Img
+           {/* Image Side */}
+            <Col xs={5} className="d-flex align-items-center justify-content-center p-2 h-100">
+              <Figure.Image
+                className="mt-3"
                 onClick={handleNavigation}
                 src={backgroundUrl}
                 style={{
-                  width: "90%", 
-                  height: "75%", 
-                  objectFit: "cover",
-                  borderRadius: "0.75rem",
-                  boxShadow: "0 0 5px rgba(0,0,0,0.1)",
+                  width: '90%',
+                  height: width < 758 ? "5rem" : "8rem",
+                  objectFit: 'cover',
+                  borderRadius: '0.75rem',
+                  boxShadow: '0 0 5px rgba(0,0,0,0.1)',
                 }}
               />
             </Col>
+
           </Row>
 
           {toModify && (

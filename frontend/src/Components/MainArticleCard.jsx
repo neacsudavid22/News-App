@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import { Button } from "react-bootstrap";
 import { deleteArticle } from "../Services/articleService";
 import "./textMultilineTruncate.css";
+import useWindowSize from "../hooks/useWindowSize";
 
 const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
@@ -58,12 +59,14 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
 
   const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
+  const { width } = useWindowSize()
+
   return (
     <Row className="mb-3 justify-content-center">
       <Col xs={12} sm={12} md={10} lg={5} xl={5}>
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
-          style={{ cursor: "pointer", height: "32rem"}}
+          style={{ cursor: "pointer", height: "auto"}}
         >
           {backgroundUrl && (
             <Figure.Image
@@ -71,7 +74,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
               src={backgroundUrl}
               className="w-100 m-0"
               style={{
-                height: "60%", // Image takes 60% of card height
+                height: width < 758 ? "15rem" : "20rem",
                 objectFit: "cover",
               }}
             />
@@ -79,7 +82,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
 
           <Card.Body 
             className="pt-3 px-3 pb-4"
-            style={{ height: "40%" }} // Content takes remaining 40%
+            style={{ height: "12rem" }}
             onClick={handleNavigation}
           >
             <div className="d-flex align-items-center gap-3 mb-2 text-muted small">
