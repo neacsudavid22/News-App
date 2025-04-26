@@ -21,6 +21,8 @@ const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sent
     };
 
     const handleNavigation = async () => {
+        if(articleTitle === "Removed article")
+            return;
         handleClose();
         if (!wasRead) await handleSwitchChange();
         navigate("/article/" + articleId);
@@ -45,6 +47,7 @@ const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sent
             onClick={handleNavigation}
             className={`shadow-sm border-1 hover-shadow transition mb-2 ${wasRead ? 'bg-light' : ''}`}
             style={{ cursor: "pointer" }}
+            disabled={articleTitle === "Removed article"}
         >
             <Card.Body className="d-flex flex-column align-items-start">
                 <Card.Subtitle className="mb-3 text-muted">
