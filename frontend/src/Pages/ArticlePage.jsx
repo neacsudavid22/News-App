@@ -130,7 +130,7 @@ const ArticlePage = () => {
                 size="sm" 
                 className="rounded-4 fw-bold w-auto text-nowrap me-2" 
                 style={{ width: "fit-content" }} 
-                onClick={() => navigate("/", {state: {tag}})}
+                onClick={() => navigate(`/?tag=${tag}`)}
               >
                 {tag}
               </Button>

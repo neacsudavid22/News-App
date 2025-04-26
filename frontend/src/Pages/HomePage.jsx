@@ -20,7 +20,7 @@ const HomePage = () => {
   const [category, setCategory] = useState('allNews');  
   const [articles, setArticles] = useState([])
   const {user} = useContext(AuthContext);
-  const [tag, setTag] = useState(location.state?.tag || "");
+  const [tag, setTag] = useState(searchParams.get("tag") || "");
   const [page, setPage] = useState(0);
   const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
   const {width} = useWindowSize();
