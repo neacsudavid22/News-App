@@ -17,6 +17,20 @@ const getArticles = async (category = '', tag = '', page = '', authorId = '') =>
     }
 }
 
+const deleteArticle = async (articleId) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+
+        return await response.json();
+    } catch (err) {
+        console.error("getArticles error:", err);
+        return null; 
+    }
+}
+
 const getArticleById = async (articleId) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`);
@@ -42,7 +56,7 @@ const getTitle = async (articleId) => {
 
         return await response.json();
     } catch (err) {
-        console.error("getTitle error:", err);
+        console.log("getTitle error or the article might not exist anymore:", err);
         return null;
     }
 }
@@ -166,7 +180,7 @@ const getDatabaseImageUrls = async () => {
     }
 }
 
-const getUnsuedImagePublicIds = async (imageUrls) => {
+const getUnsuedImagePublicIds = async (imageUrls = []) => {
     try{
         console.log(imageUrls);
         const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-unused-images-public-ids`,{
@@ -222,5 +236,6 @@ export {
     getDatabaseImageUrls,
     getUnsuedImagePublicIds,
     cleanUpUnsuedImages,
-    putArticle
+    putArticle,
+    deleteArticle
 }

@@ -89,7 +89,7 @@ const getUsername = async (userId) => {
         const username = await response.json();
         return username;
     } catch(err){
-        console.error("getUsername error:", err);
+        console.log("getUsername error, the user might not exist anymore:", err);
         return null;
     }
 }

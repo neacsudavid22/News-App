@@ -4,9 +4,11 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Figure from "react-bootstrap/Figure";
 import { useNavigate } from "react-router";
+import { Button } from "react-bootstrap";
+import { deleteArticle } from "../Services/articleService";
 import "./textMultilineTruncate.css";
 
-const MainArticleCard = ({ article, toModify = false }) => {
+const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
   const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
@@ -25,8 +27,17 @@ const MainArticleCard = ({ article, toModify = false }) => {
   }, [article?.background]);
 
   const handleNavigation = () => {
-    if(!toModify) navigate(`/article/${article._id}`);
-    else navigate(`/author`, {state: {article: article}});
+    navigate(`/article/${article._id}`);
+  };
+
+  const removeArticle = async () => {
+    try {
+      const result = await deleteArticle(article?._id);
+      if(result !== null)
+        setRefresh(true);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const formattedUpdateDate = new Intl.DateTimeFormat("ro-RO", {
@@ -52,8 +63,7 @@ const MainArticleCard = ({ article, toModify = false }) => {
       <Col xs={12} sm={12} md={10} lg={5} xl={5}>
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
-          style={{ cursor: "pointer", height: "32rem" }} // You can adjust this total height
-          onClick={handleNavigation}
+          style={{ cursor: "pointer", height: "auto" }} // You can adjust this total height
         >
           {backgroundUrl && (
             <Figure.Image
@@ -69,6 +79,7 @@ const MainArticleCard = ({ article, toModify = false }) => {
           <Card.Body 
             className="pt-3 px-3 pb-4"
             style={{ height: "40%" }} // Content takes remaining 40%
+            onClick={handleNavigation}
           >
             <div className="d-flex align-items-center gap-3 mb-2 text-muted small">
               <span className="fw-medium">{formattedUpdateDate}</span>
@@ -85,6 +96,17 @@ const MainArticleCard = ({ article, toModify = false }) => {
               {firstParagraph || "Loading..."}
             </Card.Text>
           </Card.Body>
+
+          {toModify && (
+            <Card.Footer className="d-flex justify-content-around">
+              <Button variant="danger" className="w-25 text-nowrap" onClick={removeArticle}>
+                Remove
+              </Button>
+              <Button variant="warning" className="w-25 text-nowrap" onClick={() => navigate(`/author`, { state: { article: article } })}>
+                Modify
+              </Button>
+            </Card.Footer>
+          )}
         </Card>
       </Col>
     </Row>
