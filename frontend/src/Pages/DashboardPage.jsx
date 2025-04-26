@@ -24,9 +24,7 @@ const DashboardPage = () => {
             try {
                 SET_LOADING_ALL_URLS(true);
                 const data = await getDatabaseImageUrls();
-                if (data !== null) {
-                    setImageUrls(data.imageUrls);
-                }
+                setImageUrls(data.imageUrls);
             } catch (err) {
                 console.error(err);
             }
@@ -42,15 +40,13 @@ const DashboardPage = () => {
             try {
                 SET_LOADING_UNUSED_URLS(true);
                 const data = await getUnsuedImagePublicIds(imageUrls);
-                if (data !== null) {
-                    setUnusedPublicIds(data.unusedPublicIds);
-                }
+                setUnusedPublicIds(data.unusedPublicIds);
             } catch (err) {
                 console.error(err);
             }
         };
 
-        if (imageUrls.length > 0 && !LOADING_UNUSED_URLS) {
+        if (!LOADING_UNUSED_URLS) {
             fetchUnusedImageUrls();
         }
     }, [imageUrls, LOADING_UNUSED_URLS]);
