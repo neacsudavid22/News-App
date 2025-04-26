@@ -19,7 +19,10 @@ const AddParagraph = ({ index, content = null, addSelectedComponent }) => {
             </Form.Group>
 
             <Button variant={content ? "outline-success" : "primary"} type="button"
-                onClick={() => addSelectedComponent("p", paragraph, index)}
+                onClick={() => {
+                    addSelectedComponent("p", paragraph, index);
+                    setParagraph("");
+                }}
                 className="mb-1 w-auto text-nowrap"
             >
                 {content ? "Save" : "Add Paragraph"}

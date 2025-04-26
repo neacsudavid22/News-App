@@ -18,7 +18,10 @@ const AddHeader = ({ index, content = null, addSelectedComponent }) => {
             </Form.Group>
 
             <Button variant={content ? "outline-success" : "primary"} type="button"
-                onClick={() => addSelectedComponent("h2", header, index)}
+                onClick={() => {
+                    addSelectedComponent("h2", header, index);
+                    setHeader("");
+                }}
                 className="mb-1 w-auto text-nowrap"
             >
                 {content ? "Save" : "Add Header"}

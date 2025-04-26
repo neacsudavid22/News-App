@@ -19,9 +19,8 @@ const AddImage = ({ index, content = null, setArticleImages, articleImages, addS
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!imagePreviewUrl) {
-            alert("Please select or provide an image.");
             return;
         }
 
@@ -29,7 +28,9 @@ const AddImage = ({ index, content = null, setArticleImages, articleImages, addS
             setArticleImages([...articleImages, file]);
         }
 
-        addSelectedComponent("Image", imagePreviewUrl, index);
+        await addSelectedComponent("Image", imagePreviewUrl, index);
+        setImagePreviewUrl(null);
+        setFile(null);
     };
 
     return (
@@ -53,13 +54,15 @@ const AddImage = ({ index, content = null, setArticleImages, articleImages, addS
             </Button>
 
             {imagePreviewUrl && (
-                <Image
+                 <div className="w-100 d-flex justify-content-center">
+                 <Image
                     src={imagePreviewUrl}
-                    thumbnail
-                    fluid
-                    className="w-50 p-2"
+                    thumbnail="true"
+                    fluid="true"
+                    className="w-75 p-2 my-2" 
                     alt="Image preview"
                 />
+             </div>
             )}
         </Stack>
     );

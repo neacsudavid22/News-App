@@ -10,12 +10,12 @@ import Stack from "react-bootstrap/esm/Stack";
 import Image from "react-bootstrap/Image";
 import MainNavbar from "../Components/MainNavbar";
 import Modal from "react-bootstrap/Modal";
-import useWindowSize from "../hooks/useWindowSize";
 import AddImage from "../Components/AddImage";
 import AddHeader from "../Components/AddHeader";
 import AddParagraph from "../Components/AddParagraph";
 import { useLocation, useNavigate, } from "react-router";
 import "./ArticleRedactationForm.css";
+import { Collapse } from "react-bootstrap";
 
 const ArticleEditorPage = () => {
     const location = useLocation();
@@ -50,7 +50,7 @@ const ArticleEditorPage = () => {
     };
 
     const addSelectedComponent = (contentType, content, index) => {
-        if(contentType !=="Image") content = content.trim();
+        if(contentType !== "Image") content = content.trim();
 
         if (content !== "" && index === undefined) {
             setArticleContent([...articleContent, { contentType, content }]);
@@ -99,7 +99,8 @@ const ArticleEditorPage = () => {
                                                 fromEditor: true,
                                                 id: article?._id || null ,
                                                 background: article?.background,
-                                                tags: article?.tags
+                                                tags: article?.tags,
+                                                main: article?.main
                                             }
                                         });
     }
@@ -110,7 +111,23 @@ const ArticleEditorPage = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const {width} = useWindowSize();
+    const moveComponent = (index, direction) => {
+        const newArticleContent = [...articleContent];
+        const newEdit = [...edit];
+    
+        if (direction === "up" && index > 0) {
+            [newArticleContent[index], newArticleContent[index - 1]] = [newArticleContent[index - 1], newArticleContent[index]];
+            [newEdit[index], newEdit[index - 1]] = [newEdit[index - 1], newEdit[index]];
+        } 
+        else if (direction === "down" && index < newArticleContent.length - 1) {
+            [newArticleContent[index], newArticleContent[index + 1]] = [newArticleContent[index + 1], newArticleContent[index]];
+            [newEdit[index], newEdit[index + 1]] = [newEdit[index + 1], newEdit[index]];
+        }
+    
+        setArticleContent(newArticleContent);
+        setEdit(newEdit);
+    };
+    
 
     return (
         <>
@@ -119,61 +136,140 @@ const ArticleEditorPage = () => {
         <Container fluid className="d-flex justify-content-center h-100 pt-4">
         <Row className="w-100 justify-content-center">
         <Col sm={11} md={10} lg={8} xl={8}>
-            <Form className="justify-content-center">
-                <Form.Group className="mb-3">
-                    <Form.Label><h2>Article Title</h2></Form.Label>
-                    <Form.Control type="text" placeholder="Enter article title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                </Form.Group>
-            </Form>
 
-            <Container className="justify-content-center sticky-offset py-2 bg-white border-bottom">
+        <Form className="justify-content-center mb-3 pb-3 border-bottom">
+            <Stack direction="horizontal" gap={3} className="align-items-center justify-content-around">
+                <Form.Label as="h2" className="mb-0">Article Title:</Form.Label>
+                <Form.Control 
+                    type="text" 
+                    placeholder="Enter article title" 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-50"
+                />
+            </Stack>        
+        </Form>
 
-                <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} 
-                    className="w-100 mb-2 ">
-                    <Tab eventKey="p" title="Paragraph" />
-                    <Tab eventKey="Image" title="Image" />
-                    <Tab eventKey="h2" title="Header" />
-                    <Tab eventKey="hideContent" title="Hide" />
-                </Tabs>
 
-                {EDIT_MODE ? null : renderSelectedComponent(selectedComponent)}
-            </Container>
-
-            <br />
-            <h2>Article Preview:</h2>
-            <Stack direction="vertical" gap={2} className="justify-content-center border p-3">
-                <h1>{title}</h1>
-                { articleContent.map( (item, index) => {
-                    const Tag = item.contentType;
-                    return (
-                            <div key={index} className="d-flex justify-content-between py-2 border-top">
-                                { edit[index] ? renderSelectedComponent(item.contentType, index, item.content) 
-                                    : <>
-                                       {
-                                        Tag === "Image" ? 
-                                            <Image src={item.content} alt="Article Image" thumbnail className="w-50 p-2 my-2" /> 
-                                            : <Tag className="w-100 p-2 ">{item.content}</Tag>
-                                       }
-
-                                       <Stack direction={Tag === "Image" || width < 768 ? "vertical" : "horizontal"} gap={2} className="ms-3 justify-content-center">
-                                        <Button variant="outline-success" type="button" 
-                                            onClick={() => { 
-                                                handleEdit(index); 
-                                            }}>Modify
-                                        </Button>
-                                        <Button variant="danger" type="button" 
-                                            onClick={() => { 
-                                                removeSelectedComponent(index); 
-                                            }}>Remove</Button>
-                                        </Stack>
-                                    </> }
-                            </div>
-                        );
-                    })
+        <Container 
+            style={{top:"3.5rem"}}
+            className="justify-content-center sticky-top py-2 bg-white border-bottom"         
+        >    
+            <Tabs fill defaultActiveKey="hideContent" activeKey={selectedComponent} onSelect={setSelectedComponent} 
+                className="w-100 mb-2 ">
+                <Tab eventKey="p" title="Paragraph" />
+                <Tab eventKey="Image" title="Image" />
+                <Tab eventKey="h2" title="Header" />
+                <Tab eventKey="hideContent" title="Hide" />
+            </Tabs>
+            <Collapse in={selectedComponent === "Image"}>
+                <div>
+                    {!EDIT_MODE &&
+                    <AddImage  
+                        articleImages={articleImages} 
+                        setArticleImages={setArticleImages} 
+                        addSelectedComponent={addSelectedComponent} 
+                        />
+                    }
+                </div>
+            </Collapse>
+            <Collapse in={selectedComponent === "h2"}>
+                <div>
+                    {!EDIT_MODE && 
+                    <AddHeader  
+                        addSelectedComponent={addSelectedComponent} />
                 }
-            </Stack>
+                </div>
+            </Collapse>
+            <Collapse in={selectedComponent === "p"}>
+                <div>
+                    {!EDIT_MODE && 
+                    <AddParagraph  
+                    addSelectedComponent={addSelectedComponent} />
+                    }
+                </div>
+            </Collapse>
+            <Collapse in={selectedComponent === "hideContent"}>
+                <div>
+                </div>
+            </Collapse>
+        </Container>
 
-            <Button variant="primary" type="button" className="my-4" onClick={handleSubmit}>
+    <br />
+    <h3 className="text-muted">Article Preview:</h3>
+    <Stack direction="vertical" gap={2} className="justify-content-center border p-3">
+        <h1>{title}</h1>
+
+        {articleContent.map((item, index) => {
+        const Tag = item.contentType;
+
+        return (
+            <Stack key={index} className="d-flex justify-content-between py-2 border-top">
+                {edit[index] ? (
+                    renderSelectedComponent(item.contentType, index, item.content)
+                ) : (
+                    <>
+                        {Tag === "Image" ? (
+                            <div className="w-100 d-flex justify-content-center">
+                                <Image 
+                                    src={item.content} 
+                                    alt="Article Image" 
+                                    thumbnail 
+                                    className="w-75 p-2 my-2" 
+                                />
+                            </div>
+                        ) : (
+                            <Tag className="w-100 p-2">{item.content}</Tag>
+                        )}
+
+                        <Stack direction="horizontal" gap={3} 
+                            className="justify-content-around shadow bg-white rounded-3 my-1 p-2 flex-wrap">
+                            <Button 
+                                variant="outline-success" 
+                                type="button" 
+                                onClick={() => handleEdit(index)}
+                                style={{width:"8rem"}}
+                            >
+                                Modify
+                            </Button>
+                            <Button 
+                                variant="outline-danger" 
+                                type="button" 
+                                onClick={() => removeSelectedComponent(index)}
+                                style={{width:"8rem"}}
+                            >
+                                Remove
+                            </Button>
+
+                            <Button 
+                                variant="outline-dark" 
+                                type="button" 
+                                onClick={() => moveComponent(index, "up")}
+                                disabled={index === 0}
+                                style={{width:"8rem"}}
+
+                            >
+                                Move Up
+                            </Button>
+                            <Button 
+                                variant="outline-dark" 
+                                type="button" 
+                                onClick={() => moveComponent(index, "down")}
+                                disabled={index === articleContent.length - 1}
+                                style={{width:"8rem"}}
+                            >
+                                Move Down
+                            </Button>
+                        </Stack>
+                    </>
+                    )}
+                </Stack>
+                );
+            })}
+        </Stack>
+
+
+            <Button variant="primary" type="button" size="lg" className="my-4" onClick={handleSubmit}>
                 Next
             </Button>
         </Col>
