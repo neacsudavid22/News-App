@@ -63,10 +63,11 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
       <Col xs={12} sm={12} md={10} lg={5} xl={5}>
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
-          style={{ cursor: "pointer", height: "auto" }} // You can adjust this total height
+          style={{ cursor: "pointer", height: "32rem"}}
         >
           {backgroundUrl && (
             <Figure.Image
+              onClick={handleNavigation}
               src={backgroundUrl}
               className="w-100 m-0"
               style={{
