@@ -49,13 +49,23 @@ const MainNavbar = ({toModify = false}) => {
             setFadeIn(false);
         }
     }, [uncheckedRequest, uncheckedShare]);
+
+    const [variant, setVariant] = useState("outline-light");
     
     return(
         <>
         <Navbar fixed="top" bg="dark" variant="dark" expand="lg" className="w-100 p-2 px-3">
             <Stack direction="horizontal" className="d-flex justify-content-between w-100">
 
-                <Navbar.Brand as={Link} to="/"> NewsApp </Navbar.Brand>
+                <Navbar.Brand as={Button} variant={variant}
+                onMouseEnter={()=>setVariant("outline-danger")}
+                onMouseLeave={()=>setVariant("outline-light")}
+
+                onClick={() => {
+                        navigate("/")
+                        window.location.reload();
+                    }}
+                > NewsApp </Navbar.Brand>
             
                 {user ? (
                     <Stack direction="horizontal">
