@@ -24,7 +24,7 @@ const HomePage = () => {
   const [page, setPage] = useState(0);
   const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
   const {width} = useWindowSize();
-
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     if (isInView && articles.length >= 20) {
@@ -48,8 +48,8 @@ const HomePage = () => {
     };
       
     handleArticles();
-  
-  }, [category, user, tag, page, toModify]);
+    setRefresh(false);
+  }, [category, user, tag, page, toModify, refresh]);
 
 
   return (
@@ -66,8 +66,10 @@ const HomePage = () => {
 
 
       <Container fluid className="h-100"> 
-        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString() } article={a} toModify={toModify}/> 
-                                    : <SecondaryArticleCard key={a._id.toString()} article={a} toModify={toModify}/>)}
+        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString() } article={a} 
+                                                       toModify={toModify} setRefresh={setRefresh}/> 
+                                    : <SecondaryArticleCard key={a._id.toString()} article={a} 
+                                                        toModify={toModify} setRefresh={setRefresh}/>)}
         
         {articles.length >= 20 && <div ref={targetRef}></div>}
       </Container>
