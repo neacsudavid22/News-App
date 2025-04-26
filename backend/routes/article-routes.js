@@ -53,10 +53,11 @@ articlesRouter.route('/article/:id').get(async (req, res) => {
 articlesRouter.route('/article-title/:id').get(async (req, res) => {
     try{
         const result = await getArticleById(req.params.id);
-        if (result.error) {
+        if (result.error && result.message !== "Article not found") {
             return res.status(400).json({ message: result.message });
         }
-        const {title} = result;
+
+        const title = result.message === "Article not found" ? "Removed article" : result.title;
     
         return res.status(200).json(title);
     } catch (err) {

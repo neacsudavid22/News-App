@@ -31,11 +31,13 @@ const usersRouter = express.Router()
     usersRouter.route('/username/:id').get( async (req, res) => {
         const result = await getUserById(req.params.id);
 
-        if (result.error) {
+        if (result.error && result.message !== "User not found" ) {
             return res.status(400).json({ message: result.message });
         }
 
-        return res.status(200).json(result.username);
+        const username = result.message === "User not found" ? "Removed User" : result.username
+
+        return res.status(200).json(username);
     })
 
     usersRouter.route('/user').post(async (req, res) => {
