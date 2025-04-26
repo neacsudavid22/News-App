@@ -15,7 +15,7 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
         }
   
         const author = await User.findById(authorId);
-        if (!author || author.account !== "author") {
+        if (!author || (author.account !== "author" && author.account !== "admin")) {
           return { error: true, message: "Author not found or not valid!" };
         }
   
@@ -45,28 +45,6 @@ const getArticleById = async (id) => {
     }
     catch (err) {
         console.error(`getArticleById Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-}
-
-const getArticlesByAuthor = async (authorId, page) => {
-    try{
-        const author = await User.findById(authorId);
-        if(!author){
-            return { error: true, message: "Author not found" };
-        }
-
-        const articles = await Article.find({author: author._id})
-                                      .skip((page - 1) * 20)
-                                      .limit(20)
-                                      .exec();
-        if(!articles){
-            return { error: true, message: "Articles not found" };
-        }
-        return articles
-    }
-    catch (err) {
-        console.error(`getArticlesByAuthor Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }
 }
