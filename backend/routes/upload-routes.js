@@ -47,7 +47,7 @@ uploadRouter.post("/upload-images", upload, (req, res) => {
 
 uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
   try {
-    const imageUrls = req.body.imageUrls;
+    const imageUrls = req.body.imageUrls || [];
 
     const result = await cloudinary.search
       .expression(`folder:images`)
@@ -56,6 +56,9 @@ uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
       .execute();
 
     const allPublicIds = result.resources.map(resource => resource.public_id);
+
+    if(imageUrls.length === 0)
+      return res.status(200).json({ unusedPublicIds: allPublicIds });
 
     const imageUrlsSet = new Set(imageUrls.map(url => extractPublicId(url)));
 
