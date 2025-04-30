@@ -60,7 +60,7 @@ const User = model("User", new Schema({
         }],   
         default: []
     },
-    savedPosts: {
+    savedArticles: {
         type: [{
             type: Schema.Types.ObjectId,
             ref: 'Article'
