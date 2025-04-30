@@ -51,7 +51,7 @@ const SettingsModifyProperty = ({ property, modifiedUser, setModifiedUser }) => 
 
     const dict = { email: "email", name: "text", username: "text", phone: "tel", birthdate: "date" };
 
-    const { width } = useWindowSize();
+    const { IS_SM } = useWindowSize();
 
     return (
         <>
@@ -60,7 +60,7 @@ const SettingsModifyProperty = ({ property, modifiedUser, setModifiedUser }) => 
                 <Col xs={12} sm={8} className="mb-3">
                     <div>{handleMessage()}</div>
                 </Col>
-                <Col xs={12} sm={4} className={`mb-2 d-flex justify-content-${width < 768 ? "start" : "end"}`}>
+                <Col xs={12} sm={4} className={`mb-2 d-flex justify-content-${IS_SM ? "start" : "end"}`}>
                     <Button variant="outline-warning" size="sm" className="w-100" onClick={handleShow}>
                         {`Modify ${property}`}
                     </Button>

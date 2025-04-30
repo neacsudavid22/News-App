@@ -12,7 +12,7 @@ const FriendList = ({ show, setShowFriendList }) => {
     const [friendList, setFriendList] = useState(user?.friendList || []); // Start with user data or empty array
     const [usernames, setUsernames] = useState({});
     const [filterName, setFilterName] = useState("");
-    const { width } = useWindowSize();
+    const { IS_SM } = useWindowSize();
     const [ANY_FRIEND_REMOVED, SET_ANY_FRIEND_REMOVED] = useState(false);
 
     const handleClose = () =>{ 
@@ -72,7 +72,7 @@ const FriendList = ({ show, setShowFriendList }) => {
             show={show}
             onHide={handleClose}
             placement="end"
-            className={`h-100 w-${width < 768 ? 100 : 50}`}
+            className={`h-100 w-${IS_SM ? 100 : 50}`}
         >
             <Offcanvas.Header closeButton className='w-100 px-3 border-bottom my-2'>
                 <Form.Control
@@ -89,7 +89,7 @@ const FriendList = ({ show, setShowFriendList }) => {
                         filteredFriends.map((friendId, index) => (
                             <div
                                 key={index}
-                                className={`px-${width < 768 ? "2" : "5"} d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom`}
+                                className={`px-${IS_SM ? "2" : "5"} d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom`}
                             >
                                 <strong className='fs-5'>{usernames[friendId] || "loading..."}</strong>
                                 <Button

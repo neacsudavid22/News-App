@@ -68,14 +68,14 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
         fetchTitles();
     }, [shareList]);
 
-    const { width } = useWindowSize();
+    const { IS_SM } = useWindowSize();
 
     return (
         <Offcanvas
             show={show}
             onHide={handleClose}
             placement="start"
-            className={`h-100 w-${width < 768 ? 100 : 50}`}
+            className={`h-100 w-${IS_SM ? 100 : 50}`}
         >
             <Offcanvas.Header closeButton>
                 <h1 className='fs-3'>Articles From Friends</h1>

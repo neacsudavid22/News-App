@@ -45,7 +45,7 @@ const ShareArticle = ({ show, handleClose, articleId }) => {
         if (user) fetchUsernames();
     }, [user]);
 
-    const { width } = useWindowSize();
+    const { IS_SM } = useWindowSize();
     const [filterName, setFilterName] = useState("");
 
     useEffect(()=>{
@@ -61,12 +61,12 @@ const ShareArticle = ({ show, handleClose, articleId }) => {
     return (
         <Offcanvas show={show} onHide={handleClose} placement="bottom" className="h-75">
             <Offcanvas.Header closeButton 
-                className={`w-${width < 768 ? 100 : 50} m-auto border-bottom my-2`}>
-                <Form.Control type="text" className={`w-${width < 768 ? 50 : 25}`} placeholder="search user" 
+                className={`w-${IS_SM ? 100 : 50} m-auto border-bottom my-2`}>
+                <Form.Control type="text" className={`w-${IS_SM? 50 : 25}`} placeholder="search user" 
                     onChange={(e)=>setFilterName(e.target.value)}
                 />
             </Offcanvas.Header>
-            <Offcanvas.Body className={`w-${width < 768 ? 100 : 50} m-auto`}>
+            <Offcanvas.Body className={`w-${IS_SM ? 100 : 50} m-auto`}>
                 <Stack gap={2}>
                 {friends.map((friendId, index) => (
                     <div key={index} className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 import Figure from "react-bootstrap/Figure";
 import { useNavigate } from "react-router";
 import { Button } from "react-bootstrap";
@@ -9,7 +7,7 @@ import { deleteArticle } from "../Services/articleService";
 import "./textMultilineTruncate.css";
 import useWindowSize from "../hooks/useWindowSize";
 
-const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
+const MainArticleCard = ({ article, toModify = false }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
   const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
@@ -35,7 +33,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
     try {
       const result = await deleteArticle(article?._id);
       if(result !== null)
-        setRefresh(true);
+        window.location.reload();
     } catch (err) {
       console.error(err);
     }
@@ -59,11 +57,10 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
 
   const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
-  const { width } = useWindowSize()
+  const { IS_SM } = useWindowSize()
 
   return (
-    <Row className="mb-3 justify-content-center">
-      <Col xs={12} sm={12} md={10} lg={5} xl={5}>
+
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
           style={{ cursor: "pointer", height: "auto"}}
@@ -74,7 +71,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
               src={backgroundUrl}
               className="w-100 m-0"
               style={{
-                height: width < 758 ? "15rem" : "20rem",
+                height: IS_SM ? "15rem" : "20rem",
                 objectFit: "cover",
               }}
             />
@@ -103,7 +100,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
 
           {toModify && (
             <Card.Footer className="d-flex justify-content-around">
-              <Button variant="danger" className="w-25 text-nowrap" onClick={removeArticle}>
+              <Button variant="danger" className="w-25 p-0 text-nowrap" onClick={removeArticle}>
                 Remove
               </Button>
               <Button variant="warning" className="w-25 text-nowrap" onClick={() => navigate(`/author`, { state: { article: article } })}>
@@ -112,8 +109,7 @@ const MainArticleCard = ({ article, toModify = false, setRefresh }) => {
             </Card.Footer>
           )}
         </Card>
-      </Col>
-    </Row>
+
   );
 };
 

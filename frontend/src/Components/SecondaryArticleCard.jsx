@@ -8,7 +8,7 @@ import { deleteArticle } from "../Services/articleService";
 import "./textMultilineTruncate.css";
 import useWindowSize from "../hooks/useWindowSize";
 
-const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
+const SecondaryArticleCard = ({ article, toModify = false }) => {
   const [firstParagraph, setFirstParagraph] = useState("Loading...");
   const [backgroundUrl, setBackgroundUrl] = useState("");
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
     try {
       const result = await deleteArticle(article?._id);
       if(result !== null)
-        setRefresh(true);
+        window.location.reload();
     } catch (err) {
       console.error(err);
     }
@@ -47,11 +47,10 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
 
   const status = formattedUpdateDate !== formattedCreateDate ? "UPDATED" : "PUBLISHED";
 
-  const { width } = useWindowSize();
+  const { IS_SM } = useWindowSize();
 
   return (
-    <Row className="mb-3 justify-content-center">
-      <Col xs={12} sm={12} md={10} lg={5} xl={5}>
+    
         <Card
           className="border-1 rounded-4 shadow-sm overflow-hidden"
           style={{ cursor: "pointer", height: "auto" }}
@@ -74,7 +73,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
                   </div>
 
                   <Card.Title 
-                    className={`fw-semibold text-multiline-truncate-${ width > 758 ? 2 : 3} m-0`}
+                    className={`fw-semibold text-multiline-truncate-${ !IS_SM ? 2 : 3} m-0`}
                     title={article?.title}
                     style={{ fontSize: "1.1rem" }}
                   >
@@ -82,7 +81,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
                   </Card.Title>
                 </div>
                 {
-                  width > 758 &&
+                  !IS_SM &&
                 <Card.Text className="text-muted text-multiline-truncate-3 mb-0">
                   {firstParagraph}
                 </Card.Text>}
@@ -97,7 +96,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
                 src={backgroundUrl}
                 style={{
                   width: '90%',
-                  height: width < 758 ? "5rem" : "8rem",
+                  height: IS_SM ? "5rem" : "8rem",
                   objectFit: 'cover',
                   borderRadius: '0.75rem',
                   boxShadow: '0 0 5px rgba(0,0,0,0.1)',
@@ -109,7 +108,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
 
           {toModify && (
             <Card.Footer className="d-flex justify-content-around">
-              <Button variant="danger" className="w-25 text-nowrap" onClick={removeArticle}>
+              <Button variant="danger" className="w-25 text-nowrap p-0" onClick={removeArticle}>
                 Remove
               </Button>
               <Button variant="warning" className="w-25 text-nowrap" onClick={() => navigate(`/author`, { state: { article: article } })}>
@@ -118,8 +117,7 @@ const SecondaryArticleCard = ({ article, toModify = false, setRefresh }) => {
             </Card.Footer>
           )}
         </Card>
-      </Col>
-    </Row>
+
   );
 };
 
