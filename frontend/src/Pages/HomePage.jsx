@@ -13,6 +13,7 @@ import LocationAndWeather from "../Components/LocationAndWeather";
 import { AuthContext } from "../Components/AuthProvider";
 import useElementInView from "../hooks/useElementInView";
 import { useSearchParams } from "react-router-dom";
+import { Col, Row } from "react-bootstrap";
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
@@ -23,8 +24,7 @@ const HomePage = () => {
   const [tag, setTag] = useState(searchParams.get("tag") || "");
   const [page, setPage] = useState(0);
   const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
-  const {width} = useWindowSize();
-  const [refresh, setRefresh] = useState(false);
+  const { IS_MD } = useWindowSize();
 
   useEffect(() => {
     if (isInView && articles.length >= 20) {
@@ -48,8 +48,7 @@ const HomePage = () => {
     };
       
     handleArticles();
-    setRefresh(false);
-  }, [category, user, tag, page, toModify, refresh]);
+  }, [category, user, tag, page, toModify]);
 
 
   return (
@@ -61,16 +60,25 @@ const HomePage = () => {
       </div>
       <div style={{height:"7.5rem"}}></div>
 
-      { width>991 && <CurrencyConverter/>}
-      { width>991 && <LocationAndWeather/>}
+      { !IS_MD && <CurrencyConverter/>}
+      { !IS_MD && <LocationAndWeather/>}
 
 
       <Container fluid className="h-100"> 
-        {articles.map((a) => a.main ? <MainArticleCard key={a._id.toString() } article={a} 
-                                                       toModify={toModify} setRefresh={setRefresh}/> 
-                                    : <SecondaryArticleCard key={a._id.toString()} article={a} 
-                                                        toModify={toModify} setRefresh={setRefresh}/>)}
-        
+        {articles.map((a) => a.main ? 
+          (<Row className="mb-3 justify-content-center">
+            <Col xs={12} sm={12} md={10} lg={5} xl={5}>
+              <MainArticleCard key={a._id.toString() } 
+                article={a} toModify={toModify} /> 
+            </Col>
+          </Row>) : 
+          (<Row className="mb-3 justify-content-center">
+            <Col xs={12} sm={12} md={10} lg={5} xl={5}>
+              <SecondaryArticleCard key={a._id.toString()} 
+                article={a} toModify={toModify} />
+            </Col>
+          </Row>) 
+        )}
         {articles.length >= 20 && <div ref={targetRef}></div>}
       </Container>
 
