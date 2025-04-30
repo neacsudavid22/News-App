@@ -21,7 +21,7 @@ const ArticlePage = () => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { user } = useContext(AuthContext);
+  const { user, refresh } = useContext(AuthContext);
   
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -31,7 +31,7 @@ const ArticlePage = () => {
   const handleShowShare = () => setShowShare(true);
   const handleCloseShare = () => setShowShare(false);
 
-  const { width } = useWindowSize();
+  const { IS_SM } = useWindowSize();
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -86,10 +86,9 @@ const ArticlePage = () => {
                 if (!user) return handleShow();
                 liked ? setLikeCount(prev => prev - 1) : setLikeCount(prev => prev + 1);
                 setLiked(!liked);  
-                const interaction = "like";
-                await interactOnPost(id, user._id, interaction);
+                await interactOnPost(id, "likes");
               }}
-              size={width < 758 ? "sm" : ""}
+              size={IS_SM ? "sm" : ""}
               className="me-2 rounded-5"
             >
               <strong className="me-2">{likeCount}</strong>
@@ -101,10 +100,10 @@ const ArticlePage = () => {
               onClick={async () => {
                 if (!user) return handleShow();
                 setSaved(!saved);  
-                const interaction = "save";
-                await interactOnPost(id, user._id, interaction);
+                await interactOnPost(id, "saves");
+                await refresh();
               }}
-              size={width < 758 ? "sm" : ""}
+              size={IS_SM ? "sm" : ""}
               className="me-2 rounded-5"
             >
               <strong>Save</strong> <i className={ saved ? "bi bi-save-fill" : "bi bi-save" }></i>
@@ -117,7 +116,7 @@ const ArticlePage = () => {
                 handleShowShare(); 
               }}
               className="me-2 rounded-5"
-              size={width < 758 ? "sm" : ""}
+              size={IS_SM ? "sm" : ""}
             >
               <strong>Share</strong> <i className="bi bi-send-fill"></i>
             </Button>

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../Components/AuthProvider";
-import { interactOnPost } from "../Services/articleService";
+import { postComment } from "../Services/articleService";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -12,7 +12,7 @@ const CommentForm = ({ articleId, responseTo = null, onCommentPosted }) => {
   const handleCommentPost = async () => {
     if (!user) return;
     try {
-      const addedComment = await interactOnPost(articleId, user._id, "comment", commentContent, responseTo);
+      const addedComment = await postComment(articleId, commentContent, responseTo);
       setCommentContent("");
       if (onCommentPosted) {
         onCommentPosted(addedComment);

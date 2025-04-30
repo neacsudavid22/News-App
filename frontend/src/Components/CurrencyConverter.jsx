@@ -90,7 +90,7 @@ const CurrencyConverter = () => {
       <Row className="mb-3 px-4 g-2">
         <Col>
           <Form.Label>From</Form.Label>
-          <Dropdown>
+          <Dropdown drop="down-centered">
             <Dropdown.Toggle variant="outline-secondary" className="w-100">
               {from} - {currencies.current[from]}
             </Dropdown.Toggle>
@@ -103,7 +103,7 @@ const CurrencyConverter = () => {
       <Row className="mb-3 px-4 g-2">
         <Col>
           <Form.Label>To</Form.Label>
-          <Dropdown>
+          <Dropdown drop="down-centered">
             <Dropdown.Toggle variant="outline-secondary" className="w-100">
               {to} - {currencies.current[to]}
             </Dropdown.Toggle>
