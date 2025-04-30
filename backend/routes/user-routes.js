@@ -11,7 +11,7 @@ import {
         handleFriendRequest,
         shareArticle, 
         removeFriend, 
-        markAsRead 
+        markAsRead,
     } from '../controllers/user-controller.js'
 
 const usersRouter = express.Router()

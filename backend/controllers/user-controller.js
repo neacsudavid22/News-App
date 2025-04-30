@@ -283,6 +283,45 @@ const markAsRead = async (userId, shareId) => {
     }
 };
 
+const interactionOnArticle = async (articleId, userId, interactionType = 'likes') => {
+    try {
+        if(interactionType !== "likes" && interactionType !== "saves"){
+            return { error: true, message: "invalid interaction!" };
+        }
+
+        const userData = await User.findById(userId).select({ [interactionType]: 1 }).exec();
+        if (!userData) return { error: true, message: "User doesn't exist" };
+
+        const article = await Article.find(articleId).select("_id");
+        if(!article){
+            return { error: true, message: "invalid articleId!" };
+        }
+
+        const searchSet = new Set(userData[interactionType]);
+
+        if(searchSet.has(article._id)) {
+            await User.updateOne(
+                { _id: userData._id },
+                { $pull: { [interactionType]: article._id } }
+            );
+        }
+        else {
+            await User.updateOne(
+                { _id: userData._id },
+                { $push: { [interactionType]: article._id  } }
+            );
+        }
+        
+        await userData.save();
+
+        return { success: true, shareItem };
+    } catch (err) {
+        console.error("interactionOnArticle error: ", err);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
+
 export {
     getUsers,
     getUserById,
@@ -294,5 +333,5 @@ export {
     handleFriendRequest,
     shareArticle,
     removeFriend,
-    markAsRead
+    markAsRead,
 }

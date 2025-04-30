@@ -17,6 +17,52 @@ const getArticles = async (category = '', tag = '', page = '', authorId = '') =>
     }
 }
 
+
+const getSavedArticles = async (page = 0) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/saved-articles?page=${page}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: "include"
+        })
+        if (!response.ok) {
+            throw new Error("Failed to fetch saved articles");
+        }
+
+        const { savedArticles } = await response.json();
+        const data = [...savedArticles];
+
+        return data;
+    } catch (err) {
+        console.error("getSavedArticles error:", err);
+        return null; 
+    }
+}
+
+const deleteImages = async(imageUrls = []) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/delete-images`,{
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({imageUrls}),
+            credentials: "include"
+        });
+        if(!response.ok){
+            throw new Error(response?.message || "Failed to delete images from cloudinary");
+        }
+        const result = await response.json();
+        return result;
+
+    } catch(err){
+        console.error("deleteImages error:", err);
+        return null;
+    }
+}
+
 const deleteArticle = async (articleId) => {
     try{
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`, {
@@ -24,9 +70,26 @@ const deleteArticle = async (articleId) => {
             credentials: "include"
         });
 
-        return await response.json();
+        if(!response.ok){
+            throw new Error("No article found!")
+        }
+
+        const result = await response.json();
+
+        const imageUrls = result.articleContent.filter(a=>a.contentType === "Image").map(a=>a.content);
+        imageUrls.push(result.background)
+
+        const lastResponse = await deleteImages(imageUrls)
+
+        if(!lastResponse.ok){
+            throw new Error("No images to delete on cloudinary!")
+        }
+        const lastResult = await lastResponse.json();
+
+        return lastResult;
+
     } catch (err) {
-        console.error("getArticles error:", err);
+        console.error("deleteArticle error:", err);
         return null; 
     }
 }
@@ -95,14 +158,14 @@ const putArticle = async (article, articleId) => {
     }
 }
 
-const interactOnPost = async (articleId, userId, interaction = "like", content = null, responseTo = null) => {
+const interactOnPost = async (articleId, interaction = "like") => {
     try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${interaction}/${articleId}/${userId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/interaction?type=${interaction}`, {
             method: 'PUT',
-            body: JSON.stringify({content, responseTo}),
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: "include"
         });
         if(!response.ok){
             throw new Error(response?.message || `Failed to interact on post on ${interaction} action`);
@@ -111,14 +174,36 @@ const interactOnPost = async (articleId, userId, interaction = "like", content =
         return await response.json()
 
     } catch(err){
-        console.error(`nteractOnPost error on ${interaction} action: `, err);
+        console.error(`InteractOnPost error on ${interaction} action: `, err);
+        return null;
+    }
+}
+
+const postComment = async (articleId, content = null, responseTo = null) => {
+    try{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/comment/post`, {
+            method: 'PUT',
+            body: JSON.stringify({content, responseTo}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: "include"
+        });
+        if(!response.ok){
+            throw new Error(response?.message || `Failed to post comment `);
+        }
+
+        return await response.json()
+
+    } catch(err){
+        console.error(`postComment error: `, err);
         return null;
     }
 }
 
 const deleteComment = async (articleId, commentId, isLastNode) => {
     try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/delete-comment/${commentId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}/comment/delete/${commentId}`, {
             method: 'PUT',
             body: JSON.stringify({isLastNode}),
             headers: {
@@ -237,5 +322,7 @@ export {
     getUnsuedImagePublicIds,
     cleanUpUnsuedImages,
     putArticle,
-    deleteArticle
+    deleteArticle,
+    postComment,
+    getSavedArticles
 }

@@ -49,6 +49,20 @@ const getArticleById = async (id) => {
     }
 }
 
+const getSavedArticles = async (savedArticlesIds, page = 0) => {
+    try {
+        const savedArticles = await Article.find({ _id: { $in: savedArticlesIds } })
+            .sort({ updatedAt: -1 }) 
+            .skip(page * 20)
+            .limit(20);
+
+        return savedArticles;
+    } catch (err) {
+        console.error(`getSavedArticles Error: ${err.message}`);
+        return { error: true, message: "Internal Server Error" };
+    }
+};
+
 const createArticle = async (article) => {
     try{
         const newArticle = await Article.create(article)
@@ -65,7 +79,7 @@ const createArticle = async (article) => {
 
 const deleteArticle = async (id) => {
     try{
-        const deletedArticle = await Article.deleteOne({_id: id})
+        const deletedArticle = await Article.findOneAndDelete({_id: id})
         if(!deletedArticle){
             return { error: true, message: "Error deleting article" };
         }
@@ -91,47 +105,56 @@ const updateArticle = async (id, article) => {
     }
 }
 
-const likePost = async (articleId, userId) => {
-    try{
-        const { likes } = await Article.findById(articleId).select('likes');
-        
-        const likesSet = new Set(likes);
-        likesSet.has(userId) ? likes.remove(userId)
-                                    : likes.push(userId)
+const interactOnArticle = async (articleId, user, interaction = 'likes') => {
+    try {
+      if (interaction !== "likes" && interaction !== "saves") {
+        return { error: true, message: "Invalid operation: " + interaction };
+      }
+  
+      const article = await Article.findById(articleId).select("likes saves").exec();
+      if (!article) {
+        return { error: true, message: "Article not found" };
+      }
+  
+      let userResult = null;
+  
+     
+      const alreadyInteracted = article[interaction].some(id => 
+        id.toString() === user._id.toString()
+      );
+  
+      const articleUpdate = alreadyInteracted
+        ? { $pull: { [interaction]: user._id } }
+        : { $addToSet: { [interaction]: user._id } };
+  
+      const articleResult = await Article.findOneAndUpdate(
+        { _id: articleId },
+        articleUpdate,
+        { new: true },
+        { timestamps: false }
+      );
 
-        const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { likes: likes } })
-        if(!updatedArticlePost){
-            return { error: true, message: "Error updating likes on article post" };
-        }
-        return updatedArticlePost;
+      if (interaction === "saves") {
+        const currentUser = await User.findById(user._id).select("savedArticles");
+  
+        userResult = await User.findOneAndUpdate(
+          { _id: user._id },
+          alreadyInteracted
+            ? { $pull: { savedArticles: article._id } }
+            : { $addToSet: { savedArticles: article._id } },
+          { new: true },
+        );
+      }
+  
+  
+      return { articleResult, userResult };
+  
+    } catch (err) {
+      console.error(`${interaction}Post Error: ${err.message}`);
+      return { error: true, message: "Internal Server Error" };
     }
-    catch (err) {
-        console.error(`likePost Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-}
-
-const savePost = async (articleId, userId) => {
-    try{
-        const { saves } = await Article.findById(articleId).select('saves');
-        
-        const savesSet = new Set(likes);
-        savesSet.has(userId) ? saves.remove(userId)
-                                    : saves.push(userId)
-
-        const updatedArticlePost = await Article.updateOne({_id: articleId}, { $set: { saves: saves } }
-        )
-        if(!updatedArticlePost){
-            return { error: true, message: "Error updating saves on article post" };
-        }
-        return updatedArticlePost;
-    }
-    catch (err) {
-        console.error(`savePost Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-}
-
+  };
+  
 const postComment = async (articleId, userId, content, responseTo) => {
     try{
         const { comments } = await Article.findById(articleId).select('comments');
@@ -223,6 +246,8 @@ const getAllImageUrls = async () => {
       const backgroundUrls = allArticles.flatMap((article) => article.background);
 
       const imageUrls = [...contentImageUrls, ...backgroundUrls];
+
+      console.log(imageUrls)
       
       return imageUrls
     } catch (err) {
@@ -237,10 +262,10 @@ export {
     createArticle,
     deleteArticle,
     updateArticle,
-    likePost,
-    savePost,
+    interactOnArticle,
     postComment,
     deleteComment,
     deleteGarbageComments,
     getAllImageUrls,
+    getSavedArticles
 }
