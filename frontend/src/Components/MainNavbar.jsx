@@ -82,33 +82,53 @@ const MainNavbar = ({toModify = false}) => {
                         title={('@' + user?.username) || "loading.." }
                         id="dropdown-menu-align-end"
                         >
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowAddFriend(true)}>Add a friend</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendRequests(true)}>
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => setShowAddFriend(true)}>Add a Friend</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => setShowFriendRequests(true)}>
                                 View friend requests
                                 {uncheckedRequest && (
-                                    <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
+                                    <Badge pill bg="danger" className="ms-2">
+                                        <i className="bi bi-bell small"/>
+                                    </Badge> 
                                 )}
                             </Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowFriendList(true)}>Show friend list</Dropdown.Item>
-                            <Dropdown.Item type="button" variant="danger" onClick={() => setShowShareNotifications(true)}>
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => setShowFriendList(true)}>Show Friend list</Dropdown.Item>
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => setShowShareNotifications(true)}>
                                 Articles from friends
                                 {uncheckedShare && (
-                                    <Badge pill bg="danger" className="ms-2"><i className="bi bi-bell small"></i></Badge> 
+                                    <Badge pill bg="danger" className="ms-2">
+                                        <i className="bi bi-bell small"/>
+                                    </Badge> 
                                 )}
                             </Dropdown.Item>
+                            <Dropdown.Divider />
+
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => {
+                                    navigate("/saved");
+                                }}>Go to Saved Articles</Dropdown.Item>
 
                             { (user?.account === "author" || user?.account === "admin") &&
                             <>
-                            <Dropdown.Divider />
-                            <Dropdown.Item type="button" variant="danger" onClick={handleProfile}>Go to profile</Dropdown.Item>
-                            <Dropdown.Divider />
 
-                            <Dropdown.Item type="button" variant="danger" onClick={() => navigate("/dashboard")}>Go to Dashboard</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={() => navigate("/dashboard")}>Go to Dashboard</Dropdown.Item>
+
+                            <Dropdown.Divider />
+                            <Dropdown.Item type="button" variant="danger" 
+                                onClick={handleProfile}>Go to Profile</Dropdown.Item>
+                            
                             </>
                             }
                             <Dropdown.Divider />
-                            <Dropdown.Item type="button" as={Link} to="/" onClick={handleLogout}>Logout</Dropdown.Item>
+                            <Dropdown.Item type="button" 
+                                onClick={handleLogout}>Logout</Dropdown.Item>
                         </SplitButton>
 
                         <AddFriendModal 
@@ -140,7 +160,8 @@ const MainNavbar = ({toModify = false}) => {
                         />
                     </Stack>
                 ) : (
-                    <Button className="text-light" variant="danger" as={NavLink} to="/login">Login</Button>
+                    <Button className="text-light" variant="danger" 
+                            onClick={()=>navigate("/login")}>Login</Button>
                 )}
             </Stack>
         </Navbar>

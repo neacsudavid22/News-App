@@ -10,6 +10,7 @@ import ArticlePage from "./Pages/ArticlePage";
 import { useContext } from "react";
 import ProfilePage from "./Pages/ProfilePage";
 import DashboardPage from "./Pages/DashboardPage";
+import SavePage from "./Pages/SavePage";
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/author/upload" element={<ProtectedRoute> <ArticleUploadPage /> </ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRouteLoggedIn> <ProfilePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/article/:id" element={<ArticlePage />} />
+          <Route path="/saved" element={<ProtectedRoute> <SavePage /> </ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
