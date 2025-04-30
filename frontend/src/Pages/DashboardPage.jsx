@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../Components/AuthProvider";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -12,45 +12,35 @@ import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } fr
 const DashboardPage = () => {   
 
     const {user} = useContext(AuthContext);
-    const [LOADING_ALL_URLS, SET_LOADING_ALL_URLS] = useState(false);
-    const [LOADING_UNUSED_URLS, SET_LOADING_UNUSED_URLS] = useState(false);
-
     const navigate = useNavigate();
     const [imageUrls, setImageUrls] = useState([]);
     const [unusedPublicIds, setUnusedPublicIds] = useState([]);
 
+    const loadingImagesRef = useRef(false);
+
     useEffect(() => {
-        const fetchImageUrls = async () => {
+        const fetchAllImages = async () => {
             try {
-                SET_LOADING_ALL_URLS(true);
+                loadingImagesRef.current = true;
+
+                // Step 1: get all image URLs
                 const data = await getDatabaseImageUrls();
                 setImageUrls(data.imageUrls);
+
+                // Step 2: get unused ones
+                const unusedData = await getUnsuedImagePublicIds(data.imageUrls);
+                setUnusedPublicIds(unusedData.unusedPublicIds);
             } catch (err) {
                 console.error(err);
+            } finally {
+                loadingImagesRef.current = false;
             }
         };
 
-        if (user?.account === "admin" && !LOADING_ALL_URLS) {
-            fetchImageUrls();
+        if (user?.account === "admin" && !loadingImagesRef.current) {
+            fetchAllImages();
         }
-    }, [user?.account, LOADING_ALL_URLS]);
-
-    useEffect(() => {
-        const fetchUnusedImageUrls = async () => {
-            try {
-                SET_LOADING_UNUSED_URLS(true);
-                const data = await getUnsuedImagePublicIds(imageUrls);
-                setUnusedPublicIds(data.unusedPublicIds);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        if (!LOADING_UNUSED_URLS) {
-            fetchUnusedImageUrls();
-        }
-    }, [imageUrls, LOADING_UNUSED_URLS]);
-
+    }, [user?.account]);
 
     const handleCleanUp = async () => {
         try{

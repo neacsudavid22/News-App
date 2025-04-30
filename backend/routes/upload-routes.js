@@ -57,6 +57,8 @@ uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
 
     const allPublicIds = result.resources.map(resource => resource.public_id);
 
+    console.log(imageUrls)
+
     if(imageUrls.length === 0)
       return res.status(200).json({ unusedPublicIds: allPublicIds });
 
@@ -91,6 +93,28 @@ uploadRouter.post("/cleanup-unused-images", async (req, res) => {
   } catch (error) {
     console.error("Cleanup error:", error);
     res.status(500).json({ message: "Error during cleanup", error });
+  }
+});
+
+uploadRouter.delete("/delete-images", async (req, res) => {
+  try {
+    const imageUrls = req.body.imageUrls;
+
+    if (imageUrls.length === 0) {
+      return res.status(400).json({ message: 'No images to delete' });
+    }
+
+    const imagePublicIds = imageUrls.map(url=>extractPublicId(url))
+
+    const result = await cloudinary.api.delete_resources(imagePublicIds);
+
+    res.status(200).json({
+      message: 'Images deleted successfully',
+      result: result,
+    });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ message: "Error during Delete", error });
   }
 });
 
