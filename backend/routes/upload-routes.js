@@ -18,8 +18,12 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'images',
+    signing_algorithm: null,
     allowed_formats: ['jpg', 'jpeg', 'png'],
+    resource_type: 'image',
+    access_mode: 'public'
   },
+  type: 'upload',
 }); 
 
 const upload = multer({ storage: storage }).array("images");
