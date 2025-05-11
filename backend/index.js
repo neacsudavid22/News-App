@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import locationRouter from "./routes/location-routes.js";
+import langchainRouter from "./routes/langchain-router.js";
 
 await connectDB();
 
@@ -35,6 +36,7 @@ app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);
 app.use('/location-api', locationRouter)
 app.use('/upload-api', uploadRouter);
+app.use('/langchain-api', langchainRouter);
 
 app.listen(port, () => {
     console.log(`Server running on port: ${port}`);

@@ -11,7 +11,7 @@ import Image from "react-bootstrap/Image";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavbar";
-import { postArticle, putArticle } from "../Services/articleService";
+import { generateTagsWithLangchain, postArticle, putArticle } from "../Services/articleService";
 import Modal from "react-bootstrap/esm/Modal";
 import "./ArticleRedactationForm.css";
 
@@ -129,6 +129,20 @@ const ArticleUploadPage = () => {
             setTagInput(""); 
         }
     }
+
+    const generateTags = async () => {
+        const articleText = articleContent
+            .filter(a => a.contentType === "p" || a.contentType === "h2")
+            .map(a => a.content)
+            .join(" ");
+
+        const generatedTags = await generateTagsWithLangchain(articleText);
+
+        if (generatedTags && generatedTags.length > 0) {
+            setTags([...tags, ...generatedTags]);
+        }
+    };
+
 
     const [show, setShow] = useState(false);
 
@@ -269,6 +283,7 @@ const ArticleUploadPage = () => {
                 /> 
                 <Button type="button" variant="primary" onClick={ () => addTag() }>Add</Button>
                 <Button type="button" variant="danger" onClick={ () => removeTag() }>Remove</Button>
+                <Button type="button" variant="info" onClick={ () => generateTags() }>Generate</Button>
             </Stack>
 
             <Tabs

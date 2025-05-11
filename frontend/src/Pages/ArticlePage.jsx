@@ -127,7 +127,7 @@ const ArticlePage = () => {
               <Button 
                 key={tag} 
                 size="sm" 
-                className="rounded-4 fw-bold w-auto text-nowrap me-2" 
+                className="rounded-4 fw-bold w-auto text-nowrap me-2 my-1" 
                 style={{ width: "fit-content" }} 
                 onClick={() => navigate(`/?tag=${tag}`)}
               >

@@ -16,6 +16,7 @@ import AddParagraph from "../Components/AddParagraph";
 import { useLocation, useNavigate, } from "react-router";
 import "./ArticleRedactationForm.css";
 import { Collapse } from "react-bootstrap";
+import { generateTitleWithLangchain } from "../Services/articleService";
 
 const ArticleEditorPage = () => {
     const location = useLocation();
@@ -128,6 +129,16 @@ const ArticleEditorPage = () => {
         setEdit(newEdit);
     };
     
+    const generateTitle = async () => {
+        const articleText = articleContent
+            .filter(a => a.contentType === "p" || a.contentType === "h2")
+            .map(a => a.content)
+            .join(" ");
+        const generatedTitle = await generateTitleWithLangchain(articleText);
+
+        if(generatedTitle && generatedTitle.length > 10) 
+            setTitle(generatedTitle);
+    }
 
     return (
         <>
@@ -147,6 +158,7 @@ const ArticleEditorPage = () => {
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-50"
                 />
+                <Button variant="outline-info" onClick={generateTitle}>Generate</Button>
             </Stack>        
         </Form>
 

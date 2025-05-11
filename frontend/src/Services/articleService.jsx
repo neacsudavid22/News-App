@@ -310,6 +310,41 @@ const cleanUpUnsuedImages = async (unusedPublicIds) => {
     }
 }
 
+const generateTagsWithLangchain = async (articleText) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/langchain-api/generate-tags`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({articleText: articleText}),
+        });
+
+        if (!response.ok) throw new Error("Tags generation failed");
+        const result = await response.json();
+        const generatedTags = result.tags.split(",").map(tag => tag.trim()); 
+        return generatedTags; 
+    } catch (error) {
+        console.error("Error generating tags:", error);
+    }
+}
+
+const generateTitleWithLangchain = async (articleText) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/langchain-api/generate-title`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({articleText: articleText}),
+        });
+
+        if (!response.ok) throw new Error("Title generation failed");
+        const { title } = await response.json(); 
+        return title;
+    } catch (error) {
+        console.error("Error generating title:", error);
+    }
+}
+
 export {
     getArticles,
     postArticle,
@@ -324,5 +359,7 @@ export {
     putArticle,
     deleteArticle,
     postComment,
-    getSavedArticles
+    getSavedArticles,
+    generateTagsWithLangchain,
+    generateTitleWithLangchain
 }
