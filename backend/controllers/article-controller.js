@@ -256,6 +256,7 @@ const getAllImageUrls = async () => {
     }
 };
 
+const getComments = async () => {
 const getCommentsByIds = async (idList) => {
   try {
     const articles = await Article.find({
@@ -299,5 +300,6 @@ export {
     deleteGarbageComments,
     getAllImageUrls,
     getSavedArticles
+    getComments,
     getCommentsByIds
 }

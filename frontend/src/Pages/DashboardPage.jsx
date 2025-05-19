@@ -8,6 +8,7 @@ import MainNavbar from "../Components/MainNavbar";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router";
 import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } from "../Services/articleService";
+import CommentListAdmin from "../Components/CommentListAdmin";
 
 const DashboardPage = () => {   
 
@@ -15,6 +16,7 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const [imageUrls, setImageUrls] = useState([]);
     const [unusedPublicIds, setUnusedPublicIds] = useState([]);
+    const [showCommentListAdmin, setShowCommentListAdmin] = useState(false);
 
     const loadingImagesRef = useRef(false);
 
@@ -92,6 +94,12 @@ const DashboardPage = () => {
                     > Create Author
                     </Button>
                     </Col>
+                     <Col xs={12} sm="auto">
+                    <Button size="lg" variant="danger" className="w-100" 
+                        onClick={() => setShowCommentListAdmin(true)}
+                    >Manage comments
+                    </Button>
+                    </Col>
                     <Col xs={12} sm="auto">
                         <Button size="lg" variant="secondary" className="w-100"
                                 onClick={handleCleanUp} disabled={unusedPublicIds.lenght === 0}
@@ -108,6 +116,10 @@ const DashboardPage = () => {
             </Stack>
             </Col>
         </Row>
+        <CommentListAdmin 
+            show={showCommentListAdmin} 
+            setShowCommentList={setShowCommentListAdmin}
+        />
         </Container>
 
     </div>

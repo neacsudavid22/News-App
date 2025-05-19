@@ -345,6 +345,22 @@ const generateTitleWithLangchain = async (articleText) => {
     }
 }
 
+const getAllComments = async () => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/comments`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) throw new Error("comment retrieval failed");
+        const { comments } = await response.json(); 
+        return comments;
+    } catch (error) {
+        console.error("Error on getAllComments: ", error);
+    }
+}
+
 export {
     getArticles,
     postArticle,
@@ -362,4 +378,5 @@ export {
     getSavedArticles,
     generateTagsWithLangchain,
     generateTitleWithLangchain
+    getAllComments,
 }
