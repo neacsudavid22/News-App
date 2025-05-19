@@ -72,6 +72,7 @@ const Article = model('Article', new Schema({
             } 
           }   
       }],
+      createdAt: { type: Date, default: Date.now },
       default: [] 
   }
 }, { timestamps: true }));
