@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/esm/Col";
@@ -19,7 +19,6 @@ const CommentSection = ({ articleId, comments }) => {
   const [usernames, setUsernames] = useState({});
   const [openMap, setOpenMap] = useState({});
   const [replyMap, setReplyMap] = useState({});
-  const garbageDeletedRef = useRef(false);
 
   // Build commentMap
   useEffect(() => {
@@ -76,31 +75,37 @@ const CommentSection = ({ articleId, comments }) => {
 
   // Garbage cleanup logic (send only IDs)
   useEffect(() => {
-    if (!commentList || commentList.length === 0 || garbageDeletedRef.current) return;
+    let IS_MODIFIED = false;
+    do{
+      IS_MODIFIED = false;
+      if (!commentList || commentList.length === 0) return;
+      if (Object.keys(commentMap).length === 0) return;
 
-    const deleteIds = [];
-    const remainingComments = [];
+      const deleteIds = [];
+      const remainingComments = [];
 
-    commentList.forEach((comment) => {
-      const hasReplies = commentMap[comment._id]?.replies.length > 0;
-      if (!hasReplies && comment.removed) {
-        deleteIds.push(comment._id);
-      } else {
-        remainingComments.push(comment);
-      }
-    });
-
-    if (deleteIds.length > 0) {
-      garbageDeletedRef.current = true;
-      (async () => {
-        try {
-          await deleteGarbageComment(articleId, deleteIds);
-          setCommentList(remainingComments);
-        } catch (err) {
-          console.error("Error deleting garbage comments:", err);
+      commentList.forEach((comment) => {
+        const hasReplies = commentMap[comment._id]?.replies.length > 0;
+        if (!hasReplies && comment.removed) {
+          deleteIds.push(comment._id);
+        } else {
+          remainingComments.push(comment);
         }
-      })();
-    }
+      });
+
+      if (deleteIds.length > 0) {
+        //garbageDeletedRef.current = true;
+        (async () => {
+          try {
+            const modifiedCount = await deleteGarbageComment(articleId, deleteIds);
+            IS_MODIFIED = modifiedCount > 0
+            setCommentList(remainingComments);
+          } catch (err) {
+            console.error("Error deleting garbage comments:", err);
+          }
+        })();
+      }
+    } while(IS_MODIFIED);
   }, [articleId, commentList, commentMap]);
 
   const handleOpen = (nodeId) => {
@@ -112,13 +117,12 @@ const CommentSection = ({ articleId, comments }) => {
   };
 
   const handleDeleteComment = async (comment) => {
-    if (user?._id !== comment.userId) return;
+    if(!(user?._id === comment.userId || user.account === "admin"))  return;
 
     try {
       const isLeaf = commentMap[comment._id]?.replies.length === 0;
       const updatedCommentList = await deleteComment(articleId, comment._id, isLeaf);
       if (updatedCommentList) {
-        garbageDeletedRef.current = false; // allow garbage cleanup to rerun
         setCommentList(updatedCommentList);
       }
     } catch (err) {
@@ -128,7 +132,6 @@ const CommentSection = ({ articleId, comments }) => {
 
   const onCommentPosted = (newComment) => {
     if (newComment) {
-      garbageDeletedRef.current = false;
       setCommentList((prev) => [...prev, newComment]);
     }
   };
@@ -189,7 +192,7 @@ const CommentSection = ({ articleId, comments }) => {
                   </Button>
                 )}
 
-                {!comment.removed && user?._id === comment.userId && (
+                {!comment.removed && (user?._id === comment.userId || user.account === "admin") && (
                   <Button
                     className="rounded-4"
                     size="sm"
