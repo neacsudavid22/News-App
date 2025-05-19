@@ -154,31 +154,42 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
       return { error: true, message: "Internal Server Error" };
     }
   };
-  
-const postComment = async (articleId, userId, content, responseTo) => {
-    try{
-        const { comments } = await Article.findById(articleId).select('comments');
-        
-        comments.push({ userId, content, responseTo });
-
-        const updatedArticlePost = await Article.findByIdAndUpdate({_id: articleId}, { $set: { comments: comments } }, { new: true })
-        if(!updatedArticlePost){
-            return { error: true, message: "Error updating comments on article post" };
-        }
-
-        const newComment = updatedArticlePost.comments[updatedArticlePost.comments.length - 1];
-
-        return newComment;
+  const postComment = async (articleId, userId, content, responseTo) => {
+  try {
+    const article = await Article.findById(articleId).select('comments');
+    if (!article) {
+      return { error: true, message: "Article not found" };
     }
-    catch (err) {
-        console.error(`postComment Error: ${err.message}`);
-        return { error: true, message: "Internal Server Error" };
-    }
-}
 
-const deleteComment = async (articleId, commentId, isLastNode) => {
+    article.comments.push({ userId, content, responseTo });
+
+    const result = await Article.updateOne(
+      { _id: articleId },
+      { $set: { comments: article.comments } },
+      { timestamps: false } 
+    );
+
+    if (!result.acknowledged || result.modifiedCount === 0) {
+      return { error: true, message: "Error updating comments on article post" };
+    }
+
+    const newComment = article.comments[article.comments.length - 1];
+
+    return newComment;
+  } catch (err) {
+    console.error(`postComment Error: ${err.message}`);
+    return { error: true, message: "Internal Server Error" };
+  }
+};
+
+
+const deleteComment = async (articleId, commentId, isLastNode, account) => {
     try {
         let updatedArticlePost;
+
+        console.log("isLastNode = " + isLastNode)
+        console.log("account = " + account)
+
 
         if (isLastNode === true) {
             // Remove the entire comment from the comments array
@@ -193,7 +204,7 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
                 { _id: articleId, "comments._id": commentId },
                 { 
                     $set: { 
-                        "comments.$.content": "deleted", 
+                        "comments.$.content": account === 'admin' ? "removed by admin" : "deleted", 
                         "comments.$.removed": true 
                     }
                 },
@@ -212,6 +223,7 @@ const deleteComment = async (articleId, commentId, isLastNode) => {
         return { error: true, message: "Internal Server Error" };
     }
 };
+
 const deleteGarbageComments = async (articleId, deleteIds) => {
     try {
       const result = await Article.updateOne(
@@ -225,7 +237,7 @@ const deleteGarbageComments = async (articleId, deleteIds) => {
         }
       );
   
-      return {result};
+      return { modifiedCount: result.modifiedCount };
     } catch (err) {
       console.error(`deleteGarbageComments Error: ${err.message}`);
       return { error: true, message: "Internal Server Error" };
@@ -257,6 +269,32 @@ const getAllImageUrls = async () => {
 };
 
 const getComments = async () => {
+  try {
+    const articles = await Article.find({}).select("comments").limit(100);
+
+    let allComments = [];
+    for(const article of articles){
+      for(const comment of article.comments){
+        allComments.push({
+                            articleId: article._id, 
+                            _id: comment._id, 
+                            userId: comment.userId,
+                            content: comment.content, 
+                            createdAt: comment.createdAt
+                          });
+      }
+    }
+
+    allComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    return allComments;
+
+  } catch (err) {
+    console.error(`getComments Error: ${err.message}`);
+    return { error: true, message: "Internal Server Error" };
+  }
+};
+
 const getCommentsByIds = async (idList) => {
   try {
     const articles = await Article.find({
@@ -299,7 +337,7 @@ export {
     deleteComment,
     deleteGarbageComments,
     getAllImageUrls,
-    getSavedArticles
+    getSavedArticles,
     getComments,
     getCommentsByIds
 }
