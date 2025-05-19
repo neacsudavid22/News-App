@@ -11,7 +11,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 async function generateTags(articleText) {
-    const systemTemplate = "Create 5-10 tags for the following article content, return only the words separated by a comma (,)";
+    const systemTemplate = "You are an assistant that generates 5 to 10 tags for the following article content, return only the words separated by a comma (,)";
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
     ["system", systemTemplate],
@@ -38,8 +38,50 @@ async function generateTitle(articleText) {
   return response.content;
 }
 
+async function getInappropriateComments(commentList) {
+  const systemTemplate = `You are an assistant that evalues if the content of a comment is inappropriate for a list of comments. 
+  Return only the numeric id of the inappropriate comments.
+  the response should be in this format: x,y,z, ... where x, y, z are of ObjectId from mongodb format`;
+
+  const promptTemplate = ChatPromptTemplate.fromMessages([
+    ["system", systemTemplate],
+    ["user", "{comments}"],
+  ]);
+
+  let commentListSegment = "";
+  let invokeAtTen = 0;
+  let finalResponse = [];
+  for(const comment of commentList){
+    commentListSegment += comment._id + ") " + comment.content + "\n";
+    invokeAtTen++;
+    if(invokeAtTen === 10){
+      const promptValue = await promptTemplate.invoke({ comments: commentListSegment.trim() });
+      const response = await model.invoke(promptValue);
+
+      const ids = response.content.split(",").map(id => id.trim()).filter(id => id !== "");
+
+      finalResponse.push(...ids);
+
+      commentListSegment = "";
+      invokeAtTen = 0;
+    }
+  }
+
+  if (invokeAtTen > 0) {
+    const promptValue = await promptTemplate.invoke({ comments: commentListSegment.trim() });
+    const response = await model.invoke(promptValue);
+
+    const ids = response.content.split(",").map(id => id.trim()).filter(id => id !== "");
+
+    finalResponse.push(...ids);
+  }
+  console.log(finalResponse)
+  return finalResponse;
+}
+
 
 export {
     generateTags,
-    generateTitle
+    generateTitle,
+    getInappropriateComments
 }
