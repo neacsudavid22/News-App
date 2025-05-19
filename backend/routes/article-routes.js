@@ -10,7 +10,8 @@ import {
         deleteGarbageComments,
         getAllImageUrls,
         interactOnArticle,
-        getSavedArticles
+        getSavedArticles,
+        getComments,
         getCommentsByIds
     } from '../controllers/article-controller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
@@ -78,6 +79,24 @@ articlesRouter.route('/article-title/:id').get(async (req, res) => {
         return res.status(200).json(title);
     } catch (err) {
         console.error(`Error fetching article: ${err.message}`);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/comments').get(authMiddleware, async (req, res) => {
+    try{
+        if(req.user.account !== 'admin') 
+            return res.status(403).json({ message: "access forbiden for non-admins" });
+        
+        const result = await getComments();
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }    
+
+        return res.status(200).json({comments: result});
+    } catch (err) {
+        console.error(`Error fetching comments: ${err.message}`);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 })
