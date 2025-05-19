@@ -61,8 +61,6 @@ uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
 
     const allPublicIds = result.resources.map(resource => resource.public_id);
 
-    console.log(imageUrls)
-
     if(imageUrls.length === 0)
       return res.status(200).json({ unusedPublicIds: allPublicIds });
 

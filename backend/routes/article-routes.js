@@ -214,7 +214,8 @@ articlesRouter.route('/article/:articleId/comment/post').put(authMiddleware, asy
 
 articlesRouter.route('/article/:articleId/comment/delete/:commentId/').put(authMiddleware, async (req, res) => {
     try{
-        const result = await deleteComment(req.params.articleId, req.params.commentId, req.body.isLastNode);
+        
+        const result = await deleteComment(req.params.articleId, req.params.commentId, req.body.isLastNode, req.user.account);
 
         if (result.error) {
             return res.status(400).json({ message: result.message });
