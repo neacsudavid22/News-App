@@ -1,6 +1,6 @@
 import express from 'express';
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { generateTags, generateTitle } from '../controllers/langchain-controller.js';
+import { generateTags, generateTitle, getInappropriateComments } from '../controllers/langchain-controller.js';
 
 const langchainRouter = express.Router();
 
@@ -31,5 +31,20 @@ langchainRouter.post("/generate-title", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+langchainRouter.post("/inappropriate-comments", authMiddleware, async (req, res) => {
+  try {
+    const { commentList } = req.body;
+    if (!commentList) {
+      return res.status(400).json({ error: "Missing 'comment List' in request body" });
+    }
+    const idList = await getInappropriateComments(commentList);
+    res.json({ idList: idList });
+  } catch (err) {
+    console.error("Error identifying inappropriate comments:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 export default langchainRouter;
