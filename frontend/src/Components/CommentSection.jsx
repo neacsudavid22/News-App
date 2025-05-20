@@ -192,7 +192,7 @@ const CommentSection = ({ articleId, comments }) => {
                   </Button>
                 )}
 
-                {!comment.removed && (user?._id === comment.userId || user.account === "admin") && (
+                {!comment.removed && (user?._id === comment.userId || user?.account === "admin") && (
                   <Button
                     className="rounded-4"
                     size="sm"

@@ -62,7 +62,7 @@ const ArticlePage = () => {
     <>
       <MainNavbar />
       <div style={{ height: "0.1rem" }} />
-      {article && <ArticleComponent key={article._id} article={article} />}
+      {article && <ArticleComponent key={id} article={article} />}
 
       <Modal 
         className="mt-4"
