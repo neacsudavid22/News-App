@@ -116,10 +116,14 @@ const DashboardPage = () => {
             </Stack>
             </Col>
         </Row>
-        <CommentListAdmin 
-            show={showCommentListAdmin} 
-            setShowCommentList={setShowCommentListAdmin}
-        />
+        {
+            user?.account === "admin" && 
+            <CommentListAdmin 
+                show={showCommentListAdmin} 
+                setShowCommentList={setShowCommentListAdmin}
+            />
+        }
+
         </Container>
 
     </div>
