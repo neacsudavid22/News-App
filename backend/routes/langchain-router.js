@@ -38,8 +38,8 @@ langchainRouter.post("/inappropriate-comments", authMiddleware, async (req, res)
     if (!commentList) {
       return res.status(400).json({ error: "Missing 'comment List' in request body" });
     }
-    const idList = await getInappropriateComments(commentList);
-    res.json({ idList: idList });
+    const comments = await getInappropriateComments(commentList);
+    res.json({ comments: comments });
   } catch (err) {
     console.error("Error identifying inappropriate comments:", err);
     res.status(500).json({ error: "Internal Server Error" });

@@ -268,9 +268,10 @@ const getAllImageUrls = async () => {
     }
 };
 
-const getComments = async () => {
+const getComments = async (page = 0) => {
   try {
-    const articles = await Article.find({}).select("comments").limit(100);
+    const articles = await Article.find({}).select("comments")
+                                  .skip(50 * page).limit(50 * (page + 1));
 
     let allComments = [];
     for(const article of articles){
@@ -295,37 +296,6 @@ const getComments = async () => {
   }
 };
 
-const getCommentsByIds = async (idList) => {
-  try {
-    const articles = await Article.find({
-      'comments._id': { $in: idList }
-    }).lean();
-
-    const matchedComments = [];
-
-    for (const article of articles) {
-      for (const comment of article.comments) {
-        // Conversia ID-urilor la string este necesară pentru comparație
-        if (idList.includes(comment._id.toString())) {
-          matchedComments.push({
-            articleId: article._id.toString(),
-            _id: comment._id.toString(),
-            userId: comment.userId,
-            content: comment.content,
-            createdAt: comment.createdAt
-          });
-        }
-      }
-    }
-
-    return matchedComments;
-
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    throw error;
-  }
-};
-
 export {
     getArticles,
     getArticleById,
@@ -339,5 +309,4 @@ export {
     getAllImageUrls,
     getSavedArticles,
     getComments,
-    getCommentsByIds
 }
