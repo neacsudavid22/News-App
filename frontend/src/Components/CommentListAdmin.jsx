@@ -5,27 +5,40 @@ import { getUsername } from '../Services/userService';
 import { ButtonGroup, Col, Row, Stack, Tab, Tabs } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import { deleteComment, getAllComments, getInappropriateComments } from '../Services/articleService';
+import useElementInView from "../hooks/useElementInView";
 
 const CommentListAdmin = ({ show, setShowCommentList }) => {
     const [commentList, setCommentList] = useState([]); 
     const [usernames, setUsernames] = useState({});
     const { IS_SM } = useWindowSize();
     const [selectMode, setSelectMode] = useState("chronological");
+    const [page, setPage] = useState(0);
+    const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
 
     const handleClose = () => {
         setShowCommentList(false);
     };
+
+    useEffect(()=>{
+        setPage(0);
+    },[selectMode])
+
+    useEffect(() => {
+    if (isInView && commentList.length >= 20) {
+      setPage(prev => prev + 1);
+    }
+  }, [isInView, commentList]);
 
     useEffect(() => {
         const fetchComments = async () => {
             switch(selectMode){
                 case "chronological":
                     {
-                        const result = await getAllComments();
+                        const result = await getAllComments(page);
                         setCommentList(result);
                     } break;
                 case "gemini": {
-                        const result = await getInappropriateComments();
+                        const result = await getInappropriateComments(page);
                         setCommentList(result);
                 } break;
                 default: 
@@ -35,7 +48,7 @@ const CommentListAdmin = ({ show, setShowCommentList }) => {
             
         };
         fetchComments();
-    }, [selectMode]);
+    }, [selectMode, page]);
 
     useEffect(() => {
         const fetchUsernames = async () => {
@@ -113,6 +126,8 @@ const CommentListAdmin = ({ show, setShowCommentList }) => {
                     ) : (
                         <strong className="text-center fs-3 text-muted">No comments found.</strong>
                     )}
+                    {commentList.length >= 50 && <div ref={targetRef}></div>}
+
                 </Stack>
             </Offcanvas.Body>
         </Offcanvas>

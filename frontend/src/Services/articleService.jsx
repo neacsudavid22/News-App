@@ -345,9 +345,9 @@ const generateTitleWithLangchain = async (articleText) => {
     }
 }
 
-const getAllComments = async () => {
+const getAllComments = async (page) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/comments`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/comments?page=${page}`, {
             method: "GET",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -361,10 +361,10 @@ const getAllComments = async () => {
     }
 }
 
-const getInappropriateComments = async () => {
+const getInappropriateComments = async (page) => {
     try {
-        const commentList = await getAllComments();
-        const langchainResponse = await fetch(`${import.meta.env.VITE_API_URL}/langchain-api//inappropriate-comments`, {
+        const commentList = await getAllComments(page);
+        const langchainResponse = await fetch(`${import.meta.env.VITE_API_URL}/langchain-api/inappropriate-comments`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -372,19 +372,9 @@ const getInappropriateComments = async () => {
         });
 
         if (!langchainResponse.ok) throw new Error("id list retrieval failed");
-        const { idList } = await langchainResponse.json(); 
+        const { comments } = await langchainResponse.json(); 
 
-        const articleResponse = await fetch(`${import.meta.env.VITE_API_URL}/article-api/comments-by-ids`, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({idList})
-        });
-
-        if (!articleResponse.ok) throw new Error("comment retrieval failed");
-        const { comments } = await articleResponse.json(); 
         return comments;
-
     } catch (error) {
         console.error("Error on getAllComments: ", error);
     }
