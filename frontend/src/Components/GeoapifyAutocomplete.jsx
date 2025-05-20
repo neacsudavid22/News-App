@@ -1,65 +1,90 @@
-import React, { useState } from "react";
-import { Card, Form, ListGroup, ListGroupItem } from "react-bootstrap";
+import { useState, useRef } from "react";
+import { Form, ListGroup, ListGroupItem } from "react-bootstrap";
 
 const GeoapifyAutocomplete = ({ setLocation }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const skipFetchRef = useRef(false);
 
   const handleInputChange = async (value) => {
     setQuery(value);
+
+    if (skipFetchRef.current) {
+      skipFetchRef.current = false;
+      return;
+    }
 
     if (value.length < 3) {
       setSuggestions([]);
       return;
     }
 
-    const res = 
-    await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
-      value
-    )}&bias=countrycode:ro&limit=5&apiKey=${import.meta.env.VITE_GEOAPIFY_API_KEY}`);
-    const data = await res.json()
-    setSuggestions(data.features || []);
+    try {
+      const res = await fetch(
+        `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
+          value
+        )}&filter=countrycode:ro&type=city&lang=ro&limit=5&apiKey=${import.meta.env.VITE_GEOAPIFY_API_KEY}`
+      );
+      const data = await res.json();
+      setSuggestions(data.features || []);
+    } catch (error) {
+      console.error("Geoapify error:", error);
+      setSuggestions([]);
+    }
   };
 
   const handleSelect = (location) => {
-    setLocation({
-      city: location.properties.city,
-      country: location.properties.country,
-      lat: location.properties.lat,
-      lon: location.properties.lon,
-    });
-    setQuery(location.properties.formatted); 
-    setSuggestions([]); 
+    const props = location.properties;
+    const address = {};
+    if (props.city) address.city = props.city;
+    if (props.county || props.state) address.county = props.county || props.state;
+    if (props.country) address.country = props.country;
+    if (props.lat) address.lat = props.lat;
+    if (props.lon) address.lon = props.lon;
+
+    setLocation(address);
+
+    skipFetchRef.current = true;
+
+    setQuery(
+      Object.keys(address)
+        .filter(key => key !== "lat" && key !== "lon")
+        .map(key => address[key])
+        .join(", ")
+    );
+
+    setSuggestions([]);
   };
 
   return (
-    <Card className="mb-3 shadow rounded-4">
-        <Card.Header>
-            <Card.Title className="m-auto">Search a location</Card.Title>
-        </Card.Header>
-        <Card.Body>
+    <>
       <Form.Control
         type="text"
-        placeholder="type a city name..."
+        placeholder="Introduceți un oraș, comună sau localitate..."
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
       />
       {suggestions.length > 0 && (
-        <ListGroup className="mt-1">
-          {suggestions.map((location) => (
-            <ListGroupItem
-              key={location.properties.place_id}
-              onClick={() => handleSelect(location)}
-              style={{ cursor: "pointer" }}
-            >
-              {location.properties.formatted}
-            </ListGroupItem>
-          ))}
+        <ListGroup className="pt-1">
+          {suggestions.map((location) => {
+            const props = location.properties;
+            const city = props.city || props.name || "N/A";
+            const county = props.county || props.state || "";
+            const country = props.country || "";
+
+            return (
+              <ListGroupItem
+                key={props.place_id}
+                onClick={() => handleSelect(location)}
+                style={{ cursor: "pointer" }}
+              >
+                {`${city}${county ? ", " + county : ""}${country ? ", " + country : ""}`}
+              </ListGroupItem>
+            );
+          })}
         </ListGroup>
       )}
-      </Card.Body>
-      <Card.Footer className="mt-1"><Card.Subtitle>Provided by Geoapify</Card.Subtitle></Card.Footer>
-    </Card>
+    </>
   );
 };
 

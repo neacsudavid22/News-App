@@ -11,17 +11,21 @@ import Col from 'react-bootstrap/Col';
 import { AuthContext } from "../Components/AuthProvider";
 import MainNavbar from "../Components/MainNavbar";
 import { Modal } from "react-bootstrap";
+import GeoapifyAutocomplete from "../Components/GeoapifyAutocomplete";
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
     const [birthdate, setBirthdate] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
     const [validated, setValidated] = useState(false);
+    const [address, setAddress] = useState(null);
 
     const navigate = useNavigate();
     const { login, user } = useContext(AuthContext);
@@ -36,6 +40,8 @@ const LoginPage = () => {
     const isPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/.test(password);
 
     const emptyFields = () => {
+        setFirstName("");
+        setLastName("");
         setUsername("");
         setEmail("");
         setPhone("");
@@ -45,6 +51,7 @@ const LoginPage = () => {
         setBirthdate("");
         setErrorMsg("");
         setValidated(false);
+        setAddress(null);
     }
 
     useEffect(() => {
@@ -83,7 +90,7 @@ const LoginPage = () => {
             const allValid =
                 email && isEmailValid &&
                 phone && isPhoneValid &&
-                name && gender && birthdate &&
+                name && gender && birthdate && address &&
                 username &&
                 password && isPasswordValid;
     
@@ -93,7 +100,7 @@ const LoginPage = () => {
             }
     
             try {
-                const { token } = await signUpUser(email, phone, name, gender, birthdate, username, password, admin);
+                const { token } = await signUpUser(email, phone, name, gender, birthdate, address, username, password, admin);
                 if (token) {
                     login();
                     if(admin){
@@ -140,7 +147,7 @@ const LoginPage = () => {
                             {(!TRY_TO_LOGIN || admin) && (
                                 <>
                                     <Form.Group>
-                                        <FloatingLabel label="Email address">
+                                        <FloatingLabel  className="text-muted" label="Email address">
                                             <Form.Control
                                                 type="email"
                                                 placeholder="name@example.com"
@@ -155,7 +162,7 @@ const LoginPage = () => {
                                     </Form.Group>
 
                                     <Form.Group>
-                                        <FloatingLabel label="Phone number">
+                                        <FloatingLabel  className="text-muted" label="Phone number">
                                             <Form.Control
                                                 type="tel"
                                                 placeholder="0712345678"
@@ -176,19 +183,22 @@ const LoginPage = () => {
                                     </Form.Group>
 
                                     <Form.Group>
-                                        <FloatingLabel label="Full Name">
+                                        <FloatingLabel  className="text-muted" label="First Name (Given Name)">
                                             <Form.Control
                                                 type="text"
-                                                placeholder="John Doe"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
+                                                value={firstName}
+                                                placeholder="First Name"
+                                                onChange={(e) => {
+                                                    setFirstName(e.target.value)
+                                                    setName(()=>(firstName + " " + lastName).trim());
+                                                }}
                                                 onKeyDown={(e) => {
-                                                    const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight"];
+                                                    const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Minus"];
                                                     if (!/^[a-zA-Z]$/.test(e.key) && !allowedKeys.includes(e.key)) {
                                                       e.preventDefault();
                                                     }
                                                   }}
-                                                isInvalid={validated && !name}
+                                                isInvalid={validated && !firstName}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 Name is required.
@@ -197,16 +207,39 @@ const LoginPage = () => {
                                     </Form.Group>
 
                                     <Form.Group>
-                                        <FloatingLabel label="Gender">
+                                        <FloatingLabel  className="text-muted" label="Last Name (Family Name)">
+                                            <Form.Control
+                                                type="text"
+                                                value={lastName}   
+                                                placeholder="Last Name"
+                                                onChange={(e) => {
+                                                    setLastName(e.target.value)
+                                                    setName(()=>(firstName + " " + lastName).trim());
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Minus"];
+                                                    if (!/^[a-zA-Z]$/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                                      e.preventDefault();
+                                                    }
+                                                  }}
+                                                isInvalid={validated && !lastName}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                Name is required.
+                                            </Form.Control.Feedback>
+                                        </FloatingLabel>
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <FloatingLabel  className="text-muted" label="Gender">
                                             <Form.Select
-                                                value={gender}
+                                                placeholder={"Select.."}
                                                 onChange={(e) => setGender(e.target.value)}
                                                 isInvalid={validated && !gender}
                                             >
-                                                <option value="">Select...</option>
+                                                <option value="other">don't mention / other</option>
                                                 <option value="male">male</option>
                                                 <option value="female">female</option>
-                                                <option value="other">other</option>
                                             </Form.Select>
                                             <Form.Control.Feedback type="invalid">
                                                 Gender is required.
@@ -215,7 +248,7 @@ const LoginPage = () => {
                                     </Form.Group>
 
                                     <Form.Group>
-                                        <FloatingLabel label="Birthdate">
+                                        <FloatingLabel  className="text-muted" label="Birthdate">
                                             <Form.Control
                                                 type="date"
                                                 value={birthdate}
@@ -227,11 +260,17 @@ const LoginPage = () => {
                                             </Form.Control.Feedback>
                                         </FloatingLabel>
                                     </Form.Group>
+                                    
+                                    <Form.Group>
+                                        <FloatingLabel  className="text-muted" label="Address" >
+                                            <GeoapifyAutocomplete setLocation={setAddress}/>
+                                        </FloatingLabel>
+                                    </Form.Group>
                                 </>
                             )}
 
                             <Form.Group>
-                                <FloatingLabel label="Username">
+                                <FloatingLabel  className="text-muted" label="Username">
                                     <Form.Control
                                         type="text"
                                         placeholder="Username"
@@ -243,16 +282,16 @@ const LoginPage = () => {
                                               e.preventDefault();
                                             }
                                           }}
-                                        isInvalid={!TRY_TO_LOGIN && (validated && !username)}
+                                        isInvalid={!TRY_TO_LOGIN && (validated && !username && username.length < 10)}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        Username is required.
+                                        { username.length < 10 ? "Username must be at least 10 characters long" : "Username is required."}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
                             </Form.Group>
 
                             <Form.Group>
-                                <FloatingLabel label="Password">
+                                <FloatingLabel  className="text-muted" label="Password">
                                     <Form.Control
                                         type="password"
                                         placeholder="Password"

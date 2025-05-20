@@ -35,7 +35,7 @@ const removeFriend = async (friendId) => {
     }
 }
 
-const signUpUser = async (email, phone, name, gender, birthdate, username, password, admin) => {
+const signUpUser = async (email, phone, name, gender, birthdate, address, username, password, admin) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
             method: 'POST',
@@ -50,6 +50,7 @@ const signUpUser = async (email, phone, name, gender, birthdate, username, passw
                 password,
                 gender,
                 birthdate,
+                address,
                 account: admin ? "author" : "standard",
             }),
         });

@@ -28,6 +28,9 @@ const User = model("User", new Schema({
         default: 'standard',
         required: true
     },
+    address: {
+        city: String, county: String, country: String, lat: String, lon: String
+    },
     friendList: {
         type: [{
             type: Schema.Types.ObjectId,
