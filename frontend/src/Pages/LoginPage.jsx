@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { authenticateUser, signUpUser } from "../Services/userService";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 import Button from 'react-bootstrap/Button';
@@ -17,11 +17,11 @@ const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [name, setName] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
+    const [matchingPassword, setMatchingPassword] = useState("");
     const [birthdate, setBirthdate] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
     const [validated, setValidated] = useState(false);
@@ -29,8 +29,7 @@ const LoginPage = () => {
 
     const navigate = useNavigate();
     const { login, user } = useContext(AuthContext);
-    const location = useLocation();
-    const admin = location.state?.admin || false
+    const admin = user?.account === "admin"
 
     const [TRY_TO_LOGIN, SET_TRY_TO_LOGIN] = useState(!admin);
 
@@ -45,8 +44,8 @@ const LoginPage = () => {
         setUsername("");
         setEmail("");
         setPhone("");
-        setName("");
         setPassword("");
+        setMatchingPassword("");
         setGender("");
         setBirthdate("");
         setErrorMsg("");
@@ -61,62 +60,74 @@ const LoginPage = () => {
     const handleAuth = async () => {
         setValidated(true);
         setErrorMsg("");
-    
-        if (TRY_TO_LOGIN && !admin) {
+
+        if (!TRY_TO_LOGIN && password !== matchingPassword) {
+            setErrorMsg("Passwords do not match.");
+            return;
+        }
+
+        if (TRY_TO_LOGIN) {
             if (!username || !password) {
                 setErrorMsg("Please fill in all fields correctly.");
                 return;
             }
-    
+
             try {
                 const response = await authenticateUser(username, password);
+                if (!response || !response.token) throw new Error("No token received");
 
-                if (!response || !response.token) {
-                    throw new Error("No token received");
-                }
-                const LOGIN_SUCCESSESFUL = await login();     
-                if(LOGIN_SUCCESSESFUL === true){
-                    user?.account === "standard" ? navigate("/") : navigate("/dashboard");
-                }
-                else{
-                    throw new Error("couldn't login")
+                const { success, user } = await login();
+                if (success) {
+                    navigate(user.account === "standard" ? "/" : "/dashboard");
+                } else {
+                    throw new Error("Couldn't login");
                 }
 
             } catch (err) {
                 console.error("Login error:", err);
                 setErrorMsg("Incorrect username or password.");
             }
+
         } else {
             const allValid =
                 email && isEmailValid &&
                 phone && isPhoneValid &&
-                name && gender && birthdate && address &&
+                firstName && lastName && gender && birthdate && address &&
                 username &&
                 password && isPasswordValid;
-    
+
             if (!allValid) {
                 setErrorMsg("Please fill in all fields correctly.");
                 return;
             }
-    
+
             try {
+                const name = `${firstName} ${lastName}`.trim();
                 const { token } = await signUpUser(email, phone, name, gender, birthdate, address, username, password, admin);
+
                 if (token) {
-                    login();
-                    if(admin){
+                    if (admin) {
                         handleShow();
                         emptyFields();
+                    } else {
+                        const { success, user } = await login();
+                        if (success) {
+                            navigate(user.account === "standard" ? "/" : "/dashboard");
+                        } else {
+                            throw new Error("Couldn't login after signup");
+                        }
                     }
-                    else{
-                        user.account === "standard" ? navigate("/") : navigate("/dashboard")
-                    }
+                } else {
+                    throw new Error("Token not received");
                 }
+
             } catch (err) {
                 console.error("Signup error:", err);
                 setErrorMsg("Failed to create account. Please try again.");
             }
         }
     };
+
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -136,7 +147,6 @@ const LoginPage = () => {
                         <Stack direction="vertical" gap={4} className="text-center m-4">
                             <h2>{admin ? "Create Author Form" :(TRY_TO_LOGIN ? "Log Form" : "Sign Form")}</h2>
                             {admin && <h3 className="fs-5">{`Welcome administrator, ${user.name}!`}</h3>}
-
 
                             {errorMsg && (
                                 <Form.Text className="text-danger fs-6">
@@ -188,10 +198,7 @@ const LoginPage = () => {
                                                 type="text"
                                                 value={firstName}
                                                 placeholder="First Name"
-                                                onChange={(e) => {
-                                                    setFirstName(e.target.value)
-                                                    setName(()=>(firstName + " " + lastName).trim());
-                                                }}
+                                                onChange={(e) => setFirstName(e.target.value) }
                                                 onKeyDown={(e) => {
                                                     const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Minus"];
                                                     if (!/^[a-zA-Z]$/.test(e.key) && !allowedKeys.includes(e.key)) {
@@ -212,10 +219,7 @@ const LoginPage = () => {
                                                 type="text"
                                                 value={lastName}   
                                                 placeholder="Last Name"
-                                                onChange={(e) => {
-                                                    setLastName(e.target.value)
-                                                    setName(()=>(firstName + " " + lastName).trim());
-                                                }}
+                                                onChange={(e) => setLastName(e.target.value) }
                                                 onKeyDown={(e) => {
                                                     const allowedKeys = [ " ","Space", "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Minus"];
                                                     if (!/^[a-zA-Z]$/.test(e.key) && !allowedKeys.includes(e.key)) {
@@ -262,7 +266,7 @@ const LoginPage = () => {
                                     </Form.Group>
                                     
                                     <Form.Group>
-                                        <FloatingLabel  className="text-muted" label="Address" >
+                                        <FloatingLabel className="text-muted" label="Address" >
                                             <GeoapifyAutocomplete setLocation={setAddress}/>
                                         </FloatingLabel>
                                     </Form.Group>
@@ -282,10 +286,10 @@ const LoginPage = () => {
                                               e.preventDefault();
                                             }
                                           }}
-                                        isInvalid={!TRY_TO_LOGIN && (validated && !username && username.length < 10)}
+                                        isInvalid={!TRY_TO_LOGIN && validated && (!username || username.length < 5)}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        { username.length < 10 ? "Username must be at least 10 characters long" : "Username is required."}
+                                        {( username.length < 5 && username) ? "Username must be at least 5 characters long" : "Username is required."}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
                             </Form.Group>
@@ -308,9 +312,26 @@ const LoginPage = () => {
                                         <li>At least one special character</li>
                                     </ul>
                                     </Form.Control.Feedback>
-
                                 </FloatingLabel>
                             </Form.Group>
+
+                            {(!TRY_TO_LOGIN || admin) && (
+                                <Form.Group>
+                                <FloatingLabel  className="text-muted" label="Confirm Password">
+                                    <Form.Control
+                                        type="password"
+                                        placeholder="Confirm Password"
+                                        value={matchingPassword}
+                                        onChange={(e) => setMatchingPassword(e.target.value)}
+                                        isInvalid={!TRY_TO_LOGIN && (validated && (!password || !isPasswordValid || !matchingPassword || password !== matchingPassword))}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        <p>Passwords don't match</p> 
+                                    </Form.Control.Feedback>
+                                </FloatingLabel>
+                            </Form.Group>
+                            )}
+
 
                             <Stack direction="horizontal" gap={3} className="d-flex justify-content-between">
                                 { !admin &&

@@ -7,8 +7,6 @@ const AuthProvider = ({ children }) => {
     const refreshInterval = useRef(null);
 
     const login = useCallback(async () => {
-        const settingUser = async (value) => setUser(value);
-
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
                 method: "GET",
@@ -17,17 +15,19 @@ const AuthProvider = ({ children }) => {
 
             if (response.ok) {
                 const result = await response.json();
-                await settingUser(result.user);
-                return true;
+                setUser(result.user);
+                return { success: true, user: result.user };
             }
+
             setUser(null);
-            return false;
+            return { success: false, user: null };
         } catch (error) {
             console.error("Login error:", error);
             setUser(null);
-            return false;
+            return { success: false, user: null };
         }
     }, []);
+
 
     const refresh = useCallback(async () => {
         try {

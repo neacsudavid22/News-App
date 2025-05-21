@@ -19,7 +19,7 @@ const User = model("User", new Schema({
     username: { 
         type: String, 
         unique: true,
-        minlength: [10, "The username must have at least 10 characters"]
+        minlength: [5, "The username must have at least 5 characters"]
      },
     name: String,
     account:{
