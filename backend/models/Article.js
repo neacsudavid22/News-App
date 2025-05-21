@@ -70,9 +70,9 @@ const Article = model('Article', new Schema({
                 return value === null || mongoose.isValidObjectId(value);
               }
             } 
-          }   
+          },
+          postedAt: { type: Date, default: Date.now },
       }],
-      createdAt: { type: Date, default: Date.now },
       default: [] 
   }
 }, { timestamps: true }));

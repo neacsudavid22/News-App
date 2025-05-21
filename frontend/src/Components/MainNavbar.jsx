@@ -110,7 +110,7 @@ const MainNavbar = ({toModify = false}) => {
 
                             <Dropdown.Item type="button" variant="danger" 
                                 onClick={() => {
-                                    navigate("/saved");
+                                    navigate(`/saved/${user?._id}`);
                                 }}>Go to Saved Articles</Dropdown.Item>
 
                             { (user?.account === "author" || user?.account === "admin") &&

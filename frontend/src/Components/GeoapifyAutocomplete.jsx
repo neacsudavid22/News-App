@@ -60,7 +60,7 @@ const GeoapifyAutocomplete = ({ setLocation }) => {
     <>
       <Form.Control
         type="text"
-        placeholder="Introduceți un oraș, comună sau localitate..."
+        placeholder="Introduce a locality.."
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
       />

@@ -146,20 +146,43 @@ const CommentSection = ({ articleId, comments }) => {
           <Row>
             <Col
               xs={{ span: Math.max(12 - depth, 9), offset: Math.min(depth, 3) }}
-              className="d-flex flex-column flex-wrap pt-2 border-top"
+              className="d-flex flex-column flex-wrap"
             >
-              <Stack direction="vertical" className="small mb-1">
-                <p className="mt-2 text-break">
-                  <strong>
-                    {comment.removed
-                      ? "deleted"
-                      : "@" + (usernames[comment.userId] || "loading...")}
-                  </strong>
-                </p>
-                <p className="mb-1 text-break">{comment.content}</p>
-              </Stack>
+            <Card className="mb-3 border-1 rounded-4">
+              {(() => {
+                const postedAt = comment.postedAt;
+                const formattedSentTime = new Intl.DateTimeFormat("ro-RO", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(postedAt));
 
-              <Stack gap={2} direction="horizontal" className="my-2">
+                const formattedSentDate = new Intl.DateTimeFormat("ro-RO", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                }).format(new Date(postedAt));
+
+                const isToday = new Date(postedAt).toDateString() === new Date().toDateString();
+
+                return (
+                  <Card.Header className=" rounded-top-4 d-flex justify-content-between align-items-center bg-light py-2 px-3">
+                    <Card.Title className="mb-0 h6 ">
+                      {comment.removed
+                        ? "deleted"
+                        : "@" + (usernames[comment.userId] || "loading...")}
+                    </Card.Title>
+                    <small className="text-muted fst-italic fw-bold">
+                      {`Trimis la ${formattedSentTime}${isToday ? "" : ` (${formattedSentDate})`}`}
+                    </small>
+                  </Card.Header>
+                );
+              })()}
+
+              <Card.Body className="py-3 px-3">
+                <Card.Text className="mb-0 text-break">{comment.content}</Card.Text>
+              </Card.Body>
+
+              <Card.Footer className="rounded-bottom-4 d-flex bg-light-subtle flex-wrap gap-2 py-2 px-3">
                 <Button
                   className="rounded-4"
                   size="sm"
@@ -185,25 +208,28 @@ const CommentSection = ({ articleId, comments }) => {
                   >
                     <strong>{`See ${openMap[nodeId] ? "less" : "more"}`}</strong>
                     {openMap[nodeId] ? (
-                      <i className="bi bi-caret-up-fill"></i>
+                      <i className="bi bi-caret-up-fill ms-1"></i>
                     ) : (
-                      <i className="bi bi-caret-down-fill"></i>
+                      <i className="bi bi-caret-down-fill ms-1"></i>
                     )}
                   </Button>
                 )}
 
-                {!comment.removed && (user?._id === comment.userId || user?.account === "admin") && (
-                  <Button
-                    className="rounded-4"
-                    size="sm"
-                    variant="outline-danger"
-                    onClick={() => handleDeleteComment(comment)}
-                  >
-                    <strong>Delete</strong>
-                    <i className="bi bi-trash"></i>
-                  </Button>
-                )}
-              </Stack>
+                {!comment.removed &&
+                  (user?._id === comment.userId || user?.account === "admin") && (
+                    <Button
+                      className="rounded-4"
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={() => handleDeleteComment(comment)}
+                    >
+                      <strong>Delete</strong>
+                      <i className="bi bi-trash ms-1"></i>
+                    </Button>
+                  )}
+              </Card.Footer>
+            </Card>
+
             </Col>
           </Row>
 
@@ -235,7 +261,7 @@ const CommentSection = ({ articleId, comments }) => {
   return (
     <Container className="mt-4">
       <CommentForm articleId={articleId} onCommentPosted={onCommentPosted} />
-      <Container fluid className="fs-6">
+      <Container fluid>
         {commentList.length > 0 ? (
           createCommentSection(commentTree)
         ) : (

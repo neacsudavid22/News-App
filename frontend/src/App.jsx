@@ -35,7 +35,7 @@ function App() {
           <Route path="/author/upload" element={<ProtectedRoute> <ArticleUploadPage /> </ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRouteLoggedIn> <ProfilePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/article/:id" element={<ArticlePage />} />
-          <Route path="/saved" element={<ProtectedRoute> <SavePage /> </ProtectedRoute>} />
+          <Route path="/saved/:id" element={<ProtectedRouteLoggedIn> <SavePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>

@@ -21,12 +21,12 @@ const WeatherWidget = ({location = null}) => {
 
   if (!weather) return (
         <Card className="mt-3 shadow rounded-4">
-            <Card.Header className="d-flex justify-between">
+            <Card.Body className="d-flex justify-between">
                 <Card.Title className="m-auto">Waiting for a location..</Card.Title>
                 <Spinner animation="grow" role="status" className="m-auto">
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
-            </Card.Header>
+            </Card.Body>
         </Card>
     );
 
