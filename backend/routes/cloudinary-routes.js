@@ -28,9 +28,9 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage }).array("images");
 
-const uploadRouter = express.Router();
+const cloudinarydRouter = express.Router();
 
-uploadRouter.post("/upload-images", upload, (req, res) => {
+cloudinarydRouter.post("/upload-images", upload, (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No images uploaded" });
@@ -49,7 +49,7 @@ uploadRouter.post("/upload-images", upload, (req, res) => {
   }
 });
 
-uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
+cloudinarydRouter.post('/get-unused-images-public-ids', async (req, res) => {
   try {
     const imageUrls = req.body.imageUrls || [];
 
@@ -78,7 +78,7 @@ uploadRouter.post('/get-unused-images-public-ids', async (req, res) => {
   }
 }); 
 
-uploadRouter.post("/cleanup-unused-images", async (req, res) => {
+cloudinarydRouter.post("/cleanup-unused-images", async (req, res) => {
   try {
     const unusedPublicIds = req.body.unusedPublicIds;
 
@@ -98,7 +98,7 @@ uploadRouter.post("/cleanup-unused-images", async (req, res) => {
   }
 });
 
-uploadRouter.delete("/delete-images", async (req, res) => {
+cloudinarydRouter.delete("/delete-images", async (req, res) => {
   try {
     const imageUrls = req.body.imageUrls;
 
@@ -121,4 +121,4 @@ uploadRouter.delete("/delete-images", async (req, res) => {
 });
 
 
-export default uploadRouter;
+export default cloudinarydRouter;

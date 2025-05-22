@@ -50,7 +50,7 @@ const ArticleUploadPage = () => {
         if (formData.getAll("images").length === 0) return [];
     
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/upload-images`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cloudinary-api/upload-images`, {
                 method: "POST",
                 body: formData,
                 credentials: "include"

@@ -6,7 +6,7 @@ import cors from "cors";
 import connectDB from './config/db.js'
 import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
-import uploadRouter from "./routes/upload-routes.js";
+import cloudinarydRouter from "./routes/cloudinary-routes.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -35,7 +35,7 @@ app.use(cors(corsOptions));
 app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);
 app.use('/location-api', locationRouter)
-app.use('/upload-api', uploadRouter);
+app.use('/cloudinary-api', cloudinarydRouter);
 app.use('/langchain-api', langchainRouter);
 
 app.listen(port, () => {

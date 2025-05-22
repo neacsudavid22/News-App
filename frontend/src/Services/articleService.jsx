@@ -43,7 +43,7 @@ const getSavedArticles = async (page = 0) => {
 
 const deleteImages = async(imageUrls = []) => {
     try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/delete-images`,{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/cloudinary-api/delete-images`,{
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json'
@@ -268,7 +268,7 @@ const getDatabaseImageUrls = async () => {
 const getUnsuedImagePublicIds = async (imageUrls = []) => {
     try{
         console.log(imageUrls);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/get-unused-images-public-ids`,{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/cloudinary-api/get-unused-images-public-ids`,{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -290,7 +290,7 @@ const getUnsuedImagePublicIds = async (imageUrls = []) => {
 
 const cleanUpUnsuedImages = async (unusedPublicIds) => {
     try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-api/cleanup-unused-images`,{
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/cloudinary-api/cleanup-unused-images`,{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
