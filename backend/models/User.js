@@ -52,7 +52,7 @@ const User = model("User", new Schema({
                 ref: 'Article'},
             sentAt: {
                 type: Date,
-                default: Date.now() }            
+                default: Date.now }            
         }],
         default: []
     },
