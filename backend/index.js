@@ -10,10 +10,11 @@ import cloudinarydRouter from "./routes/cloudinary-routes.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import locationRouter from "./routes/location-routes.js";
-import langchainRouter from "./routes/langchain-router.js";
+import langchainRouter from "./routes/langchain-routes.js";
+import { connectCloudinary } from "./config/cloudinary.js";
 
 await connectDB();
+await connectCloudinary();
 
 const port = process.env.PORT || 5000;
 
@@ -34,7 +35,6 @@ app.use(cors(corsOptions));
 
 app.use('/article-api', articlesRouter);
 app.use('/user-api', usersRouter);
-app.use('/location-api', locationRouter)
 app.use('/cloudinary-api', cloudinarydRouter);
 app.use('/langchain-api', langchainRouter);
 

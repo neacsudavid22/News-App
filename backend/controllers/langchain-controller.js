@@ -1,14 +1,6 @@
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { config } from "dotenv";
-
-config();
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
-  temperature: 0,
-  googleApiKey: process.env.GOOGLE_API_KEY,
-});
+import model from "../config/langchain.js";
 
 async function generateTags(articleText) {
     const systemTemplate = "You are an assistant that generates 5 to 10 tags for the following article content, return only the words separated by a comma (,)";
