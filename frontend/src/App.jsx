@@ -11,6 +11,7 @@ import { useContext } from "react";
 import ProfilePage from "./Pages/ProfilePage";
 import DashboardPage from "./Pages/DashboardPage";
 import SavePage from "./Pages/SavePage";
+import ChartsPage from "./Pages/ChartsPage";
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/article/:id" element={<ArticlePage />} />
           <Route path="/saved/:id" element={<ProtectedRouteLoggedIn> <SavePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/charts" element={<ChartsPage/>}></Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>

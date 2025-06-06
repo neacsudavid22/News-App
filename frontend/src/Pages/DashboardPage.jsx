@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router";
 import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } from "../Services/articleService";
 import CommentListAdmin from "../Components/CommentListAdmin";
+import ChartsPage from "./ChartsPage";
 
 const DashboardPage = () => {   
 
@@ -63,8 +64,10 @@ const DashboardPage = () => {
     }
 
     return(
-    <div className="vh-100 bg-light">
+        
+    <div className="h-100 bg-light">
     <MainNavbar/>
+    
     <Container fluid className="py-5 d-flex justify-content-center bg-light">
         <Row className="w-100 justify-content-center">
             <Col xs={12} md={10} lg={8} xl={6}>
@@ -94,7 +97,7 @@ const DashboardPage = () => {
                     > Create Author
                     </Button>
                     </Col>
-                     <Col xs={12} sm="auto">
+                    <Col xs={12} sm="auto">
                     <Button size="lg" variant="danger" className="w-100" 
                         onClick={() => setShowCommentListAdmin(true)}
                     >Manage comments
@@ -110,6 +113,12 @@ const DashboardPage = () => {
                         <i className={`ms-2 bi bi-${unusedPublicIds.length > 0 ? "trash" : "emoji-smile"}-fill`}></i>
                         </Button>
                     </Col>
+                    <Col xs={12} sm="auto">
+                        <Button size="lg" variant="primary" className="w-100" 
+                            onClick={() => navigate("/charts")}
+                        >View Statistics
+                        </Button>
+                    </Col>
                     </>
                 )}
                 </Row>
@@ -123,9 +132,7 @@ const DashboardPage = () => {
                 setShowCommentList={setShowCommentListAdmin}
             />
         }
-
         </Container>
-
     </div>
     );
 }
