@@ -4,7 +4,7 @@ import {
         updateArticle, postComment, deleteComment, 
         deleteGarbageComments, getAllImageUrls,
         interactOnArticle, getSavedArticles, getComments,
-        getUserInteractionData
+        getUserInteractionData, getArticlesForHomepage
     } from '../controllers/article-controller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
 
@@ -18,6 +18,26 @@ articlesRouter.route('/article').get(async (req, res) => {
         const authorId = req.query.authorId; 
 
         const result = await getArticles(category, tag, page, authorId); 
+
+        if (result.error) {
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(`Error fetching users: ${err.message}`);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/article/homepage').get(async (req, res) => {
+    try {
+        const category = req.query.category; 
+        const tag = req.query.tag; 
+        const page = req.query.page; 
+        const authorId = req.query.authorId; 
+
+        const result = await getArticlesForHomepage(category, tag, page, authorId); 
 
         if (result.error) {
             return res.status(400).json({ message: result.message });

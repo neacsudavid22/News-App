@@ -31,6 +31,37 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
     }
   };
 
+  const getArticlesForHomepage = async (category, tag = "", page = 0, authorId = '') => {
+    try {
+      const searchObject = {};
+  
+      if (category) searchObject.category = category;
+      if (tag) searchObject.tags = { $in: [tag] };
+  
+      if (authorId) {
+        if (!mongoose.Types.ObjectId.isValid(authorId)) {
+          return { error: true, message: "Must provide a valid id for author!" };
+        }
+  
+        const author = await User.findById(authorId);
+        if (!author || (author.account !== "author" && author.account !== "admin")) {
+          return { error: true, message: "Author not found or not valid!" };
+        }
+  
+        searchObject.author = authorId;
+      }
+  
+      return await Article.find(searchObject).select("-likes -shares -saves -comments")
+                          .skip((page) * 20) .limit(20)
+                          .sort({ updatedAt: -1 }).exec();  
+    } catch (err) {
+      console.error(`getArticles Error: ${err.message}`);
+      return { error: true, message: "Internal Server Error" };
+    }
+  };
+
+  
+
 const getArticleById = async (id) => {
     try{
         const article = await Article.findById(id)
@@ -370,5 +401,6 @@ export {
     getAllImageUrls,
     getSavedArticles,
     getComments,
-    getUserInteractionData
+    getUserInteractionData,
+    getArticlesForHomepage
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import Container from 'react-bootstrap/Container';
 import "./HomePage.css";
 import { getArticles } from "../Services/articleService";
@@ -13,7 +13,7 @@ import LocationAndWeather from "../Components/LocationAndWeather";
 import { AuthContext } from "../Components/AuthProvider";
 import useElementInView from "../hooks/useElementInView";
 import { useSearchParams } from "react-router-dom";
-import { Col, Row } from "react-bootstrap";
+import { Col, Placeholder, Row } from "react-bootstrap";
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
@@ -25,10 +25,12 @@ const HomePage = () => {
   const [page, setPage] = useState(0);
   const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
   const { IS_MD } = useWindowSize();
+  const TRY_TO_GET = useRef(true);
 
   useEffect(() => {
-    if (isInView && articles.length >= 20) {
+    if (isInView && articles.length >= 20 && TRY_TO_GET.current) {
       setPage(prev => prev + 1);
+      TRY_TO_GET.current = false
     }
   }, [isInView, articles]);
 
@@ -40,6 +42,7 @@ const HomePage = () => {
   
       try {
         const data = await getArticles(category, tag, page, toModify ? user?._id : '');
+        if(data !== null){ setTimeout(()=>TRY_TO_GET.current = true, 5000) }
         setArticles(prev => page === 0 ? data : [...prev, ...data]);
   
       } catch (err) {
@@ -79,7 +82,12 @@ const HomePage = () => {
             </Col>
           </Row>) 
         )}
-        {articles.length >= 20 && <div ref={targetRef}></div>}
+        {
+          (articles.length >= 20) && 
+          <Placeholder ref={targetRef} as="div" animation="glow">
+            <Placeholder xs={12} />
+          </Placeholder>
+        }
       </Container>
 
     </Stack>

@@ -1,7 +1,7 @@
 const getArticles = async (category = '', tag = '', page = '', authorId = '') => {
     try {
         if(category === "allNews") category = "";
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` 
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/homepage` 
             + `?page=${page}&category=${category}&tag=${tag}&authorId=${authorId}`);
 
         if (!response.ok) {
