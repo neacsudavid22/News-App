@@ -84,7 +84,7 @@ const getUsername = async (userId) => {
         const username = await response.json();
         return username;
     } catch(err){
-        console.log("getUsername error, the user might not exist anymore:", err);
+        console.error("getUsername error, the user might not exist anymore:", err);
         return null;
     }
 }

@@ -116,7 +116,7 @@ const getTitle = async (articleId) => {
 
         return await response.json();
     } catch (err) {
-        console.log("getTitle error or the article might not exist anymore:", err);
+        console.error("getTitle error or the article might not exist anymore:", err);
         return null;
     }
 }
