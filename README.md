@@ -34,7 +34,3 @@ For full access and testing, use the following demo credentials:
 
 - **Username:** `admin_acc`
 - **Password:** `Admin2003!`
-
----
-
-Let me know if you want to include badges, a setup guide, or more details about the project’s architecture!
