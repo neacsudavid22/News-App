@@ -11,6 +11,13 @@
   },
   "dependencies": {
     "@geoapify/geocoder-autocomplete": "^2.1.0",
+    "@nivo/bar": "^0.99.0",
+    "@nivo/core": "^0.99.0",
+    "@nivo/heatmap": "^0.99.0",
+    "@nivo/pie": "^0.99.0",
+    "@nivo/radar": "^0.99.0",
+    "@nivo/scatterplot": "^0.99.0",
+    "@nivo/tree": "^0.99.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "react": "^19.0.0",
