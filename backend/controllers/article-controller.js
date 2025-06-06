@@ -144,7 +144,6 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
       }
   
       let userResult = null;
-  
      
       const alreadyInteracted = article[interaction].some(id => 
         id.toString() === user._id.toString()
@@ -157,22 +156,19 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
       const articleResult = await Article.findOneAndUpdate(
         { _id: articleId },
         articleUpdate,
-        { new: true },
-        { timestamps: false }
+        { new: true, timestamps: false }
       );
 
       if (interaction === "saves") {
-        const currentUser = await User.findById(user._id).select("savedArticles");
   
         userResult = await User.findOneAndUpdate(
           { _id: user._id },
           alreadyInteracted
             ? { $pull: { savedArticles: article._id } }
             : { $addToSet: { savedArticles: article._id } },
-          { new: true },
+          { new: true, timestamps: false }
         );
       }
-  
   
       return { articleResult, userResult };
   
@@ -181,8 +177,8 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
       return { error: true, message: "Internal Server Error" };
     }
   };
-  
-  const postComment = async (articleId, userId, content, responseTo) => {
+
+const postComment = async (articleId, userId, content, responseTo) => {
   try {
     const article = await Article.findById(articleId).select('comments');
     if (!article) {
@@ -194,7 +190,7 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
     const result = await Article.updateOne(
       { _id: articleId },
       { $set: { comments: article.comments } },
-      { timestamps: false } 
+      { timestamps: false }
     );
 
     if (!result.acknowledged || result.modifiedCount === 0) {
@@ -215,16 +211,12 @@ const deleteComment = async (articleId, commentId, isLastNode, account) => {
     try {
         let updatedArticlePost;
 
-        console.log("isLastNode = " + isLastNode)
-        console.log("account = " + account)
-
-
         if (isLastNode === true) {
             // Remove the entire comment from the comments array
             updatedArticlePost = await Article.findByIdAndUpdate(
                 { _id: articleId},
                 { $pull: { comments: { _id: commentId } } },
-                { new: true }
+                { new: true, timestamps: false }
             );
         } else {
             // If it got replies, mark it as deleted instead of removing
@@ -236,7 +228,7 @@ const deleteComment = async (articleId, commentId, isLastNode, account) => {
                         "comments.$.removed": true 
                     }
                 },
-                { new: true }
+                { new: true, timestamps: false }
             );
         }
 
@@ -262,7 +254,8 @@ const deleteGarbageComments = async (articleId, deleteIds) => {
               _id: { $in: deleteIds },
             },
           },
-        }
+        },
+        { timestamps: false }
       );
   
       return { modifiedCount: result.modifiedCount };
@@ -271,7 +264,6 @@ const deleteGarbageComments = async (articleId, deleteIds) => {
       return { error: true, message: "Internal Server Error" };
     }
   };
-  
 
 const getAllImageUrls = async () => {
     try {
@@ -386,7 +378,6 @@ const getUserInteractionData = async (interactionType = 'saves') => {
     return { error: true, message: "Internal Server Error" }; 
   }
 }
-
 
 export {
     getArticles,
