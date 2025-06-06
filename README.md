@@ -1,21 +1,40 @@
 # NewsWebApp
 
-A Web Application for my degree which aims to function as a content management application for a news agency featuring social media elements for user interaction.
+NewsWebApp is a full-stack web application developed as part of my degree project. It serves as a comprehensive content management system (CMS) tailored for news agencies, incorporating interactive social media features to enhance user engagement.
 
-Status: ongoing
+**Project Status:** Ongoing
 
-Technologies used:
-front-end: React.js + Bootstrap-react + nivo (for charts)
-back-end: Node.js Express
-databases: Mongodb
-other API'S: OpenWeather, Geoapify (Geocode autocomplete), IntersectionOBserver
+## Features
 
-The Web Application is deployed and hosted by Render and can be accessed via https://newswebapp-qvgp.onrender.com
+- **Content Management:** Efficiently create, edit, and manage news articles and media.
+- **User Interaction:** Integrated social media elements for comments, likes, and sharing.
+- **Data Visualization:** Interactive charts and analytics powered by Nivo.
+- **Responsive Design:** Built with React.js and Bootstrap-React for seamless user experience across devices.
+- **Real-Time Weather:** Integration with OpenWeather API for live weather updates.
+- **Location Services:** Geoapify-powered autocomplete for geocoding.
+- **Media Hosting:** Cloudinary integration for scalable and secure media storage.
 
-The Media content is hosted on Cloudinary
+## Technologies Used
 
-The database is hosted by Atlas
+- **Frontend:** React.js, Bootstrap-React, Nivo
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB (hosted on Atlas)
+- **APIs:** OpenWeather, Geoapify
+- **Other:** IntersectionObserver, Cloudinary
 
-For full testing use this account:
-account username: admin_acc
-account password: Admin2003!
+## Deployment
+
+The application is deployed via [Render](https://newswebapp-qvgp.onrender.com).  
+Media content is hosted on Cloudinary.  
+The database is managed and hosted by MongoDB Atlas.
+
+## Demo Account
+
+For full access and testing, use the following demo credentials:
+
+- **Username:** `admin_acc`
+- **Password:** `Admin2003!`
+
+---
+
+Let me know if you want to include badges, a setup guide, or more details about the project’s architecture!
