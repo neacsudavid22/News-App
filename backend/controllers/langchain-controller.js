@@ -68,11 +68,8 @@ async function getInappropriateComments(commentList) {
     finalResponse.push(...ids);
   }
 
-  const filteredComments = commentList.filter(c=>finalResponse.includes(c._id))
-  console.log(filteredComments)
-  return filteredComments;
+  return commentList.filter(c=>finalResponse.includes(c._id))
 }
-
 
 export {
     generateTags,

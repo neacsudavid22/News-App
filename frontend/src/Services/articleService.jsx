@@ -264,7 +264,6 @@ const getDatabaseImageUrls = async () => {
 
 const getUnsuedImagePublicIds = async (imageUrls = []) => {
     try{
-        console.log(imageUrls);
         const response = await fetch(`${import.meta.env.VITE_API_URL}/cloudinary-api/get-unused-images-public-ids`,{
             method: "POST",
             headers: {

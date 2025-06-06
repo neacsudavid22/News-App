@@ -81,8 +81,6 @@ const ArticleEditorPage = () => {
             const newEdit = [...edit]
             newEdit.splice(index, 1)
             setEdit(newEdit)
-
-            console.log(articleImages)
     };
     
     const handleEdit = (index) => {

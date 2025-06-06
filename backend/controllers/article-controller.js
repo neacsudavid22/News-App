@@ -278,8 +278,6 @@ const getAllImageUrls = async () => {
       const backgroundUrls = allArticles.flatMap((article) => article.background);
 
       const imageUrls = [...contentImageUrls, ...backgroundUrls];
-
-      console.log(imageUrls)
       
       return imageUrls
     } catch (err) {
