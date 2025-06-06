@@ -377,6 +377,23 @@ const getInappropriateComments = async (page) => {
     }
 }
 
+const getInteractionData = async (interactionType) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/analytics-data/${interactionType}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) throw new Error("id list retrieval failed");
+        const { data } = await response.json(); 
+
+        return data;
+    } catch (error) {
+        console.error("Error on getAllComments: ", error);
+    }
+}
+
 export {
     getArticles,
     postArticle,
@@ -395,5 +412,6 @@ export {
     generateTagsWithLangchain,
     generateTitleWithLangchain,
     getAllComments,
-    getInappropriateComments
+    getInappropriateComments,
+    getInteractionData
 }

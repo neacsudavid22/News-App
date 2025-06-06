@@ -4,7 +4,7 @@ import {
         updateArticle, postComment, deleteComment, 
         deleteGarbageComments, getAllImageUrls,
         interactOnArticle, getSavedArticles, getComments,
-        getScatterData
+        getUserInteractionData
     } from '../controllers/article-controller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
 
@@ -226,6 +226,22 @@ articlesRouter.route('/get-all-cloudinary-urls').get(authMiddleware , async(req,
     } catch(err){
         console.error("getAllImageUrls error:", err);
         return res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+articlesRouter.route('/analytics-data/:interaction').get(authMiddleware, async(req, res)=>{
+    try { 
+        if(req.user.account !== "admin")
+            return res.status(403).json({message: "Only administrators are allowed!"})
+        const result = await getUserInteractionData(req.params.interaction);
+        if(result.error){
+            return res.status(400).json({ message: result.message });
+        }
+
+        return res.status(200).json({ data: result });
+    } catch(err) {
+        console.error("");
+        return res.status(500).json({message: "Internal Server Error"});
     }
 })
 

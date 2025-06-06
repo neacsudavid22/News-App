@@ -293,6 +293,70 @@ const getComments = async (page = 0) => {
   }
 };
 
+const getUserInteractionData = async (interactionType = 'saves') => {
+  try{
+    const interactionMap = {
+      saves: { path: '$saves', userField: null },
+      likes: { path: '$likes', userField: null },
+      shares: { path: '$shares', userField: null },
+      comments: { path: '$comments', userField: '$comments.userId' }
+    };
+
+    const interaction = interactionMap[interactionType];
+    if (!interaction) return {error: true, message: "Invalid interaction type"}
+
+    const pipeline = [];
+
+    if (interactionType === 'comments') {
+      pipeline.push(
+        { $unwind: '$comments' },
+        { $addFields: { userId: '$comments.userId' } }
+      );
+    } else {
+      pipeline.push(
+        { $unwind: interaction.path },
+        { $addFields: { userId: interaction.path } }
+      );
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          id: '$_id',
+          article_category: '$category',
+          user_age: {
+            $dateDiff: {
+              startDate: '$user.birthdate',
+              endDate: '$$NOW',
+              unit: 'year'
+            }
+          },
+          user_gender: '$user.gender',
+          user_address: '$user.address',
+          friend_count: { $size: '$user.friendList'},
+          _id: 0
+        }
+      }
+    );
+
+    const result = await Article.aggregate(pipeline).exec();
+    return result;
+  } catch(err){
+    console.error(`getUserInteractionData Error: ${err.message}`);
+    return { error: true, message: "Internal Server Error" }; 
+  }
+}
+
+
 export {
     getArticles,
     getArticleById,
@@ -305,5 +369,6 @@ export {
     deleteGarbageComments,
     getAllImageUrls,
     getSavedArticles,
-    getComments
+    getComments,
+    getUserInteractionData
 }
