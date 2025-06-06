@@ -1,17 +1,10 @@
 import express from 'express';
 import { 
-        getArticles,
-        getArticleById, 
-        createArticle, 
-        deleteArticle, 
-        updateArticle, 
-        postComment, 
-        deleteComment, 
-        deleteGarbageComments,
-        getAllImageUrls,
-        interactOnArticle,
-        getSavedArticles,
-        getComments
+        getArticles, getArticleById, createArticle, deleteArticle, 
+        updateArticle, postComment, deleteComment, 
+        deleteGarbageComments, getAllImageUrls,
+        interactOnArticle, getSavedArticles, getComments,
+        getScatterData
     } from '../controllers/article-controller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
 

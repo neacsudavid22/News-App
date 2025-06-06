@@ -43,14 +43,8 @@ const signUpUser = async (email, phone, name, gender, birthdate, address, userna
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                email,
-                phone,
-                name,
-                username,
-                password,
-                gender,
-                birthdate,
-                address,
+                email, phone, name, username,
+                password, gender, birthdate, address,
                 account: admin ? "author" : "standard",
             }),
         });

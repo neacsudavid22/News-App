@@ -17,6 +17,7 @@ import { useLocation, useNavigate, } from "react-router";
 import "./ArticleRedactationForm.css";
 import { Collapse } from "react-bootstrap";
 import { generateTitleWithLangchain } from "../Services/articleService";
+import useWindowSize from "../hooks/useWindowSize";
 
 const ArticleEditorPage = () => {
     const location = useLocation();
@@ -140,6 +141,8 @@ const ArticleEditorPage = () => {
             setTitle(generatedTitle);
     }
 
+    const { IS_MD } = useWindowSize();
+
     return (
         <>
         <MainNavbar/>
@@ -149,16 +152,18 @@ const ArticleEditorPage = () => {
         <Col sm={11} md={10} lg={8} xl={8}>
 
         <Form className="justify-content-center mb-3 pb-3 border-bottom">
-            <Stack direction="horizontal" gap={3} className="align-items-center justify-content-around">
-                <Form.Label as="h2" className="mb-0">Article Title:</Form.Label>
+            <Stack direction={IS_MD ? "vertical" : "horizontal"} gap={3} className="align-items-center justify-content-around">
+                <Form.Label as="h2" className="mb-0">Article Title</Form.Label>
+                <Stack direction="horizontal" gap={1} className="align-items-center justify-content-around">
                 <Form.Control 
                     type="text" 
                     placeholder="Enter article title" 
                     value={title} 
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-50"
+                    className={IS_MD ? "w-50" : "w-75"}
                 />
                 <Button variant="outline-info" onClick={generateTitle}>Generate</Button>
+                </Stack>
             </Stack>        
         </Form>
 

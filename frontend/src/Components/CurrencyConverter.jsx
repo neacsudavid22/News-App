@@ -94,7 +94,7 @@ const CurrencyConverter = () => {
             <Dropdown.Toggle variant="outline-secondary" className="w-100">
               {from} - {currencies.current[from]}
             </Dropdown.Toggle>
-            <Dropdown.Menu className="w-100" style={{ maxHeight: "300px", overflowY: "auto" }}>
+            <Dropdown.Menu className="w-100" style={{ maxHeight: "30vh", overflowY: "auto" }}>
               {renderOptions('from')}
             </Dropdown.Menu>
           </Dropdown>
@@ -107,7 +107,7 @@ const CurrencyConverter = () => {
             <Dropdown.Toggle variant="outline-secondary" className="w-100">
               {to} - {currencies.current[to]}
             </Dropdown.Toggle>
-            <Dropdown.Menu className="w-100" style={{ maxHeight: "300px", overflowY: "auto" }}>
+            <Dropdown.Menu className="w-100" style={{ maxHeight: "30vh", overflowY: "auto" }}>
               {renderOptions('to')}
             </Dropdown.Menu>
           </Dropdown>

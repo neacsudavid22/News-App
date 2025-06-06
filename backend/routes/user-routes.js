@@ -1,20 +1,13 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js' 
 import { 
-        getUsers, 
-        getUserById,    
-        createUser, 
-        deleteUser, 
-        updateUser, 
-        loginUser, 
-        sendFriendRequest,
-        handleFriendRequest,
-        shareArticle, 
-        removeFriend, 
-        markAsRead,
+        getUsers, getUserById, createUser, deleteUser, 
+        updateUser, loginUser, sendFriendRequest,
+        handleFriendRequest, shareArticle, 
+        removeFriend, markAsRead
     } from '../controllers/user-controller.js'
 
-const usersRouter = express.Router()
+const usersRouter = express.Router();
 
     usersRouter.route('/user').get(authMiddleware, async (req, res) => {
         const category = req.query.category
@@ -184,7 +177,11 @@ const usersRouter = express.Router()
     });
 
     usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {
-        return res.status(200).json({ user: req.user });
+        const user = await getUserById(req.user._id);
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        return res.status(200).json({ user });
     });
 
     usersRouter.put("/share-article-to/:fid", authMiddleware, async (req, res) => {

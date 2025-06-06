@@ -533,12 +533,13 @@
               "error": {}
             },
             {
-              "code": "",
               "name": "lat",
+              "hackoladeMeta": {},
               "isActivated": true,
               "type": "string",
-              "GUID": "ee80c568-52a7-407e-b92d-43a722516b24",
-              "error": {}
+              "error": {},
+              "code": "",
+              "GUID": "ee80c568-52a7-407e-b92d-43a722516b24"
             },
             {
               "code": "",
@@ -1670,7 +1671,7 @@
       "modelName": false
     }
   },
-  "lastModifTS": "2025-05-23T15:37:54.634Z",
+  "lastModifTS": "2025-05-31T13:08:22.709Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -1749,7 +1750,32 @@
       "changed": false
     },
     "dtDiagram": {
-      "collapsedNodes": [],
+      "collapsedNodes": [
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "5a917bc5-0b6a-4139-91c6-7a610689d4d7"
+        ],
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "b546ca6c-a047-498e-8b41-f36f05cc039f"
+        ],
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "dc712016-8ca5-41f9-803a-450d45f18da1"
+        ],
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "31227366-39f2-44f9-a997-621c39334494"
+        ],
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "e4279aaf-1954-4e25-89a9-44376d4c1fd0"
+        ],
+        [
+          "e989c134-d729-4b10-9e2a-339e2696413c",
+          "43bac560-2b72-4fbc-bc54-4e7d6d9411d2"
+        ]
+      ],
       "shouldDistributeCollections": false
     }
   }

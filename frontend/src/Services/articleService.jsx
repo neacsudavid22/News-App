@@ -1,6 +1,4 @@
-
 const getArticles = async (category = '', tag = '', page = '', authorId = '') => {
-
     try {
         if(category === "allNews") category = "";
         const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article` 
@@ -16,7 +14,6 @@ const getArticles = async (category = '', tag = '', page = '', authorId = '') =>
         return null; 
     }
 }
-
 
 const getSavedArticles = async (page = 0) => {
     try {
@@ -379,7 +376,6 @@ const getInappropriateComments = async (page) => {
         console.error("Error on getAllComments: ", error);
     }
 }
-
 
 export {
     getArticles,

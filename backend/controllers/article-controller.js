@@ -22,13 +22,9 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
         searchObject.author = authorId;
       }
   
-      const articles = await Article.find(searchObject)
-                                    .skip((page) * 20)
-                                    .limit(20)
-                                    .exec();
-  
-      return articles;
-  
+      return await Article.find(searchObject)
+                          .skip((page) * 20) .limit(20)
+                          .sort({ updatedAt: -1 }).exec();  
     } catch (err) {
       console.error(`getArticles Error: ${err.message}`);
       return { error: true, message: "Internal Server Error" };
@@ -154,6 +150,7 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
       return { error: true, message: "Internal Server Error" };
     }
   };
+  
   const postComment = async (articleId, userId, content, responseTo) => {
   try {
     const article = await Article.findById(articleId).select('comments');
@@ -308,5 +305,5 @@ export {
     deleteGarbageComments,
     getAllImageUrls,
     getSavedArticles,
-    getComments,
+    getComments
 }

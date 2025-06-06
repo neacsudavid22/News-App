@@ -6,7 +6,7 @@ import Image from "react-bootstrap/Image";
 import { getAuthorName } from "../Services/userService";
 
 const ArticleComponent = ( {article} ) => { 
-    const [imageUrls, setImageUrls] = useState({}); // Store image URLs
+    const [imageUrls, setImageUrls] = useState({}); 
     const [author, setAuthor] = useState(null);
 
     useEffect(() => {
@@ -61,7 +61,7 @@ const ArticleComponent = ( {article} ) => {
                                 </div>
                             ) : (
                                 <div key={index} className=" justify-content-start">
-                                    <Tag className="p-2 my-2" style={{textAlign: "justify", texJustify: "auto"}}>{a.content}</Tag>
+                                    <Tag className="p-2 my-2">{a.content}</Tag>
                                 </div>
                             )}
                         </Col>
