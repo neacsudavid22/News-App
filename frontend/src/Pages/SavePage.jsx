@@ -49,7 +49,7 @@ const SavePage = () => {
       <div className="fixed-top">
         <MainNavbar />
       </div>
-      <h1 className="fixed-top d-flex justify-content-center p-4 bg-secondary-subtle shadow"
+      <h1 className="fixed-top d-flex justify-content-center z-1 p-4 bg-secondary-subtle shadow"
           style={{top: "3.6rem"}}>Saved Articles</h1>
       <div style={{height: IS_SM ? "10rem" : "11rem"}}></div>
 

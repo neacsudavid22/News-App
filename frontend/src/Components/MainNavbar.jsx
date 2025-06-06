@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import Navbar from 'react-bootstrap/Navbar';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Stack from "react-bootstrap/Stack";
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -69,6 +69,7 @@ const MainNavbar = ({toModify = false}) => {
             
                 {user ? (
                     <Stack direction="horizontal">
+                        
                     {(uncheckedRequest || uncheckedShare) && (
                        <Collapse in={fadeIn}>
                         <Badge pill bg="danger" className="mx-2">
@@ -83,6 +84,7 @@ const MainNavbar = ({toModify = false}) => {
                         id="dropdown-menu-align-end"
                         >
                             <Dropdown.Item type="button" variant="danger" 
+
                                 onClick={() => setShowAddFriend(true)}>Add a Friend</Dropdown.Item>
                             <Dropdown.Item type="button" variant="danger" 
                                 onClick={() => setShowShareId(true)}>Share your id</Dropdown.Item>
