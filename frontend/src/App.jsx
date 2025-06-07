@@ -20,6 +20,11 @@ function App() {
     return (user?.account === "author" || user?.account === "admin") ? children : <LoginPage />;
   }
 
+  function ProtectedRouteAdmin({ children }) {
+    const { user } = useContext(AuthContext);
+    return user?.account === "admin" ? children : <LoginPage />;
+  }
+
   function ProtectedRouteLoggedIn({ children }) {
     const { user } = useContext(AuthContext);
     const { id } = useParams();
@@ -38,7 +43,7 @@ function App() {
           <Route path="/article/:id" element={<ArticlePage />} />
           <Route path="/saved/:id" element={<ProtectedRouteLoggedIn> <SavePage /> </ProtectedRouteLoggedIn>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/charts" element={<ChartsPage/>}></Route>
+          <Route path="/charts" element={<ProtectedRouteAdmin><ChartsPage/></ProtectedRouteAdmin>}></Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
