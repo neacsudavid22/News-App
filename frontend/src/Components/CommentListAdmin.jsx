@@ -6,6 +6,7 @@ import { ButtonGroup, Col, Row, Stack, Tab, Tabs } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import { deleteComment, getAllComments, getInappropriateComments } from '../Services/articleService';
 import useElementInView from "../hooks/useElementInView";
+import { Gemini } from '@lobehub/icons';
 
 const CommentListAdmin = ({ show, setShowCommentList }) => {
     const [commentList, setCommentList] = useState([]); 
@@ -99,7 +100,7 @@ const CommentListAdmin = ({ show, setShowCommentList }) => {
                     <Button  onClick={()=>setSelectMode("gemini")}
                             variant={selectMode === "gemini" ? 'info' : 'outline-info'}
                             size={IS_SM ? "sm" : "lg"}
-                        >Gemini detection</Button>
+                        >Gemini detection <Gemini size={20} /></Button>
                 </ButtonGroup>
             </Offcanvas.Header>
             <Offcanvas.Body className={`w-${IS_SM ? 100 : 75} m-auto`}>

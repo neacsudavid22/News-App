@@ -18,6 +18,7 @@ import "./ArticleRedactationForm.css";
 import { Collapse } from "react-bootstrap";
 import { generateTitleWithLangchain } from "../Services/articleService";
 import useWindowSize from "../hooks/useWindowSize";
+import { Gemini } from "@lobehub/icons";
 
 const ArticleEditorPage = () => {
     const location = useLocation();
@@ -150,18 +151,21 @@ const ArticleEditorPage = () => {
         <Col sm={11} md={10} lg={8} xl={8}>
 
         <Form className="justify-content-center mb-3 pb-3 border-bottom">
-            <Stack direction={IS_MD ? "vertical" : "horizontal"} gap={3} className="align-items-center justify-content-around">
-                <Form.Label as="h2" className="mb-0">Article Title</Form.Label>
-                <Stack direction="horizontal" gap={1} className="align-items-center justify-content-around">
-                <Form.Control 
-                    type="text" 
-                    placeholder="Enter article title" 
-                    value={title} 
-                    onChange={(e) => setTitle(e.target.value)}
-                    className={IS_MD ? "w-50" : "w-75"}
-                />
-                <Button variant="outline-info" onClick={generateTitle}>Generate</Button>
-                </Stack>
+            <Stack direction={IS_MD ? "vertical" : "horizontal"} gap={2} className="w-100">
+                <Form.Label as="h2" className="mb-0 text-center text-nowrap align-items-center">Article Title: </Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter article title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <Button
+                        variant="outline-info"
+                        onClick={generateTitle}
+                        className="mt-2 mt-md-0 text-nowrap"
+                    >
+                        Generate <Gemini size={20} />
+                    </Button>
             </Stack>        
         </Form>
 

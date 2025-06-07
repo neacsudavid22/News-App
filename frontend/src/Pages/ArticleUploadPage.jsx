@@ -14,6 +14,9 @@ import MainNavbar from "../Components/MainNavbar";
 import { generateTagsWithLangchain, postArticle, putArticle } from "../Services/articleService";
 import Modal from "react-bootstrap/esm/Modal";
 import "./ArticleRedactationForm.css";
+import { Gemini } from "@lobehub/icons";
+import useWindowSize from "../hooks/useWindowSize";
+import { Card } from "react-bootstrap";
 
 const ArticleUploadPage = () => {
     const location = useLocation();
@@ -25,7 +28,7 @@ const ArticleUploadPage = () => {
     const articleImages = location.state.articleImages || [];
     const title = location.state.title || "";
 
-    const [category, setCategory] = useState("politics")
+    const [category, setCategory] = useState(location.state?.category || "politics")
     const [tags, setTags] = useState(location.state?.tags || []);
     const [tagInput, setTagInput] = useState(""); 
     const [tagSelect, setTagSelect] = useState(""); 
@@ -161,6 +164,7 @@ const ArticleUploadPage = () => {
     }, [location.state, navigate]);
 
     const [mainArticle, setMainArticle] = useState(false);
+    const { IS_MD } = useWindowSize();
 
     return (
         <>
@@ -218,7 +222,8 @@ const ArticleUploadPage = () => {
 
             <Stack direction="verical" className="d-flex justify-content-center border-top py-3 mb-1" gap={3} >
                 <Form.Group className="w-100 mb-3 pe-5">
-                    <Form.Label><b>Background</b></Form.Label>
+                    <Form.Label className="fs-2 fw-bold">Background</Form.Label>
+                    <div className={IS_MD ? "w-100" : "w-50"}>
                     <Form.Control
                         type="file"
                         accept="image/*"
@@ -227,35 +232,37 @@ const ArticleUploadPage = () => {
                             setBackground(e.target.files[0])
                         } }
                     />
+                    </div>
                 </Form.Group>
 
-                {backgroundPreview && (
-                <>
-                <p className="text-muted">This is how the background will look like on cards</p>
-                <div
-                    className="w-100 mb-3 overflow-hidden border"
-                    style={{
-                    width: "100%",
-                    height: "12rem", 
-                    minHeight:"25vw",
-                    }}
-                    >
-                    <Image
-                    thumbnail
-                    src={backgroundPreview}
-                    alt="Background Preview"
-                    className="w-100 h-100"
-                    style={{
-                        objectFit: "cover",
-                    }}
-                    />
-                </div>
-                </>
-                )}
+                {backgroundPreview && 
+                <Card className="w-100 mb-3 overflow-hidden border">
+                    <Card.Body className="p-2">
+                        <div className="d-flex justify-content-center my-2">
+                        <Card.Text className="text-muted fs-4 mb-2">
+                            This is how the background will look like on cards
+                        </Card.Text>
+                        </div>
+                        <div className="d-flex justify-content-center mb-3">
+                            <Card.Img
+                                variant="top"
+                                src={backgroundPreview}
+                                alt="Background Preview"
+                                className="w-75 rounded-3"
+                                style={{
+                                    height: IS_MD ? "15rem" : "20rem",
+                                    objectFit: "cover",
+                                }}
+                            />
+                        </div>
+                    </Card.Body>
+                </Card>
+                }
    
             </Stack>
 
-            <Form.Select aria-label="Category" onChange={(e) => setCategory(e.target.value)} className="w-50">
+            <Form.Group className="border-top border-bottom d-flex flex-row justify-content-between align-items-center">
+            <Form.Select aria-label="Category" onChange={(e) => setCategory(e.target.value)} className="w-50 h-25">
                 <option value="politics">politics</option>
                 <option value="extern">extern</option>
                 <option value="finance">finance</option>
@@ -265,37 +272,39 @@ const ArticleUploadPage = () => {
             </Form.Select>
 
             <Form.Check 
-            className="my-4"
+                className="my-4 text-nowrap"
                 type="switch"
                 id={`main-switch-${articleId}`}
-                label={mainArticle ? "Main Article" : "Secondary Article"}
+                label={mainArticle ? "Main" : "Secondary"}
                 onChange={()=>setMainArticle(prev=>!prev)}
                 onClick={(e) => e.stopPropagation()}
             />
+            </Form.Group>
 
-            <Stack direction="horizontal" className="mt-4 mb-3" gap={3}>
+            <Stack direction={IS_MD ? "vertical" : "horizontal"}  className="mt-4 mb-3" gap={3}>
                 <Form.Control
                     type="text" 
                     placeholder="add tags" 
-                    className="w-50" 
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                 /> 
-                <Button type="button" variant="primary" onClick={ () => addTag() }>Add</Button>
-                <Button type="button" variant="danger" onClick={ () => removeTag() }>Remove</Button>
-                <Button type="button" variant="info" onClick={ () => generateTags() }>Generate</Button>
+                <Stack gap={3} direction="horizontal" className=" justify-content-evenly">
+                <Button type="button" variant="outline-success" style={{width: "120px"}} onClick={ () => addTag() }> Add</Button>
+                <Button type="button" variant="outline-danger" style={{width: "120px"}} onClick={ () => removeTag() }>Remove</Button>
+                <Button type="button" variant="outline-info" style={{width: "120px"}} className="text-nowrap" onClick={ () => generateTags() }>Generate <Gemini size={20}/></Button>
+                </Stack>
             </Stack>
 
             <Tabs
                 variant="pills"
                 id="justify-tab-example"
-                className="mb-3 nav-pills"
+                className=" mb-3 nav-pills justify-content-between"
                 onSelect={(e) => setTagSelect(e)}
                 onDoubleClick={ () => removeTag() }
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
             </Tabs> 
             
-            <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-between pt-3 border-top">
             <Button variant="success" type="button" className="mb-5 text-nowrap" 
                     onClick={ handlePublish }>
                 Publish Article
