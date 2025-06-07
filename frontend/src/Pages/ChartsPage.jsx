@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Pie from "../Components/Charts/ResponsivePie";
 import Bar from "../Components/Charts/ResponsiveBar";
 import ScatterPlot from "../Components/Charts/ResponsiveScatterPlot";
-import Tree from "../Components/Charts/ResponsiveTree";
 import Radar from "../Components/Charts/ResponsiveRadar";
 import { getInteractionData } from "../Services/articleService";
 import Tab from 'react-bootstrap/Tab';
@@ -72,48 +71,13 @@ const ChartsPage = () => {
                   <Tab eventKey="shares" title="Shares" />
                 </Tabs>
             </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
-              <h2 className="text-center mb-4">{`Pie Chart - Gender distribution on ${interactionType}`}</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Pie filterBy={"gender"} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
-              <h2 className="text-center mb-4">{`Pie Chart - Age distribution on ${interactionType}`}</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Pie filterBy={"age"} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
-              <h2 className="text-center mb-4">{`Bar Chart - Age distribution on ${interactionType} `}</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Bar filterBy="age" interaction={interactionType} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
-              <h2 className="text-center mb-4">{`Bar Chart - Gender distribution ${interactionType} `}</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Bar filterBy="gender" interaction={interactionType} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
-              <h3 className="text-center text-wrap w-75 mb-4">{`Scatter Plot - Corellation between Number of friends and Number of Interactions - ${interactionType}`}</h3>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <ScatterPlot interaction={interactionType} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "85vh" }}>
-              <h2 className="text-center mb-4">{`Tree Map - ${interactionType} `}</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Tree interaction={interactionType} rawData={getDataByInteractionType()} />
-              </div>
-            </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "80vh" }}>
-              <h2 className="text-center mb-4">Radar Chart</h2>
-              <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
-                <Radar rawDataLikes={rawDataLikes} rawDataSaves={rawDataSaves} rawDataShares={rawDataShares} rawDataComments={rawDataComments}/>
-              </div>
-            </Col>
+            <Pie interactionType={interactionType} filterBy={"gender"} rawData={getDataByInteractionType()} />
+            <Pie interactionType={interactionType} filterBy={"age"} rawData={getDataByInteractionType()} />
+            <Bar filterBy="age" interactionType={interactionType} rawData={getDataByInteractionType()} />
+            <Bar filterBy="gender" interactionType={interactionType} rawData={getDataByInteractionType()} />
+            <Bar filterBy="age-gender" interactionType={interactionType} rawData={getDataByInteractionType()} />
+            <ScatterPlot interactionType={interactionType} rawData={getDataByInteractionType()} />
+            <Radar rawDataLikes={rawDataLikes} rawDataSaves={rawDataSaves} rawDataShares={rawDataShares} rawDataComments={rawDataComments}/>
           </Row>
         </Container>
       </>
