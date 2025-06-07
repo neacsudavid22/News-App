@@ -22,7 +22,6 @@ const Article = model('Article', new Schema({
     type: [String],
     default: [] 
     },
-  backgroundUrl: String,
   articleContent: [{
     _id: false,
     content: String,
