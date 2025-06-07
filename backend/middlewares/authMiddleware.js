@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-    const token = req.cookies.token; 
+
+    const token = req.headers.authorization?.startsWith("Bearer ") ?
+                  req.headers.authorization.split(" ")[1] : req.cookies.token;
 
     if (!token) return res.status(403).json({ message: "Token required" });
 
