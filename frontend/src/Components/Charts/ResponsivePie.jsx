@@ -67,7 +67,7 @@ const Pie = ({ interactionType, rawData = [], filterBy = "age" }) => {
 
     return (
         <>
-        <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "80h" }}>
+        <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "80vh" }}>
             <h2 className="text-center mb-4">{`Pie Chart - Gender distribution on ${interactionType}`}</h2>
             <div className="w-75 h-100 border-bottom">
             <ResponsivePie

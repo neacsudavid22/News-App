@@ -76,7 +76,7 @@ const analyzeDataForChartType = async (chartType, data, interaction = "likes, sh
     The context is that you analyze data for a web application for a news agency which is testing social media elements in their app.
     The social media element you analyze is: ${interaction}.
     The data is in JSON format.
-    Give me only the analysis, limit the text to 1000 characters, but at least 500.
+    Give me only the analysis, limit the text to 600 characters, but at least 350.
     By analysis I accept also simple observation of the data.
     If you can give a suggestion/recomandation to the news agency.
     the text should not have any * for bold or any other formatting`;
