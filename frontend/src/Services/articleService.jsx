@@ -393,6 +393,28 @@ const getInteractionData = async (interactionType) => {
     }
 }
 
+const getAnalysisForChart = async (chartType, data, interaction = '') => {
+    try {
+        if(!["likes", "shares", "comments", "saves", "all"].includes(interaction)){
+            throw new Error("Interaction must be either likes, shares, comments, saves or all - literal.");
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/langchain-api/analyze-data/chart/${chartType}/interaction/${interaction}`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({data: data})
+        });
+
+        if (!response.ok) throw new Error("id list retrieval failed");
+        const { analysis } = await response.json(); 
+
+        return analysis;
+    } catch (error) {
+        console.error("Error on getAnalysisForChart: ", error);
+    }
+}
+
 export {
     getArticles,
     postArticle,
@@ -412,5 +434,6 @@ export {
     generateTitleWithLangchain,
     getAllComments,
     getInappropriateComments,
-    getInteractionData
+    getInteractionData,
+    getAnalysisForChart
 }
