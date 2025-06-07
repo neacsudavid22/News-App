@@ -102,13 +102,13 @@ const ChartsPage = () => {
                 <ScatterPlot interaction={interactionType} rawData={getDataByInteractionType()} />
               </div>
             </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
+            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "85vh" }}>
               <h2 className="text-center mb-4">{`Tree Map - ${interactionType} `}</h2>
               <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
                 <Tree interaction={interactionType} rawData={getDataByInteractionType()} />
               </div>
             </Col>
-            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM? "50vh" : "80vh" }}>
+            <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "80vh" }}>
               <h2 className="text-center mb-4">Radar Chart</h2>
               <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>
                 <Radar rawDataLikes={rawDataLikes} rawDataSaves={rawDataSaves} rawDataShares={rawDataShares} rawDataComments={rawDataComments}/>

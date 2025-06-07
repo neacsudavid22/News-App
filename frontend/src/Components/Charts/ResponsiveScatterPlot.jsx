@@ -29,6 +29,8 @@ const ScatterPlot = ({ rawData = [], interaction = "" }) => {
         <ResponsiveScatterPlot
             data={data}
             margin={{ top: 20, right: 80, bottom: 70, left: 70 }}
+            blendMode='multiply'
+            colors={{ scheme: 'spectral' }}
             axisBottom={{
                 legend: 'Number of friends',
                 legendOffset: 46,
@@ -39,7 +41,7 @@ const ScatterPlot = ({ rawData = [], interaction = "" }) => {
                 legendOffset: -60,
                 legendPosition: 'middle'
             }}
-            yScale={{ type: 'linear', min: 0 }} // y is always 1, so max 2 for visibility
+            yScale={{ type: 'linear', min: 0 }} 
             xScale={{ type: 'linear', min: 0 }}
             legends={[
                 {

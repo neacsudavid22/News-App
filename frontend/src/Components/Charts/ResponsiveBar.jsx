@@ -1,6 +1,5 @@
 import { ResponsiveBar } from '@nivo/bar'
 import { useEffect, useState } from 'react'
-import useWindowSize from '../../hooks/useWindowSize';
 
 const Bar = ({ rawData = [], filterBy = "age", interaction = "" }) => {
     const [data, setData] = useState([]);
@@ -47,16 +46,16 @@ const Bar = ({ rawData = [], filterBy = "age", interaction = "" }) => {
         }
     }, [rawData, filterBy]);
 
-    const { IS_MD } = useWindowSize();
-
     if (!data.length) return <div>Loading...</div>;
 
     return(
         <ResponsiveBar 
+        groupMode='grouped'
             margin={{ top: 20, right: 130, bottom: 50, left: 80 }}
             data={data}
             keys={keys}
             indexBy="group"
+            colors={{ scheme: 'tableau10' }}
             axisBottom={{ 
                 legend: filterBy === "age" ? 'Age group' : 'Gender',
                 legendOffset: 32 

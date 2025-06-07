@@ -59,6 +59,7 @@ const Pie = ({ rawData = [], filterBy = "age" }) => {
             data={data}
             innerRadius={0.5}
             padAngle={0.6}
+            colors={{ scheme: 'tableau10' }}
             cornerRadius={2}
             activeOuterRadiusOffset={8}
             arcLinkLabelsSkipAngle={10}

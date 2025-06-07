@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 
 const Tree = ({ rawData = [], interaction = "" }) => {
     const [data, setData] = useState(null);
+    const total = rawData.length || 0;
     
-    useEffect(()=>{
+    useEffect(() => {
         const getAgeGroup = (age) => {
             if (age < 18) return 'sub 18';
             if (age < 25) return '18-24';
@@ -16,50 +17,68 @@ const Tree = ({ rawData = [], interaction = "" }) => {
         };
 
         const root = { name: interaction, children: [] };
-        const ageMap = {};
+        const categoryMap = {};
 
         for (const item of rawData) {
             const ageGroup = getAgeGroup(item.user_age);
             const gender = item.user_gender;
             const category = item.article_category;
 
-            if (!ageMap[ageGroup]) ageMap[ageGroup] = {};
-            if (!ageMap[ageGroup][gender]) ageMap[ageGroup][gender] = {};
-            if (!ageMap[ageGroup][gender][category]) ageMap[ageGroup][gender][category] = 0;
-            ageMap[ageGroup][gender][category]++;
+            if (!categoryMap[category]) categoryMap[category] = {};
+            if (!categoryMap[category][ageGroup]) categoryMap[category][ageGroup] = {};
+            if (!categoryMap[category][ageGroup][gender]) categoryMap[category][ageGroup][gender] = 0;
+            categoryMap[category][ageGroup][gender]++;
         }
 
-        for (const ageGroup of Object.keys(ageMap)) {
-            const ageNode = { name: ageGroup, children: [] };
-            for (const gender of Object.keys(ageMap[ageGroup])) {
-                const genderNode = { name: gender, children: [] };
-                for (const category of Object.keys(ageMap[ageGroup][gender])) {
-                    genderNode.children.push({
-                        name: ageMap[ageGroup][gender][category] + " - " + category,
-                        value: ageMap[ageGroup][gender][category]
+        for (const category of Object.keys(categoryMap)) {
+            const totalCategory = Object.values(categoryMap[category]).reduce(
+                (sum, ageObj) => sum + Object.values(ageObj).reduce((s, v) => s + v, 0), 0
+            );
+            // Procent din radacina
+            const percentCategory = ((totalCategory / total) * 100).toFixed(2);
+            const categoryNode = { name: `${category} - ${percentCategory}%`, children: [], value: totalCategory };
+
+            for (const ageGroup of Object.keys(categoryMap[category])) {
+                const totalAge = Object.values(categoryMap[category][ageGroup]).reduce((s, v) => s + v, 0);
+
+                // Procent din categoria părinte
+                const percentAge = ((totalAge / totalCategory) * 100).toFixed(2);
+                const ageNode = { name: `${ageGroup} - ${percentAge}%`, children: [], value: totalAge };
+
+                for (const gender of Object.keys(categoryMap[category][ageGroup])) {
+                    const count = categoryMap[category][ageGroup][gender];
+
+                    // Procent din ageGroup părinte
+                    const percentGender = ((count / totalAge) * 100).toFixed(2);
+                    ageNode.children.push({
+                        name: `${gender} - ${percentGender}%`,
+                        value: count
                     });
                 }
-                ageNode.children.push(genderNode);
+                categoryNode.children.push(ageNode);
             }
-            root.children.push(ageNode);
+            root.children.push(categoryNode);
         }
 
         setData(root);
-    }, [rawData, interaction]);
+    }, [total, rawData, interaction]);
 
     
     if (!data) return <div>Loading...</div>;
 
     return (
         <ResponsiveTree
-            margin={{ top: 50,  bottom: 90 }}
+            margin={{ top: 40,  bottom: 50 }}
             data={data}
             identity="name"
             value="value"
-            label={ node => node.data.name }
+            nodeColor={{ scheme: 'paired' }}
+            label={node => node.data.name}
+            labelsPosition="layout-opposite"
+            layout='top-to-bottom'
+            highlightAncestorLinks={true}
             activeNodeSize={24}
             inactiveNodeSize={12}
-            nodeColor={{ scheme: 'tableau10' }}
             fixNodeColorAtDepth={1}
             linkThickness={2}
             activeLinkThickness={8}
