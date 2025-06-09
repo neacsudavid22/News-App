@@ -34,6 +34,7 @@ const Radar = ({ rawDataLikes, rawDataSaves, rawDataShares, rawDataComments }) =
     if(!(data.length > 0)) return <p>Loading...</p>
 
     return (
+        <>
         <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "100vh" }}>
             <h2 className="text-center mb-4">Radar Chart</h2>
             <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>    
@@ -61,16 +62,17 @@ const Radar = ({ rawDataLikes, rawDataSaves, rawDataShares, rawDataComments }) =
                 ]}
             />
             </div>
-            <Stack direction='horizontal' gap={2} className='w-75 m-auto mt-3'>
-                <Form className="flex-grow-1">
-                    <Form.Group className="mb-3" controlId={`radar`}>
-                        <Form.Control as="textarea" rows={4} value={analysisText} disabled />
-                    </Form.Group>
-                </Form>
-                <Button variant="outline-info" onClick={analyzeData}
-                >Get Analysis <Gemini size={20} /></Button>
-            </Stack>
         </Col>
+        <Stack direction='horizontal' gap={2} className='w-75 m-auto mt-3'>
+            <Form className="flex-grow-1">
+                <Form.Group className="mb-3" controlId={`radar`}>
+                    <Form.Control as="textarea" rows={4} value={analysisText} disabled />
+                </Form.Group>
+            </Form>
+            <Button variant="outline-info" onClick={analyzeData}
+            >Get Analysis <Gemini size={20} /></Button>
+        </Stack>
+        </>
     );
 }
 
