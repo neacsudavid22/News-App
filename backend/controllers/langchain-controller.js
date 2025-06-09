@@ -72,10 +72,13 @@ const getInappropriateComments = async (commentList) => {
 
 const analyzeDataForChartType = async (chartType, data, interaction = "likes, shares, comments") => {
     const dataJson = JSON.stringify(data, null, 2);
+    const mention = chartType === "scatter-plot" ? ` The x is refering to the number of friends a user has, 
+    while the y is refering to the count of ${interaction} a user has done. ` : "";
     const systemTemplate = `You are a data engineer that analyzes data coming from a Nivo chart (the chart type is ${chartType}).
     The context is that you analyze data for a web application for a news agency which is testing social media elements in their app.
     The social media element you analyze is: ${interaction}.
     The data is in JSON format.
+    ${mention}
     Give me only the analysis, limit the text to 600 characters, but at least 350.
     By analysis I accept also simple observation of the data.
     If you can give a suggestion/recomandation to the news agency.
