@@ -76,14 +76,14 @@ const getArticleById = async (id) => {
     }
 }
 
-const getSavedArticles = async (savedArticlesIds, page = 0) => {
+const getSavedArticles = async (userId, page = 0) => {
     try {
-        const savedArticles = await Article.find({ _id: { $in: savedArticlesIds } })
+        const response = await User.find({_id: userId}).select('savedArticles').exec();
+        const { savedArticles } = response[0];
+        return await Article.find({ _id: { $in: savedArticles } })
             .sort({ updatedAt: -1 }) 
             .skip(page * 20)
             .limit(20);
-
-        return savedArticles;
     } catch (err) {
         console.error(`getSavedArticles Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
@@ -153,7 +153,7 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
         ? { $pull: { [interaction]: user._id } }
         : { $addToSet: { [interaction]: user._id } };
   
-      const articleResult = await Article.findOneAndUpdate(
+      const articleResult = await Article.updateOne(
         { _id: articleId },
         articleUpdate,
         { new: true, timestamps: false }
@@ -161,7 +161,7 @@ const interactOnArticle = async (articleId, user, interaction = 'likes') => {
 
       if (interaction === "saves") {
   
-        userResult = await User.findOneAndUpdate(
+        userResult = await User.updateOne(
           { _id: user._id },
           alreadyInteracted
             ? { $pull: { savedArticles: article._id } }

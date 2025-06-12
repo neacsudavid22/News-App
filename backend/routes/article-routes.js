@@ -67,7 +67,7 @@ articlesRouter.route('/article/:id').get(async (req, res) => {
 articlesRouter.route('/saved-articles').get(authMiddleware, async (req, res) => {
     try{
         console.log(req.user.savedArticles)
-        const result = await getSavedArticles(req.user.savedArticles, req.query.page);
+        const result = await getSavedArticles(req.user._id, req.query.page);
         if (result.error) {
             return res.status(400).json({ message: result.message });
         }
