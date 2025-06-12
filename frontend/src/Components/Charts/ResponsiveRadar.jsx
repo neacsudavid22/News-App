@@ -35,7 +35,7 @@ const Radar = ({ rawDataLikes, rawDataSaves, rawDataShares, rawDataComments }) =
 
     return (
         <>
-        <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "100vh" }}>
+        <Col md={10} className="d-flex flex-column justify-content-center align-items-center mb-4" style={{ minHeight: IS_SM ? "50vh" : "80vh" }}>
             <h2 className="text-center mb-4">Radar Chart</h2>
             <div className={`${IS_SM ? "w-100" : "w-75"} h-100 border-bottom`}>    
             <ResponsiveRadar 

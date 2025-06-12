@@ -9,7 +9,6 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router";
 import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } from "../Services/articleService";
 import CommentListAdmin from "../Components/CommentListAdmin";
-import ChartsPage from "./ChartsPage";
 
 const DashboardPage = () => {   
 
