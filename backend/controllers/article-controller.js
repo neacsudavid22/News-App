@@ -60,17 +60,36 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
     }
   };
 
-  
-
 const getArticleById = async (id) => {
-    try{
-        const article = await Article.findById(id)
-        if(!article){
+    try {
+        const result = await Article.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(id) } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "author",
+                    foreignField: "_id",
+                    as: "authorInfo"
+                }
+            },
+            { $unwind: "$authorInfo" },
+            {
+                $addFields: {
+                    author_username: "$authorInfo.username",
+                    author_name: "$authorInfo.name"
+                }
+            },
+            {
+                $project: {
+                    authorInfo: 0 // exclude the joined array
+                }
+            }
+        ]);
+        if (!result || result.length === 0) {
             return { error: true, message: "Article not found" };
         }
-        return article
-    }
-    catch (err) {
+        return result[0];
+    } catch (err) {
         console.error(`getArticleById Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }

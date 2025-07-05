@@ -19,14 +19,23 @@ const getUsers = async () => {
 }
 
 const getUserById = async (id) => {
-    try{
+    try {
         const user = await User.findById(id)
-        if(!user){
+            .populate({
+                path: 'friendList',
+                select: 'username name'
+            })
+            .populate({
+                path: 'shareList.userFrom',
+                select: 'username name'
+            })
+            .lean();
+
+        if (!user) {
             return { error: true, message: "User not found" };
         }
         return user;
-    }
-    catch (err) {
+    } catch (err) {
         console.error(`getUsersById Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
     }

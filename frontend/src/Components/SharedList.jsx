@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { AuthContext } from './AuthProvider';
-import { getUsername } from '../Services/userService';
 import { getTitle } from '../Services/articleService';
 import { Stack } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
@@ -9,7 +8,6 @@ import ShareCard from './ShareCard';
 
 const SharedList = ({ show, handleClose, setUncheckedShare }) => {
     const { user } = useContext(AuthContext);
-    const [usernames, setUsernames] = useState({});
     const [titles, setTitles] = useState({});
 
     const shareList = (user?.shareList || []).sort(
@@ -19,30 +17,6 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
     useEffect(() => {
         setUncheckedShare(shareList.some(item => item.read === false));
     }, [shareList, setUncheckedShare]);
-
-    useEffect(() => {
-        const fetchUsernames = async () => {
-            const tempUsernames = {};
-
-            await Promise.all(
-                shareList.map(async (item) => {
-                    const userFrom = item.userFrom;
-                    if (!tempUsernames[userFrom]) {
-                        try {
-                            const username = await getUsername(userFrom);
-                            tempUsernames[userFrom] = username;
-                        } catch {
-                            tempUsernames[userFrom] = "Unknown";
-                        }
-                    }
-                })
-            );
-
-            setUsernames(tempUsernames);
-        };
-
-        fetchUsernames();
-    }, [shareList]);
 
     useEffect(() => {
         const fetchTitles = async () => {
@@ -90,7 +64,7 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
                                 articleId={sharedItem.sharedArticle}
                                 articleTitle={titles[sharedItem.sharedArticle] || "Unknown Title"}
                                 sentAt={sharedItem.sentAt}
-                                userFrom={usernames[sharedItem.userFrom] || "Unknown User"}
+                                userFrom={sharedItem.userFrom.username || "Unknown User"}
                                 read={sharedItem.read || false}
                                 handleClose={handleClose}
                             />

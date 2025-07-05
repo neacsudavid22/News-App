@@ -3,29 +3,9 @@ import Container from "react-bootstrap/esm/Container";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Image from "react-bootstrap/Image";
-import { getAuthorName } from "../Services/userService";
 
 const ArticleComponent = ( {article} ) => { 
     const [imageUrls, setImageUrls] = useState({}); 
-    const [author, setAuthor] = useState(null);
-
-    useEffect(() => {
-        const fetchAuthor = async () => {
-            try {
-                    if(!article) return;
-
-                    const authorName = await getAuthorName(article.author);
-                    if(authorName){
-                        setAuthor(authorName);
-                    }
-                }
-            catch (err) {
-                console.error("Error fetching article:", err);
-            }
-        };
-
-        fetchAuthor();
-    }, [article]);
 
     useEffect(() => {
         if (!article?.articleContent) return;
@@ -47,7 +27,7 @@ const ArticleComponent = ( {article} ) => {
             </Row>
             <Row className="w-100 justify-content-center ms-1 my-2">
                 <Col xs={12} sm={12} md={8} lg={8} xl={7} > 
-                    <h5>{author ? "Author: " + author : "Loading..."}</h5>
+                    <h5>{article?.author_name ? "Author: " + article?.author_name : "Loading..."}</h5>
                 </Col>
             </Row>
                 {article?.articleContent?.map((a, index) => {
