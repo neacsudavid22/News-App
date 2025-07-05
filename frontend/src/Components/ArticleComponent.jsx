@@ -27,7 +27,7 @@ const ArticleComponent = ( {article} ) => {
             </Row>
             <Row className="w-100 justify-content-center ms-1 my-2">
                 <Col xs={12} sm={12} md={8} lg={8} xl={7} > 
-                    <h5>{article?.author_name ? "Author: " + article?.author_name : "Loading..."}</h5>
+                    <h5>{article?.author?.name ? "Author: " + article?.author?.name : "Loading..."}</h5>
                 </Col>
             </Row>
                 {article?.articleContent?.map((a, index) => {

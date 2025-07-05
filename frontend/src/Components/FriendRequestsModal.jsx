@@ -4,7 +4,6 @@ import { AuthContext } from './AuthProvider';
 import { getUsername, requestService } from '../Services/userService';
 
 const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest }) => {
-    const { user, refresh } = useContext(AuthContext);
     const [friendRequests, setFriendRequests] = useState([]);
     const [usernames, setUsernames] = useState({});
     const [handledRequests, setHandledRequests] = useState(0);
@@ -20,41 +19,13 @@ const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest 
         setUncheckedRequest(user?.friendRequests.length > 0);
     }, [user, setUncheckedRequest]);
 
-    useEffect(() => {
-        const getUsernameFetch = async (id) => {
-            try {
-                const username = await getUsername(id);
-                return username;
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        const fetchUsernames = async () => {
-            const tempUsernames = {}
-                
-            await Promise.all(
-                (friendRequests).map(async (fr) => {
-                    const username = await getUsernameFetch(fr);
-                    tempUsernames[fr] = username;
-                })
-            );
-        
-            setUsernames(tempUsernames);
-        }
-
-        fetchUsernames();
-    }, [friendRequests]);
-
     const handleRequest = async (requestUserId, action) => {
         try {
             const fetchResult = await requestService(requestUserId, action);
             if (fetchResult !== null) {
-                setFriendRequests(prev => prev.filter(id => id !== requestUserId));
-
-                setUsernames(prev => {
-                    const updated = { ...prev };
-                    delete updated[requestUserId];
+                setFriendRequests(prev => {
+                    const updated = prev.filter(req => req._id !== requestUserId);
+                    setUncheckedRequest(updated.length > 0);
                     return updated;
                 });
 

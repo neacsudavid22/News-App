@@ -1,14 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { AuthContext } from './AuthProvider';
-import { getTitle } from '../Services/articleService';
 import { Stack } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import ShareCard from './ShareCard';
 
 const SharedList = ({ show, handleClose, setUncheckedShare }) => {
     const { user } = useContext(AuthContext);
-    const [titles, setTitles] = useState({});
 
     const shareList = (user?.shareList || []).sort(
         (a, b) => new Date(b.sentAt) - new Date(a.sentAt)
@@ -18,29 +16,6 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
         setUncheckedShare(shareList.some(item => item.read === false));
     }, [shareList, setUncheckedShare]);
 
-    useEffect(() => {
-        const fetchTitles = async () => {
-            const tempTitles = {};
-
-            await Promise.all(
-                shareList.map(async (item) => {
-                    const articleId = item.sharedArticle;
-                    if (!tempTitles[articleId]) {
-                        try {
-                            const title = await getTitle(articleId);
-                            tempTitles[articleId] = title;
-                        } catch {
-                            tempTitles[articleId] = "Unknown Title";
-                        }
-                    }
-                })
-            );
-
-            setTitles(tempTitles);
-        };
-
-        fetchTitles();
-    }, [shareList]);
 
     const { IS_SM } = useWindowSize();
 
@@ -62,7 +37,7 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
                                 key={sharedItem._id}
                                 sharedItemId={sharedItem._id}
                                 articleId={sharedItem.sharedArticle}
-                                articleTitle={titles[sharedItem.sharedArticle] || "Unknown Title"}
+                                articleTitle={sharedItem.sharedArticle.title || "Unknown Title"}
                                 sentAt={sharedItem.sentAt}
                                 userFrom={sharedItem.userFrom.username || "Unknown User"}
                                 read={sharedItem.read || false}

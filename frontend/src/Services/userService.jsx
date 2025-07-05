@@ -75,20 +75,6 @@ const getAuthorName = async (authorId) => {
     }
 }
 
-const getUsername = async (userId) => {
-    try{
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/username/${userId}`);
-        if(!response.ok){
-            throw new Error(response?.message || "Failed to get username");
-        }
-        const username = await response.json();
-        return username;
-    } catch(err){
-        console.error("getUsername error, the user might not exist anymore:", err);
-        return null;
-    }
-}
-
 const requestService = async (requestUserId, action = "accept") => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/handle-request/${requestUserId}`, {
@@ -211,7 +197,6 @@ export {
     authenticateUser, 
     signUpUser, 
     getAuthorName, 
-    getUsername, 
     sendFriendRequest,  
     updateUser, 
     requestService,

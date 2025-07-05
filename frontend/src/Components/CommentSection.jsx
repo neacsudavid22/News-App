@@ -1,13 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
-import Stack from "react-bootstrap/esm/Stack";
 import Collapse from "react-bootstrap/Collapse";
 import { AuthContext } from "../Components/AuthProvider";
 import { deleteComment, deleteGarbageComment } from "../Services/articleService";
-import { getUsername } from "../Services/userService";
 import CommentForm from "../Components/CommentForm";
 import Card from "react-bootstrap/Card";
 
@@ -16,7 +14,6 @@ const CommentSection = ({ articleId, comments }) => {
   const [commentList, setCommentList] = useState(comments);
   const [commentMap, setCommentMap] = useState({});
   const [commentTree, setCommentTree] = useState([]);
-  const [usernames, setUsernames] = useState({});
   const [openMap, setOpenMap] = useState({});
   const [replyMap, setReplyMap] = useState({});
 
@@ -31,32 +28,6 @@ const CommentSection = ({ articleId, comments }) => {
 
     setCommentMap(tempMap);
   }, [commentList]);
-
-  // Fetch usernames
-  useEffect(() => {
-    const fetchUsernames = async () => {
-      const tempUsernames = {};
-
-      await Promise.all(
-        Object.values(commentMap).map(async (comment) => {
-          if (!tempUsernames[comment.userId]) {
-            try {
-              const username = await getUsername(comment.userId);
-              tempUsernames[comment.userId] = username;
-            } catch (err) {
-              console.error(err);
-            }
-          }
-        })
-      );
-
-      setUsernames(tempUsernames);
-    };
-
-    if (Object.keys(commentMap).length > 0) {
-      fetchUsernames();
-    }
-  }, [commentMap]);
 
   // Build tree structure
   useEffect(() => {
@@ -169,7 +140,7 @@ const CommentSection = ({ articleId, comments }) => {
                     <Card.Title className="mb-0 h6 ">
                       {comment.removed
                         ? "deleted"
-                        : "@" + (usernames[comment.userId] || "loading...")}
+                        : "@" + (comment.username || "loading...")}
                     </Card.Title>
                     <small className="text-muted fst-italic fw-bold">
                       {`Trimis la ${formattedSentTime}${isToday ? "" : ` (${formattedSentDate})`}`}
