@@ -1,4 +1,5 @@
-import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import { createContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -6,91 +7,54 @@ const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const refreshInterval = useRef(null);
 
-    const login = useCallback(async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user-by-token`, {
+    const getAuthUser = async () => {
+        try{
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/auth-user`, {
                 method: "GET",
                 credentials: "include"
             });
-
-            if (response.ok) {
+            if(response.ok){
                 const result = await response.json();
-                setUser(result.user);
-                return { success: true, user: result.user };
+                if(result.authenticated) { setUser(result.user) }
+                return { authenticated: result.authenticated }
             }
-
-            setUser(null);
-            return { success: false, user: null };
-        } catch (error) {
-            console.error("Login error:", error);
-            setUser(null);
-            return { success: false, user: null };
+        } catch(err){
+            console.error(err);
         }
-    }, []);
+    }
 
-
-    const refresh = useCallback(async () => {
-        try {
-            await fetch(`${import.meta.env.VITE_API_URL}/user-api/refresh-token`, {
-                method: "GET",
-                credentials: "include"
-            });
-
-        } catch (error) {
-            console.error("Refresh failed:", error);
-        }
-    }, []);
-
-    const logout = useCallback(async () => {
+    const logout = async () => {
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/user-api/logout`, {
                 method: "POST",
                 credentials: "include"
             });
-        } finally {
             setUser(null);
             if (refreshInterval.current) {
                 clearInterval(refreshInterval.current);
                 refreshInterval.current = null;
             }
+        } 
+        catch(err){
+            console.error(err);
         }
-    }, []);
+    };
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/user-api/check-auth`, {
-                    method: "GET",
-                    credentials: "include"
-                });
-
-                const result = await response.json();
-                if (result.authenticated === true) {
-                    await login();
-
-                    if (!refreshInterval.current) {
-                        refreshInterval.current = setInterval(refresh, 20000); 
-                    }
-                } else {
-                    setUser(null);
-                }
-            } catch (err) {
-                console.error("Auth check error:", err);
-                setUser(null);
-            }
-        };
-
-        checkAuth();
-
+        (async () => await getAuthUser())();
+        if (!refreshInterval.current) {
+            refreshInterval.current = setInterval(getAuthUser,  5 * 60 * 1000); 
+        }
         return () => {
             if (refreshInterval.current) {
                 clearInterval(refreshInterval.current);
+                refreshInterval.current = null;
             }
         };
-    }, [login, refresh]);
+    }, []);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, refresh }}>
+        <AuthContext.Provider value={{ user, getAuthUser, logout }}>
             {children}
         </AuthContext.Provider>
     );

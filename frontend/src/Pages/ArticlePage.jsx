@@ -21,7 +21,7 @@ const ArticlePage = () => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { user, refresh } = useContext(AuthContext);
+  const { user, getAuthUser } = useContext(AuthContext);
   
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -101,7 +101,7 @@ const ArticlePage = () => {
                 if (!user) return handleShow();
                 setSaved(!saved);  
                 await interactOnPost(id, "saves");
-                await refresh();
+                await getAuthUser();
               }}
               size={IS_SM ? "sm" : ""}
               className="me-2 rounded-5"

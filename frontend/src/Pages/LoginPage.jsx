@@ -28,7 +28,7 @@ const LoginPage = () => {
     const [address, setAddress] = useState(null);
 
     const navigate = useNavigate();
-    const { login, user } = useContext(AuthContext);
+    const { getAuthUser, user } = useContext(AuthContext);
     const admin = user?.account === "admin"
 
     const [TRY_TO_LOGIN, SET_TRY_TO_LOGIN] = useState(!admin);
@@ -73,12 +73,12 @@ const LoginPage = () => {
             }
 
             try {
-                const response = await authenticateUser(username, password);
-                if (!response || !response.token) throw new Error("No token received");
+                const result = await authenticateUser(username, password);
+                if (!result || !result.token) throw new Error("No token received");
 
-                const { success, user } = await login();
-                if (success) {
-                    navigate(user.account === "standard" ? "/" : "/dashboard");
+                const { authenticated } = await getAuthUser();
+                if (authenticated) {
+                    navigate(user?.account === "standard" ? "/" : "/dashboard");
                 } else {
                     throw new Error("Couldn't login");
                 }
@@ -110,8 +110,8 @@ const LoginPage = () => {
                         handleShow();
                         emptyFields();
                     } else {
-                        const { success, user } = await login();
-                        if (success) {
+                        const { authenticated } = await getAuthUser();
+                        if (authenticated) {
                             navigate(user.account === "standard" ? "/" : "/dashboard");
                         } else {
                             throw new Error("Couldn't login after signup");

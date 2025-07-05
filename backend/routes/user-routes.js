@@ -122,54 +122,21 @@ const usersRouter = express.Router();
         return res.status(200).json(result);
     })
 
-    usersRouter.post("/logout", authMiddleware, (req, res) => {
+    usersRouter.post("/logout", authMiddleware, async (req, res) => {
         res.clearCookie("token", {
             httpOnly: true,
             sameSite: "Lax"
         });
         return res.status(200).json({ message: "Logged out successfully" });
     });
-    
-    usersRouter.get("/refresh-token", authMiddleware, async (req, res) => {
-        try {
+
+    usersRouter.get("/auth-user", authMiddleware, async (req, res) => {
+        if (req.user) {
             const user = await getUserById(req.user._id);
-            if (!user) {
-                return res.status(400).json({ message: "User not found" });
-            }
-            const forRefresh = true;
-            const result = await loginUser(user.username, user.password, forRefresh);
-    
-            res.clearCookie("token", {
-                httpOnly: true,
-                sameSite: "Lax"
-            });
-    
-            res.cookie("token", result.token, {
-                httpOnly: true,
-                sameSite: "Lax",
-                maxAge: 60 * 60 * 1000
-            });
-    
-            return res.status(200).json(result);
-        } catch (error) {
-            console.error("Error refreshing token:", error);
-            return res.status(500).json({ message: "Internal server error" });
+            delete user.password;
+            return res.status(200).json({ authenticated: true, user: user });
         }
-    });
-
-    usersRouter.get("/check-auth", (req, res) => {
-        if (req.cookies.token) {
-            return res.json({ authenticated: true });
-        }
-        return res.json({ authenticated: false });
-    });
-
-    usersRouter.get("/user-by-token", authMiddleware, async (req, res) => {
-        const user = await getUserById(req.user._id);
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-        return res.status(200).json({ user });
+        return res.status(200).json({ authenticated: false });
     });
 
     usersRouter.put("/share-article-to/:fid", authMiddleware, async (req, res) => {

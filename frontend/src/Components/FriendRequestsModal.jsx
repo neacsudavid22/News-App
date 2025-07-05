@@ -1,18 +1,15 @@
 import { Modal, Button, ListGroup, Row, Col } from 'react-bootstrap';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
-import { getUsername, requestService } from '../Services/userService';
+import { requestService } from '../Services/userService';
 
 const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest }) => {
+    const { user, getAuthUser } = useContext(AuthContext);
     const [friendRequests, setFriendRequests] = useState([]);
-    const [usernames, setUsernames] = useState({});
-    const [handledRequests, setHandledRequests] = useState(0);
 
-    const handleClose = () => {
+    const handleClose = async () => {
+        await getAuthUser();
         setShowFriendRequests(false);
-        if(handledRequests > 0){
-            window.location.reload();
-        }
     }
     useEffect(() => {
         setFriendRequests(user?.friendRequests || []);
@@ -28,11 +25,6 @@ const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest 
                     setUncheckedRequest(updated.length > 0);
                     return updated;
                 });
-
-                setHandledRequests(prev=>prev+1);
-
-                setUncheckedRequest(prev => prev && friendRequests.length - 1 > 0);
-                await refresh();
             }
         } catch (err) {
             console.error(err);
@@ -40,48 +32,47 @@ const FriendRequestsModal = ({ show, setShowFriendRequests, setUncheckedRequest 
     };
 
     return (
-        <Modal show={show} className='mt-4' onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Friend Requests</Modal.Title>
+        <Modal scrollable show={show} className='mt-4 overflow-visible' onHide={handleClose} style={{height: "90vh"}}>
+            <Modal.Header closeButton >
+                <Modal.Title className='px-2'>Friend Requests</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="px-3" >
                 <ListGroup>
                     {friendRequests.length > 0 ? (
-                        friendRequests.map((requestUserId, index) => (
-                            <ListGroup.Item key={index}>
-                                <Row className="align-items-center justify-content-between">
-                                    <Col xs={6} className="text-truncate">
-                                        <strong>{usernames[requestUserId] || "Loading..."}</strong>
-                                    </Col>
-                                    <Col xs="auto">
+                        friendRequests.map((friendRequest, index) => (
+                            <ListGroup.Item key={index} className="mb-3 border rounded-3 shadow-sm over">
+                                <div className="d-flex flex-column align-items-center py-1">
+                                    <strong className="fs-5 mb-2 text-center">
+                                        {friendRequest.username || "Loading..."}
+                                    </strong>
+                                    <div className="d-flex gap-3">
                                         <Button
                                             variant="success"
                                             size="sm"
-                                            className="me-2"
-                                            onClick={() => handleRequest(requestUserId, "accept")}
+                                            className="px-4"
+                                            onClick={() => handleRequest(friendRequest._id, "accept")}
                                         >
                                             Accept
                                         </Button>
                                         <Button
                                             variant="danger"
                                             size="sm"
-                                            onClick={() => handleRequest(requestUserId, "decline")}
+                                            className="px-4"
+                                            onClick={() => handleRequest(friendRequest._id, "decline")}
                                         >
                                             Decline
                                         </Button>
-                                    </Col>
-                                </Row>
+                                    </div>
+                                </div>
                             </ListGroup.Item>
                         ))
                     ) : (
-                        <p className="text-center text-muted">No friend requests.</p>
+                        <p className="text-center text-muted my-4">No friend requests.</p>
                     )}
                 </ListGroup>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
+
             </Modal.Footer>
         </Modal>
     );

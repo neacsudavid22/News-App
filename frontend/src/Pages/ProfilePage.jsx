@@ -12,7 +12,7 @@ import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router";
 
 const ProfilePage = () => {
-    const { user, refresh } = useContext(AuthContext);
+    const { user, getAuthUser } = useContext(AuthContext);
     const [modifiedUser, setModifiedUser] = useState(user);
     const [show, setShow] = useState(false);
     const navigate = useNavigate();
@@ -23,7 +23,7 @@ const ProfilePage = () => {
         try{
             const result = await updateUser(user._id, modifiedUser);
             if(result){ 
-                refresh(); 
+                await getAuthUser(); 
                 handleShow();
             }
         }

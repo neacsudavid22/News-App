@@ -17,8 +17,8 @@ import SharedList from "./SharedList";
 const MainNavbar = ({toModify = false}) => {
     const { user, logout } = useContext(AuthContext); 
 
-    const handleLogout = () => {
-        if(user){ logout() }
+    const handleLogout = async () => {
+        if(user){ await logout() }
     }
 
     const [showAddFriend, setShowAddFriend] = useState(false);

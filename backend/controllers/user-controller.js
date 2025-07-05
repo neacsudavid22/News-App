@@ -229,24 +229,17 @@ const removeFriend = async (id, friendId) => {
     }
 };
 
-const loginUser = async (username, password, forRefresh = false) => {
+const loginUser = async (username, password) => {
     try {
-        const user = await User.findOne({ username }).exec();
+        const user = await User.findOne({ username })
+                            .select('-friendRequests -friendList -savedArticles -shareList').exec();
         if (!user) return { error: true, message: "User doesn't exist" };
 
-        // Compare password with hashed version
-        if(!forRefresh){
-            const validPassword = await bcrypt.compare(password, user.password);
-            if (!validPassword) return { error: true, message: "Invalid password" };
-        }
-        else if (password !== user.password) return { error: true, message: "Invalid password" };
-
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) return { error: true, message: "Invalid password" };
+        
         const userObj = user.toObject();
         delete userObj.password;
-        delete userObj.friendRequests;
-        delete userObj.friendList;
-        delete userObj.savedArticles;
-        delete userObj.shareList;
 
         // Generate JWT token
         const token = jwt.sign(
@@ -254,7 +247,7 @@ const loginUser = async (username, password, forRefresh = false) => {
         );
 
         if(!token) return { error: true, message: "Error generating token" };
-        return { token };
+        return { error: false, token: token };
     } catch (err) {
         console.error("Error with login:", err);
         return { error: true, message: "Internal Server Error" };

@@ -6,7 +6,7 @@ import { markAsRead } from "../Services/userService";
 import { AuthContext } from "./AuthProvider";
 
 const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sentAt, handleClose }) => {
-    const { refresh } = useContext(AuthContext);
+    const { getAuthUser } = useContext(AuthContext);
     const [wasRead, setWasRead] = useState(read);
     const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ const ShareCard = ({ sharedItemId, articleId, articleTitle, userFrom, read, sent
         const result = await markAsRead(sharedItemId);
         if (!result.error) {
             setWasRead(true);
-            await refresh();
+            await getAuthUser();
         } else {
             console.warn("Could not mark as read:", result.message);
         }
