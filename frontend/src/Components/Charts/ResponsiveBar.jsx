@@ -127,14 +127,17 @@ const Bar = ({ interactionType, rawData = [], filterBy = "age" }) => {
             />
             </div>   
         </Col>
-        <Stack direction='horizontal' gap={2} className='w-75 m-auto mt-3'>
-            <Form className="flex-grow-1">
+         <Stack direction='vertical' gap={2} className='w-50 mt-3'>
+            <Form className='w-75 mx-auto'>
                 <Form.Group className="mb-3" controlId={`bar-analysis-${filterBy}-${interactionType}`}>
-                    <Form.Control as="textarea" rows={4} value={analysisText} disabled />
+                    <Form.Control as="textarea" rows={5} value={analysisText} disabled />
                 </Form.Group>
+                <div className="d-flex justify-content-end">
+                    <Button variant="outline-info" onClick={analyzeData}>
+                        Get Analysis <Gemini size={20} />
+                    </Button>
+                </div>
             </Form>
-            <Button variant="outline-info" onClick={analyzeData}
-            >Get Analysis <Gemini size={20} /></Button>
         </Stack>
         </>
     );

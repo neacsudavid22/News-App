@@ -53,7 +53,7 @@ const ChartsPage = () => {
     return (
       <>
         <MainNavbar />
-        <Container fluid className=" d-flex justify-content-center h-100 pt-4">
+        <Container fluid className=" d-flex justify-content-center h-100 pt-4 mb-4">
           <Row className="w-100 justify-content-center g-4">
             <Col md={10} className="d-flex flex-column bg-white justify-content-center align-items-center mb-4">
                 <Tabs
