@@ -100,13 +100,13 @@ articlesRouter.route('/comments').get(authMiddleware, async (req, res) => {
         if(req.user.account !== 'admin') 
             return res.status(403).json({ message: "access forbiden for non-admins" });
         
-        const result = await getComments(req.query.page || 0);
+        const result = await getComments(req.query.page || 1);
 
         if (result.error) {
             return res.status(400).json({ message: result.message });
         }    
 
-        return res.status(200).json({comments: result});
+        return res.status(200).json(result);
     } catch (err) {
         console.error(`Error fetching comments: ${err.message}`);
         return res.status(500).json({ message: "Internal Server Error" });

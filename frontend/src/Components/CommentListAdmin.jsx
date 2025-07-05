@@ -1,78 +1,58 @@
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { getUsername } from '../Services/userService';
-import { ButtonGroup, Col, Row, Stack, Tab, Tabs } from 'react-bootstrap';
+import { ButtonGroup, Col, Row, Spinner, Stack, Tab, Tabs } from 'react-bootstrap';
 import useWindowSize from '../hooks/useWindowSize';
 import { deleteComment, getAllComments, getInappropriateComments } from '../Services/articleService';
 import useElementInView from "../hooks/useElementInView";
 import { Gemini } from '@lobehub/icons';
+import { useRef } from 'react';
 
 const CommentListAdmin = ({ show, setShowCommentList }) => {
     const [commentList, setCommentList] = useState([]); 
-    const [usernames, setUsernames] = useState({});
     const { IS_SM } = useWindowSize();
     const [selectMode, setSelectMode] = useState("chronological");
-    const [page, setPage] = useState(0);
+    const FETCHING = useRef(false);
+    const [chronologicalPage, setChronologicalPage] = useState(1);
+    const [geminiPage, setGeminiPage] = useState(1);
     const [targetRef, isInView] = useElementInView({ threshold: 0.5 });
 
     const handleClose = () => {
         setShowCommentList(false);
     };
 
-    useEffect(()=>{
-        setPage(0);
-    },[selectMode])
-
-    useEffect(() => {
-    if (isInView && commentList.length >= 20) {
-      setPage(prev => prev + 1);
+    const handleSelectMode = (mode) => {
+        setSelectMode(mode);
+        setCommentList([]);
+        setChronologicalPage(1); 
+        setGeminiPage(1);
     }
-  }, [isInView, commentList]);
 
     useEffect(() => {
         const fetchComments = async () => {
+            FETCHING.current = true
             switch(selectMode){
                 case "chronological":
                     {
-                        const result = await getAllComments(page);
-                        setCommentList(result);
+                        const comments = await getAllComments(chronologicalPage);
+                        setCommentList(prev => [...prev, ...(comments || [])]);
                     } break;
                 case "gemini": {
-                        const result = await getInappropriateComments(page);
-                        setCommentList(result);
+                        const comments = await getInappropriateComments(geminiPage);
+                        setCommentList(prev => [...prev, ...(comments || [])]);
                 } break;
                 default: 
                     setCommentList([]);
                     break;
             }
-            
+            FETCHING.current = false
         };
-        fetchComments();
-    }, [selectMode, page]);
-
-    useEffect(() => {
-        const fetchUsernames = async () => {
-            const temp = {};
-            await Promise.all(
-                commentList.map(async (comment) => {
-                    const uid = comment.userId;
-                    if (!temp[uid]) {
-                        try {
-                            temp[uid] = await getUsername(uid);
-                        } catch {
-                            temp[uid] = "Unknown";
-                        }
-                    }
-                })
-            );
-            setUsernames(temp);
-        };
-
-        if (commentList) {
-            fetchUsernames();
+        if (isInView && !FETCHING.current) {
+            fetchComments();
+            selectMode === 'chronological' ? 
+                setChronologicalPage(prev => prev + 1) : setGeminiPage(prev => prev + 1)
         }
-    }, [commentList]);
+    }, [selectMode, chronologicalPage, geminiPage, isInView]);
 
     const handleDeleteComment = async (comment) => {
         try {
@@ -86,18 +66,17 @@ const CommentListAdmin = ({ show, setShowCommentList }) => {
         }
     };
 
-
     return (
      <Offcanvas show={show} onHide={handleClose} placement="bottom" className="h-75">
             <Offcanvas.Header closeButton className={`w-${IS_SM ? 100 : 75} m-auto border-bottom`}>
                 <ButtonGroup
                     className="mx-3" 
                 >
-                    <Button onClick={()=>setSelectMode("chronological")}
+                    <Button onClick={()=>handleSelectMode("chronological")}
                             variant={selectMode === "chronological" ? 'secondary' : 'outline-secondary'}
                             size={IS_SM ? "sm" : "lg"}
                         >Chronological</Button>
-                    <Button  onClick={()=>setSelectMode("gemini")}
+                    <Button onClick={()=>handleSelectMode("gemini")}
                             variant={selectMode === "gemini" ? 'info' : 'outline-info'}
                             size={IS_SM ? "sm" : "lg"}
                         >Gemini detection <Gemini size={20} /></Button>
@@ -106,28 +85,35 @@ const CommentListAdmin = ({ show, setShowCommentList }) => {
             <Offcanvas.Body className={`w-${IS_SM ? 100 : 75} m-auto`}>
                 <Stack gap={2}>
                     {commentList.length > 0 ? (
-                        commentList.map((comment) => (
+                        commentList.map((comment, index) => (
                             <div
-                                key={comment._id}
-                                className={` px-${IS_SM ? "2" : "5"} d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom`}
+                                key={comment._id + index}
+                                className={`px-${IS_SM ? "2" : "5"} mb-3 pb-2 border-bottom`}
                             >
-                                <div>
-                                    <strong className='fs-5'>{"user: " + usernames[comment.userId] || "loading..."}</strong>
-                                    <div className='mt-3 text-muted'>Comment content: {comment.content}</div>
+                                <strong className='fs-5'>
+                                    {comment.username || "loading..."}
+                                </strong>
+                                <div className='mt-3 text-muted'>Comment content: {comment.content}</div>
+                                <div className="mt-2 mb-4 pt-3 border-top d-flex justify-content-start">
+                                    <Button
+                                        className="rounded-4"
+                                        variant="outline-danger"
+                                        onClick={() => handleDeleteComment(comment)}
+                                    >
+                                    <strong>Remove comment</strong><i className="ps-1 bi bi-trash-fill"></i>
+                                    </Button>
                                 </div>
-                                <Button
-                                    className="rounded-4"
-                                    variant="outline-danger"
-                                    onClick={() => handleDeleteComment(comment)}
-                                >
-                                    <strong>Delete</strong> <i className="ps-1 bi bi-trash-fill"></i>
-                                </Button>
                             </div>
                         ))
                     ) : (
                         <strong className="text-center fs-3 text-muted">No comments found.</strong>
                     )}
-                    {commentList.length >= 50 && <div ref={targetRef}></div>}
+                    {FETCHING.current && 
+                    <div className='d-flex justify-content-center'>
+                        <Spinner className=' align-center' animation='grow'></Spinner>
+                        <strong className='ps-3 fs-3 align'>Loading comments</strong>
+                    </div> }
+                    {<div ref={targetRef}></div>}
 
                 </Stack>
             </Offcanvas.Body>

@@ -286,28 +286,38 @@ const getAllImageUrls = async () => {
     }
 };
 
-const getComments = async (page = 0) => {
+const getComments = async (page = 1) => {
   try {
-    const articles = await Article.find({}).select("comments")
-                                  .skip(50 * page).limit(50 * (page + 1));
+    const pipeline = [
+      { $sort: { createdAt: -1 } },
+      { $skip: page - 1 },
+      { $limit: page * 5 },
+      { $unwind: "$comments" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "comments.userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          articleId: "$_id",
+          _id: "$comments._id",
+          userId: "$comments.userId",
+          username: "$user.username",
+          content: "$comments.content",
+          createdAt: "$comments.createdAt"
+        }
+      },
+      { $sort: { createdAt: -1 } }
+    ];
 
-    let allComments = [];
-    for(const article of articles){
-      for(const comment of article.comments){
-        allComments.push({
-                            articleId: article._id, 
-                            _id: comment._id, 
-                            userId: comment.userId,
-                            content: comment.content, 
-                            createdAt: comment.createdAt
-                          });
-      }
-    }
+    const allComments = await Article.aggregate(pipeline).exec();
 
-    allComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    return allComments;
-
+    return { comments: allComments }
   } catch (err) {
     console.error(`getComments Error: ${err.message}`);
     return { error: true, message: "Internal Server Error" };
