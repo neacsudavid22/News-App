@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router";
 import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } from "../Services/articleService";
 import CommentListAdmin from "../Components/CommentListAdmin";
+import useWindowSize from "../hooks/useWindowSize";
 
 const DashboardPage = () => {   
 
@@ -17,6 +18,7 @@ const DashboardPage = () => {
     const [imageUrls, setImageUrls] = useState([]);
     const [unusedPublicIds, setUnusedPublicIds] = useState([]);
     const [showCommentListAdmin, setShowCommentListAdmin] = useState(false);
+    const {IS_SM} = useWindowSize();
 
     const loadingImagesRef = useRef(false);
 
@@ -58,10 +60,6 @@ const DashboardPage = () => {
         }
     } 
 
-    const handleCreateArticle = () => {
-        navigate("/author");
-    }
-
     return(
         
     <div className="h-100 bg-light">
@@ -70,57 +68,45 @@ const DashboardPage = () => {
     <Container fluid className="py-5 d-flex justify-content-center bg-light">
         <Row className="w-100 justify-content-center">
             <Col xs={12} md={10} lg={8} xl={6}>
-            <Stack gap={4} className="p-5 bg-white shadow rounded-4">
+            <Stack gap={4} className=" p-5 bg-white shadow rounded-4">
                 <h1 className="text-center fs-2 mb-2">
                 {user && `Welcome ${user.name}, you are registered as ${user.account}!`}
                 </h1>
-
-                <Row className="g-3 justify-content-center">
-                <Col xs={12} sm="auto">
-                    <Button size="lg" variant="primary" onClick={handleCreateArticle} className="w-100">
-                    Create Article
+                    <Button size="lg" variant="primary" onClick={()=>navigate("/author")} className={`${IS_SM ? 'w-100' : 'w-75'} mx-auto py-2 fs-5`}>
+                        Create Article
                     </Button>
-                </Col>
-                <Col xs={12} sm="auto">
-                    <Button size="lg" variant="warning" className="w-100"
+                    <Button size="lg" variant="warning" className={`${IS_SM ?' w-100' : 'w-75'} mx-auto py-2 fs-5`}
                         onClick={() => navigate("/?toModify=true")}
                     >
-                    Modify Article
+                        Modify Article
                     </Button>
-                </Col>
-                {user?.account === "admin" && (
-                    <>
-                    <Col xs={12} sm="auto">
-                    <Button size="lg" variant="success" className="w-100" 
-                        onClick={() => navigate("/login", {state: {admin: true}})}
-                    > Create Author
-                    </Button>
-                    </Col>
-                    <Col xs={12} sm="auto">
-                    <Button size="lg" variant="danger" className="w-100" 
-                        onClick={() => setShowCommentListAdmin(true)}
-                    >Manage comments
-                    </Button>
-                    </Col>
-                    <Col xs={12} sm="auto">
-                        <Button size="lg" variant="secondary" className="w-100"
-                                onClick={handleCleanUp} disabled={unusedPublicIds.lenght === 0}
-                        >
-                        {unusedPublicIds.length > 0 ? 
-                        `Clean Up - ${unusedPublicIds.length} unused images` 
-                        : "No images to Clean Up"}
-                        <i className={`ms-2 bi bi-${unusedPublicIds.length > 0 ? "trash" : "emoji-smile"}-fill`}></i>
-                        </Button>
-                    </Col>
-                    <Col xs={12} sm="auto">
-                        <Button size="lg" variant="primary" className="w-100" 
-                            onClick={() => navigate("/charts")}
-                        >View Statistics
-                        </Button>
-                    </Col>
-                    </>
-                )}
-                </Row>
+                    {user?.account === "admin" && (
+                        <>
+                            <Button size="lg" variant="success" className={`${IS_SM ? 'w-100' : 'w-75'} mx-auto py-2 fs-5`}
+                                onClick={() => navigate("/login", {state: {admin: true}})}
+                            > 
+                                Create Author
+                            </Button>
+                            <Button size="lg" variant="danger" className={`${IS_SM ?' w-100' : 'w-75'} mx-auto py-2 fs-5`}
+                                onClick={() => setShowCommentListAdmin(true)}
+                            >
+                                Manage comments
+                            </Button>
+                            <Button size="lg" variant="info" className={`${IS_SM ? 'w-100' : 'w-75'} mx-auto py-2 fs-5`}
+                                onClick={() => navigate("/charts")}
+                            >
+                                View Statistics
+                            </Button>
+                            <Button size="lg" variant="secondary" className={`${IS_SM ?' w-100' : 'w-75' } mx-auto py-2 fs-5`}
+                                    onClick={handleCleanUp} disabled={unusedPublicIds.length === 0}
+                            >
+                                {unusedPublicIds.length > 0 ? 
+                                    `Clean Up - ${unusedPublicIds.length} unused images` 
+                                    : "No images to Clean Up"}
+                                <i className={`ms-2 bi bi-${unusedPublicIds.length > 0 ? "trash" : "emoji-smile"}-fill`}></i>
+                            </Button>
+                        </>
+                    )}
             </Stack>
             </Col>
         </Row>
