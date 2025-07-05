@@ -29,6 +29,14 @@ const getUserById = async (id) => {
                 path: 'shareList.userFrom',
                 select: 'username name'
             })
+            .populate({
+                path: 'shareList.sharedArticle',
+                select: 'title'
+            })
+            .populate({
+                path: 'friendRequests',
+                select: 'username name'
+            })
             .lean();
 
         if (!user) {

@@ -62,33 +62,13 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
 
 const getArticleById = async (id) => {
     try {
-        const result = await Article.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(id) } },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "author",
-                    foreignField: "_id",
-                    as: "authorInfo"
-                }
-            },
-            { $unwind: "$authorInfo" },
-            {
-                $addFields: {
-                    author_username: "$authorInfo.username",
-                    author_name: "$authorInfo.name"
-                }
-            },
-            {
-                $project: {
-                    authorInfo: 0 // exclude the joined array
-                }
-            }
-        ]);
-        if (!result || result.length === 0) {
+        const article = await Article.findById(id)
+            .populate({ path: 'author', select: 'username name' })
+            .lean();
+        if (!article) {
             return { error: true, message: "Article not found" };
         }
-        return result[0];
+        return article;
     } catch (err) {
         console.error(`getArticleById Error: ${err.message}`);
         return { error: true, message: "Internal Server Error" };
@@ -305,38 +285,31 @@ const getAllImageUrls = async () => {
     }
 };
 
-const getComments = async (page = 1) => {
+const getComments = async (page = 1, pageSize = 5) => {
   try {
-    const pipeline = [
-      { $sort: { createdAt: -1 } },
-      { $skip: page - 1 },
-      { $limit: page * 5 },
-      { $unwind: "$comments" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "comments.userId",
-          foreignField: "_id",
-          as: "user"
-        }
-      },
-      { $unwind: "$user" },
-      {
-        $project: {
-          articleId: "$_id",
-          _id: "$comments._id",
-          userId: "$comments.userId",
-          username: "$user.username",
-          content: "$comments.content",
-          createdAt: "$comments.createdAt"
-        }
-      },
-      { $sort: { createdAt: -1 } }
-    ];
+    const articles = await Article.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .select('comments') 
+      .populate({
+        path: 'comments.userId',
+        select: 'username'
+      })
+      .lean();
 
-    const allComments = await Article.aggregate(pipeline).exec();
+    const allComments = articles.flatMap(article =>
+      (article.comments || []).map(comment => ({
+        articleId: article._id,
+        _id: comment._id,
+        userId: comment.userId?._id || comment.userId,
+        username: comment.userId?.username || '',
+        content: comment.content,
+        createdAt: comment.createdAt || Date.now()
+      }))
+    ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    return { comments: allComments }
+    return { comments: allComments };
   } catch (err) {
     console.error(`getComments Error: ${err.message}`);
     return { error: true, message: "Internal Server Error" };
@@ -344,32 +317,13 @@ const getComments = async (page = 1) => {
 };
 
 const getUserInteractionData = async (interactionType = 'saves') => {
-  try{
-    const interactionMap = {
-      saves: { path: '$saves', userField: null },
-      likes: { path: '$likes', userField: null },
-      shares: { path: '$shares', userField: null },
-      comments: { path: '$comments', userField: '$comments.userId' }
-    };
+  try {
+    const path = `$${interactionType}`;
+    const userIdPath = interactionType === 'comments' ? `${path}.userId` : path;
 
-    const interaction = interactionMap[interactionType];
-    if (!interaction) return {error: true, message: "Invalid interaction type"}
-
-    const pipeline = [];
-
-    if (interactionType === 'comments') {
-      pipeline.push(
-        { $unwind: '$comments' },
-        { $addFields: { userId: '$comments.userId' } }
-      );
-    } else {
-      pipeline.push(
-        { $unwind: interaction.path },
-        { $addFields: { userId: interaction.path } }
-      );
-    }
-
-    pipeline.push(
+    const pipeline = [
+      { $unwind: path },
+      { $addFields: { userId: userIdPath } },
       {
         $lookup: {
           from: 'users',
@@ -392,17 +346,17 @@ const getUserInteractionData = async (interactionType = 'saves') => {
           },
           user_gender: '$user.gender',
           user_address: '$user.address',
-          friend_count: { $size: '$user.friendList'},
+          friend_count: { $size: '$user.friendList' },
           _id: 0
         }
       }
-    );
+    ];
 
     const result = await Article.aggregate(pipeline).exec();
     return result;
-  } catch(err){
+  } catch (err) {
     console.error(`getUserInteractionData Error: ${err.message}`);
-    return { error: true, message: "Internal Server Error" }; 
+    return { error: true, message: "Internal Server Error" };
   }
 }
 
