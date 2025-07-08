@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { cleanUpUnsuedImages, getDatabaseImageUrls, getUnsuedImagePublicIds } from "../Services/articleService";
 import CommentListAdmin from "../Components/CommentListAdmin";
 import useWindowSize from "../hooks/useWindowSize";
+import { Card, CardBody } from "react-bootstrap";
 
 const DashboardPage = () => {   
 
@@ -65,13 +66,14 @@ const DashboardPage = () => {
     <div className="h-100 bg-light">
     <MainNavbar/>
     
-    <Container fluid className="py-5 d-flex justify-content-center bg-light">
+    <Container fluid className="py-3 d-flex justify-content-center bg-light">
         <Row className="w-100 justify-content-center">
             <Col xs={12} md={10} lg={8} xl={6}>
             <Stack gap={4} className=" p-5 bg-white shadow rounded-4">
-                <h1 className="text-center fs-2 mb-2">
-                {user && `Welcome ${user.name}, you are registered as ${user.account}!`}
-                </h1>
+                <div className="text-center">
+                    <h2 >{user && `Welcome ${user.name}!`}</h2>
+                    <h3>{`Role: ${user.account}`}</h3>
+                </div>
                     <Button size="lg" variant="primary" onClick={()=>navigate("/author")} className={`${IS_SM ? 'w-100' : 'w-75'} mx-auto py-2 fs-5`}>
                         Create Article
                     </Button>

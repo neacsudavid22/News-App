@@ -32,11 +32,11 @@ const SharedList = ({ show, handleClose, setUncheckedShare }) => {
             <Offcanvas.Body>
                 <Stack gap={2} className='overflow-auto'>
                     {shareList.length > 0 ? (
-                        shareList.map((sharedItem) => (
+                        shareList.map((sharedItem, index) => (
                             <ShareCard
-                                key={sharedItem._id}
+                                key={sharedItem._id + index}
                                 sharedItemId={sharedItem._id}
-                                articleId={sharedItem.sharedArticle}
+                                articleId={sharedItem.sharedArticle._id}
                                 articleTitle={sharedItem.sharedArticle.title || "Unknown Title"}
                                 sentAt={sharedItem.sentAt}
                                 userFrom={sharedItem.userFrom.username || "Unknown User"}

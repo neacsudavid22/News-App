@@ -68,16 +68,16 @@ const HomePage = () => {
 
 
       <Container fluid className="h-100"> 
-        {articles.map((a) => a.main ? 
+        {articles.map((a, index) => a.main ? 
           (<Row className="mb-3 justify-content-center">
             <Col xs={12} sm={12} md={10} lg={5} xl={5}>
-              <MainArticleCard key={a._id.toString() } 
+              <MainArticleCard key={a._id + index } 
                 article={a} toModify={toModify} /> 
             </Col>
           </Row>) : 
           (<Row className="mb-3 justify-content-center">
             <Col xs={12} sm={12} md={10} lg={5} xl={5}>
-              <SecondaryArticleCard key={a._id.toString()} 
+              <SecondaryArticleCard key={a._id + index} 
                 article={a} toModify={toModify} />
             </Col>
           </Row>) 
