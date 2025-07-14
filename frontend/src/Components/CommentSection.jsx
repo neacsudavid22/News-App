@@ -134,16 +134,17 @@ const CommentSection = ({ articleId, comments }) => {
                 }).format(new Date(postedAt));
 
                 const isToday = new Date(postedAt).toDateString() === new Date().toDateString();
+                const dateString = `Sent at ${formattedSentTime}${isToday ? "" : ` (${formattedSentDate})`}`
 
                 return (
                   <Card.Header className=" rounded-top-4 d-flex justify-content-between align-items-center bg-light py-2 px-3">
                     <Card.Title className="mb-0 h6 ">
                       {comment.removed
                         ? "deleted"
-                        : "@" + (comment.username || "loading...")}
+                        : "@" + (comment.userId.username || "loading...")}
                     </Card.Title>
                     <small className="text-muted fst-italic fw-bold">
-                      {`Trimis la ${formattedSentTime}${isToday ? "" : ` (${formattedSentDate})`}`}
+                      {dateString}
                     </small>
                   </Card.Header>
                 );

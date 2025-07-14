@@ -52,7 +52,7 @@ articlesRouter.route('/article/homepage').get(async (req, res) => {
 
 articlesRouter.route('/article/:id').get(async (req, res) => {
     try{
-        const result = await getArticleById(req.params.id);
+        const result = await getArticleById(req.params.id, req.query.comments || false);
         if (result.error) {
             return res.status(400).json({ message: result.message });
         }

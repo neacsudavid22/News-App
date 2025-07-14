@@ -93,7 +93,7 @@ const deleteArticle = async (articleId) => {
 
 const getArticleById = async (articleId) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/article-api/article/${articleId}?comments=true`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch article");

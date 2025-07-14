@@ -60,11 +60,19 @@ const getArticles = async (category, tag = "", page = 0, authorId = '') => {
     }
   };
 
-const getArticleById = async (id) => {
+const getArticleById = async (id, comments = false) => {
     try {
+        const populateArray = [
+            { path: 'author', select: 'username name' }
+        ];
+        if (comments) {
+            populateArray.push({ path: 'comments.userId', select: 'username' });
+        }
+
         const article = await Article.findById(id)
-            .populate({ path: 'author', select: 'username name' })
+            .populate(populateArray)
             .lean();
+
         if (!article) {
             return { error: true, message: "Article not found" };
         }
