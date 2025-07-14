@@ -52,7 +52,10 @@ const signUpUser = async (email, phone, name, gender, birthdate, address, userna
         if (!response.ok) {
             throw new Error("Failed to sign up user");
         }
-        await response.json();
+
+        if (admin) {
+            return { success: true };
+        }
 
         return await authenticateUser(username, password);
     } catch (err) {

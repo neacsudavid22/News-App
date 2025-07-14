@@ -61,6 +61,37 @@ const LoginPage = () => {
         setValidated(true);
         setErrorMsg("");
 
+        if (admin) {
+            const allValid =
+                email && isEmailValid &&
+                phone && isPhoneValid &&
+                firstName && lastName && gender && birthdate && address &&
+                username &&
+                password && isPasswordValid &&
+                password === matchingPassword;
+
+            if (!allValid) {
+                setErrorMsg("Please fill in all fields correctly.");
+                return;
+            }
+
+            try {
+                const name = `${firstName} ${lastName}`.trim();
+                const { success } = await signUpUser(email, phone, name, gender, birthdate, address, username, password, true);
+
+                if (success) {
+                    handleShow();
+                    emptyFields();
+                } else {
+                    throw new Error("Author not added");
+                }
+            } catch (err) {
+                console.error("Signup error:", err);
+                setErrorMsg("Failed to create account. Please try again.");
+            }
+            return;
+        }
+
         if (!TRY_TO_LOGIN && password !== matchingPassword) {
             setErrorMsg("Passwords do not match.");
             return;
@@ -82,12 +113,10 @@ const LoginPage = () => {
                 } else {
                     throw new Error("Couldn't login");
                 }
-
             } catch (err) {
                 console.error("Login error:", err);
                 setErrorMsg("Incorrect username or password.");
             }
-
         } else {
             const allValid =
                 email && isEmailValid &&
@@ -103,24 +132,18 @@ const LoginPage = () => {
 
             try {
                 const name = `${firstName} ${lastName}`.trim();
-                const { token } = await signUpUser(email, phone, name, gender, birthdate, address, username, password, admin);
+                const { token } = await signUpUser(email, phone, name, gender, birthdate, address, username, password, false);
 
                 if (token) {
-                    if (admin) {
-                        handleShow();
-                        emptyFields();
+                    const { authenticated } = await getAuthUser();
+                    if (authenticated) {
+                        navigate(user.account === "standard" ? "/" : "/dashboard");
                     } else {
-                        const { authenticated } = await getAuthUser();
-                        if (authenticated) {
-                            navigate(user.account === "standard" ? "/" : "/dashboard");
-                        } else {
-                            throw new Error("Couldn't login after signup");
-                        }
+                        throw new Error("Couldn't login after signup");
                     }
                 } else {
                     throw new Error("Token not received");
                 }
-
             } catch (err) {
                 console.error("Signup error:", err);
                 setErrorMsg("Failed to create account. Please try again.");
