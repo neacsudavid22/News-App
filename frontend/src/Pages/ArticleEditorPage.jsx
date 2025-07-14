@@ -287,10 +287,14 @@ const ArticleEditorPage = () => {
             })}
         </Stack>
 
-
+        <div className="d-flex justify-content-between">
+            <Button variant="danger" type="button" size="lg" className="my-4" onClick={()=>navigate('/dashboard')}>
+                Abort
+            </Button>
             <Button variant="primary" type="button" size="lg" className="my-4" onClick={handleSubmit}>
                 Next
             </Button>
+        </div>
         </Col>
         </Row>
         </Container>

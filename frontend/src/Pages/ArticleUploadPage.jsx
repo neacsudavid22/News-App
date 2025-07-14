@@ -142,7 +142,7 @@ const ArticleUploadPage = () => {
         const generatedTags = await generateTagsWithLangchain(articleText);
 
         if (generatedTags && generatedTags.length > 0) {
-            setTags([...tags, ...generatedTags]);
+            setTags([...tags, ...generatedTags.filter(tag => !tags.includes(tag))]);
         }
     };
 
@@ -298,7 +298,7 @@ const ArticleUploadPage = () => {
             <Tabs
                 variant="pills"
                 id="justify-tab-example"
-                className=" mb-3 nav-pills justify-content-between"
+                className=" mb-3 nav-pills justify-content-evenly"
                 onSelect={(e) => setTagSelect(e)}
                 onDoubleClick={ () => removeTag() }
             > {tags.map((tag) => <Tab className="m-2" eventKey={tag} title={tag}></Tab>)}
