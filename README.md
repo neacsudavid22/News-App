@@ -1,6 +1,6 @@
 # NewsApp - Fullstack (MERN) web application 
 
-NewsWebApp is a full-stack web application developed as part of my degree project. It serves as a comprehensive content management system (CMS) tailored for news agencies, incorporating interactive social media features to enhance user engagement.
+[NewsApp](https://newswebapp-qvgp.onrender.com) is a full-stack web application developed as part of my degree project. It serves as a comprehensive content management system (CMS) tailored for news agencies, incorporating interactive social media features to enhance user engagement.
 
 ## Features
 
@@ -22,7 +22,7 @@ NewsWebApp is a full-stack web application developed as part of my degree projec
 
 ## Deployment
 
-The application is deployed via [Render](https://newswebapp-qvgp.onrender.com).  
+The application is deployed via Render.  
 Media content is hosted on Cloudinary.  
 The database is managed and hosted by MongoDB Atlas.
 
