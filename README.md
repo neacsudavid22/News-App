@@ -1,4 +1,4 @@
-# NewsWebApp
+# NewsApp - Fullstack (MERN) web application 
 
 NewsWebApp is a full-stack web application developed as part of my degree project. It serves as a comprehensive content management system (CMS) tailored for news agencies, incorporating interactive social media features to enhance user engagement.
 
