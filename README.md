@@ -2,13 +2,11 @@
 
 NewsWebApp is a full-stack web application developed as part of my degree project. It serves as a comprehensive content management system (CMS) tailored for news agencies, incorporating interactive social media features to enhance user engagement.
 
-**Project Status:** Ongoing
-
 ## Features
 
 - **Content Management:** Efficiently create, edit, and manage news articles and media.
 - **User Interaction:** Integrated social media elements for comments, likes, and sharing.
-- **Data Visualization:** Interactive charts and analytics powered by Nivo.
+- **Data Visualization:** Interactive charts and analytics powered by Nivo,enhanced with Gemini API for advanced chart analysis.
 - **Responsive Design:** Built with React.js and Bootstrap-React for seamless user experience across devices.
 - **Real-Time Weather:** Integration with OpenWeather API for live weather updates.
 - **Location Services:** Geoapify-powered autocomplete for geocoding.
