@@ -37,7 +37,7 @@ const CommentSection = ({ articleId, comments }) => {
       if (comment.responseTo && commentMap[comment.responseTo]) {
         commentMap[comment.responseTo].replies.push(comment);
       } else {
-        tree.push(comment);
+        tree.push(commentMap[comment._id]);
       }
     });
 
