@@ -8,7 +8,7 @@ import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
 import cloudinarydRouter from "./routes/cloudinary-routes.js";
 import cookieParser from "cookie-parser";
-import path from "path";
+import {path, join} from "path";
 import { fileURLToPath } from "url";
 import langchainRouter from "./routes/langchain-routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
@@ -43,11 +43,12 @@ app.listen(port, () => {
 });
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.use(express.static(join(__dirname, "../frontend/dist")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+app.use((req, res) => {
+  res.sendFile(join(__dirname, "../frontend/dist/index.html"));
 });
+
 
