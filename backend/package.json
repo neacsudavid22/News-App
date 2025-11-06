@@ -10,8 +10,8 @@
   "license": "ISC",
   "description": "",
   "engines": {
-    "node": ">=20"
-  },
+    "node": "22.x"
+  }  
   "dependencies": {
     "@langchain/core": "^0.3.55",
     "@langchain/google-genai": "^0.2.8",
