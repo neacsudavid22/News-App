@@ -8,7 +8,7 @@ import articlesRouter from './routes/article-routes.js';
 import usersRouter from './routes/user-routes.js';
 import cloudinarydRouter from "./routes/cloudinary-routes.js";
 import cookieParser from "cookie-parser";
-import {path, join} from "path";
+import { dirname, join } from 'path'; 
 import { fileURLToPath } from "url";
 import langchainRouter from "./routes/langchain-routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
