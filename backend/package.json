@@ -11,7 +11,7 @@
   "description": "",
   "engines": {
     "node": "22.x"
-  }  
+  },
   "dependencies": {
     "@langchain/core": "^0.3.55",
     "@langchain/google-genai": "^0.2.8",
